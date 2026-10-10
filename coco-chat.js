@@ -1505,7 +1505,8 @@
     '.root .login-form .fld{margin:0}',
     '.root .login-form .fld > span{margin-bottom:8px;font-size:14px;line-height:1.5;display:block;font-size:.78125rem;color:var(--accent-soft-dark);}',
 
-    '.root .login-actions .err{min-height:40px;margin:0 0 8px;font-size:14px;line-height:20px;overflow-wrap:anywhere}',
+    '.root .login-actions .err{min-height:0;margin:0 0 8px;font-size:14px;line-height:20px;overflow-wrap:anywhere}',
+    '.root .login-actions .err:empty{display:none}',
 
     '.root .login-view > .x{width:44px;height:44px;top:calc(4px + env(safe-area-inset-top,0px));left:4px}',
     '.root .login-view button:focus-visible{outline:2px solid var(--accent-soft-dark);outline-offset:3px}',
