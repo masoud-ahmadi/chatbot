@@ -1251,30 +1251,16 @@
 
     'button.launcher svg{width:1.625rem;height:1.625rem}.launcher:hover{transform:scale(1.07)}.launcher:active{transform:scale(.95)}',
 
-    '.panel{position:fixed;top:auto;right:auto;bottom:auto;left:auto;width:24.5rem;height:min(41.25rem,calc(100vh - 7rem));max-height:calc(100vh - 7rem);background:var(--bg);border-radius:1.375rem;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;opacity:0;visibility:hidden;transform:translateY(1.125rem) scale(.97);transform-origin:bottom left;transition:opacity .22s ease,transform .3s cubic-bezier(.2,.9,.3,1.1),visibility 0s linear .3s;z-index:2}',
+    // Expand from the launcher; keep text hidden during the strongest scaling.
+    '.root .panel{position:fixed;top:auto;right:auto;bottom:auto;left:auto;width:min(24.5rem,calc(100vw - 2rem));height:min(41.25rem,calc(100vh - 7rem));max-height:calc(100vh - 7rem);background:var(--bg);border-radius:var(--panel-closed-radius,50%);box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;opacity:0;visibility:hidden;pointer-events:none;transform-origin:center;transform:translate(var(--panel-from-x,0px),calc(var(--panel-base-y,0px) + var(--panel-from-y,24px))) scale(var(--panel-from-sx,.9),var(--panel-from-sy,.9));transition:transform .24s cubic-bezier(.4,0,.8,.2),border-radius .24s ease,opacity .08s linear .16s,visibility 0s linear .24s;z-index:2}',
+    '.root.open .panel{opacity:1;visibility:visible;pointer-events:auto;border-radius:1.375rem;transform:translate(0,var(--panel-base-y,0px)) scale(1,1);transition:transform .38s cubic-bezier(.16,1,.3,1),border-radius .38s ease,opacity .06s linear,visibility 0s}',
+    '.root .panel > .view{opacity:0;transform:translateY(10px);transition:opacity .06s linear,transform .12s ease}',
+    '.root.open .panel > .view{opacity:1;transform:none;transition:opacity .16s ease .22s,transform .18s ease .2s}',
+    '.root .launcher{transition:transform .2s ease,opacity .12s linear .16s}',
+    '.root.open .launcher{opacity:0;pointer-events:none;transform:scale(.85);transition:transform .16s ease,opacity .08s linear}',
 
-    // بازشدن از پایین
-    '.pos-bottom-right .panel{transform-origin:bottom right}',
-
-    // بازشدن از بالا به پایین
-    '.pos-top-left .panel,.pos-top-right .panel{transform:translateY(-1.125rem) scale(.97);transform-origin:top left}',
-
-    '.pos-top-right .panel{transform-origin:top right}',
-
-    // قرارگیری پنل در کنار دکمه
-    '.pos-middle-left .panel,.pos-middle-right .panel{transform:translateY(-50%) scale(.97);transform-origin:center left}',
-
-    '.pos-middle-right .panel{transform-origin:center right}',
-
-    // وضعیت باز پنل
-    '.root.open .panel{opacity:1;visibility:visible;transition-delay:0s}',
-
-    '.root.open:not(.pos-middle-left):not(.pos-middle-right) .panel{transform:none}',
-
-    '.root.open.pos-middle-left .panel,.root.open.pos-middle-right .panel{transform:translateY(-50%) scale(1)}',
-
-    // موبایل: پنل تمام‌صفحه
-    '@media (max-width:40rem){.panel{left:0!important;right:0!important;top:var(--vvt,0px)!important;bottom:auto!important;width:auto;height:var(--vvh,100dvh)!important;max-height:none!important;border-radius:0;transform:translateY(1.5rem)}.root.open .panel{transform:none!important}.root.open .launcher{opacity:0;pointer-events:none;transform:scale(.6)}}',
+    // Mobile: a sheet slides up and its rounded top settles into fullscreen.
+    '@media (max-width:40rem){.root .panel{--panel-base-y:0px;left:0!important;right:0!important;top:var(--vvt,0px)!important;bottom:auto!important;width:auto;height:var(--vvh,100dvh)!important;max-height:none!important;border-radius:1.75rem 1.75rem 0 0;transform:translateY(100%);transition:transform .26s cubic-bezier(.4,0,.8,.2),border-radius .26s ease,opacity .06s linear .2s,visibility 0s linear .26s}.root.open .panel{transform:translateY(0);border-radius:0;transition:transform .42s cubic-bezier(.16,1,.3,1),border-radius .18s ease .22s,opacity .06s linear,visibility 0s}}',
 
     '.view{position:absolute;inset:0;display:none;flex-direction:column}.view.active{display:flex}',
 
@@ -1386,7 +1372,7 @@
     '@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-.375rem)}}',
     '@keyframes bob{0%,100%{transform:translateY(.1875rem) scale(.96)}50%{transform:translateY(-.25rem) scale(1.04)}}',
     '@keyframes morph{0%,100%{border-radius:46% 54% 50% 50%/52% 46% 54% 48%}50%{border-radius:54% 46% 48% 52%/46% 54% 46% 54%}}',
-    '@media (prefers-reduced-motion:reduce){.root *,.root *::before,.root *::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}',
+    '@media (prefers-reduced-motion:reduce){.root *,.root *::before,.root *::after{animation-duration:.001ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.001ms!important;transition-delay:0s!important}}',
     '@media (max-width:40rem){.inp,.ta,input.otp-i{font-size:1rem}}',
 
     /* =========================================================
@@ -1397,7 +1383,7 @@
     '.root{--surface:#ffffff;--surface2:#ffffff;--muted:#708090;--line:rgba(5,46,22,.08);--in:#ffffff;--out:#e8fed8;--outtext:#052e16;--wall:#cfe9c9;--wall2:#b4e0c9;--ok:#00c951;--danger:#e2474c;--cloud:#ffffff;--shadow:0 1.5rem 3.75rem -1.5rem rgba(5,46,22,.3)}',
 
     // پنجره اصلی چت
-    '.root .panel{background:var(--accent);border-radius:1.375rem;box-shadow:0 1.5rem 3.75rem -1.5rem rgba(5,46,22,.3),0 0 0 1px rgba(5,46,22,.03)}',
+    '.root .panel{background:var(--accent);box-shadow:0 1.5rem 3.75rem -1.5rem rgba(5,46,22,.3),0 0 0 1px rgba(5,46,22,.03)}',
 
     '.root .cover_content{position:absolute;inset:0;height:100%;background-color:var(--accent);background-image: linear-gradient(180deg, #0000 -11.43%, #fff 82%), var(--widget-wallpaper);background-repeat:repeat;transition:min-height .25s ease-out 0s,max-height .25s ease-out 0s;z-index:-1;max-height:100%;min-height:100%}',
 
@@ -1521,7 +1507,7 @@
     '.root .cloud-btn{background:#00a844;color:#ffffff}',
 
     // حالت موبایل
-    '@media(max-width:40rem){.root .panel{width:100%;border:0;border-radius:0;box-shadow:none;background:#ffffff}.root .hdr{min-height:calc(3.75rem + env(safe-area-inset-top,0px));padding-top:calc(.5rem + env(safe-area-inset-top,0px));padding-bottom:.5rem}.root .msgs{padding:.625rem .5625rem .75rem}.root .bubble{max-width:86%;padding:.4375rem .5625rem .3125rem}.root .dock{padding-left:.4375rem;padding-right:.4375rem}.root .composer{gap:.4375rem}.root .field{min-height:2.75rem}.root .ta{font-size:1rem}.root .send{width:2.6875rem;height:2.6875rem}}',
+    '@media(max-width:40rem){.root .panel{width:100%;border:0;box-shadow:none;background:#ffffff}.root .hdr{min-height:calc(3.75rem + env(safe-area-inset-top,0px));padding-top:calc(.5rem + env(safe-area-inset-top,0px));padding-bottom:.5rem}.root .msgs{padding:.625rem .5625rem .75rem}.root .bubble{max-width:86%;padding:.4375rem .5625rem .3125rem}.root .dock{padding-left:.4375rem;padding-right:.4375rem}.root .composer{gap:.4375rem}.root .field{min-height:2.75rem}.root .ta{font-size:1rem}.root .send{width:2.6875rem;height:2.6875rem}}',
 
     // کاهش انیمیشن برای کاربرانی که ترجیح می‌دهند
     '@media(prefers-reduced-motion:reduce){.root .bubble,.root .menu,.root .emoji{animation:none!important;transition:none!important}}',
@@ -1630,6 +1616,7 @@
               class: 'launcher',
               type: 'button',
               'aria-label': T.open,
+              'aria-expanded': 'false',
               on: {
                 click: function () {
                   self.toggle();
@@ -1644,9 +1631,11 @@
         class: 'panel',
         role: 'dialog',
         'aria-label': T.brand,
+        'aria-hidden': 'true',
       },
       h('div', { class: 'cover_content' })
     );
+    this.panel.inert = true;
     this.views = {
       login: this.buildLogin(),
       otp: this.buildOtp(),
@@ -1677,6 +1666,7 @@
       else if (self.emojiPanel.classList.contains('on'))
         self.toggleEmoji(false);
       else if (self.mode !== 'normal') self.A.onCancelCompose();
+      else self.close();
     });
     this.events.add(shadow, 'pointerdown', function (e) {
       if (
@@ -1717,20 +1707,40 @@
     return this.root.classList.contains('open');
   };
   UI.prototype.open = function () {
+    if (this.isOpen()) return;
+    this.returnFocus = this.shadow.activeElement || document.activeElement;
+    this.updatePanelMotion();
+    // Commit the collapsed geometry before starting the transition.
+    void this.panel.offsetWidth;
+    this.panel.inert = false;
+    this.panel.setAttribute('aria-hidden', 'false');
     this.root.classList.add('open');
     if (this.launcher) this.launcher.setAttribute('aria-expanded', 'true');
     this.A.onOpen && this.A.onOpen();
     var self = this;
-    this.events.timeout(function () {
-      self.focusPrimary();
-    }, 320);
+    this.focusTimer = this.events.timeout(function () {
+      self.focusTimer = 0;
+      if (self.isOpen()) self.focusPrimary();
+    }, window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches
+      ? 0
+      : 430);
   };
   UI.prototype.close = function () {
+    if (!this.isOpen()) return;
+    if (this.focusTimer) {
+      this.events.clearTimeout(this.focusTimer);
+      this.focusTimer = 0;
+    }
+    this.panel.inert = true;
+    this.panel.setAttribute('aria-hidden', 'true');
     this.root.classList.remove('open');
     if (this.launcher) this.launcher.setAttribute('aria-expanded', 'false');
     this.toggleEmoji(false);
     this.closeMenu();
     this.A.onClose && this.A.onClose();
+    var focusTarget = this.returnFocus;
+    if (focusTarget && focusTarget.isConnected && focusTarget.focus)
+      focusTarget.focus({ preventScroll: true });
   };
   UI.prototype.toggle = function () {
     if (this.isOpen()) this.close();
@@ -1749,11 +1759,15 @@
 
     var isLeft = /-left$/.test(position);
     var isMiddle = position.indexOf('middle-') === 0;
+    this.panelPosition = settings;
+    this.root.style.setProperty('--panel-base-y', isMiddle ? '-50%' : '0px');
+    var launcherGap = this.launcher ? this.launcher.offsetHeight + 14 : 0;
+    var launcherGapX = this.launcher ? this.launcher.offsetWidth + 14 : 0;
 
     var x = offsetX + 'px';
 
     // در موقعیت میانی، پنل کنار دکمه قرار می‌گیرد.
-    var panelX = (isMiddle ? offsetX + 70 : offsetX) + 'px';
+    var panelX = (isMiddle ? offsetX + launcherGapX : offsetX) + 'px';
 
     var y = offsetY + 'px';
 
@@ -1782,7 +1796,7 @@
       }
 
       this.panel.style.top = 'auto';
-      this.panel.style.bottom = offsetY + 70 + 'px';
+      this.panel.style.bottom = offsetY + launcherGap + 'px';
     } else if (position.indexOf('top-') === 0) {
       // بالا: پنل به سمت پایین باز می‌شود.
       if (this.launcher) {
@@ -1790,12 +1804,13 @@
         this.launcher.style.bottom = 'auto';
       }
 
-      this.panel.style.top = offsetY + 70 + 'px';
+      this.panel.style.top = offsetY + launcherGap + 'px';
       this.panel.style.bottom = 'auto';
     } else {
       // وسط: پنل در کنار دکمه قرار می‌گیرد.
       if (this.launcher) {
-        this.launcher.style.top = 'calc(50% - 29px + ' + y + ')';
+        this.launcher.style.top =
+          'calc(50% - ' + (this.launcher.offsetHeight / 2) + 'px + ' + y + ')';
         this.launcher.style.bottom = 'auto';
       }
 
@@ -1807,9 +1822,58 @@
     // جلوگیری از خروج پنل از محدوده عمودی صفحه
     var vh = window.innerHeight || document.documentElement.clientHeight || 800;
 
-    var available = isMiddle ? vh - 40 : vh - offsetY - 86;
+    var available = isMiddle
+      ? vh - 2 * offsetY - 32
+      : vh - offsetY - launcherGap - 16;
 
     this.panel.style.maxHeight = Math.max(160, Math.min(660, available)) + 'px';
+    this.updatePanelMotion();
+  };
+  UI.prototype.updatePanelMotion = function () {
+    if (!this.panelPosition) return;
+    var p = this.panelPosition;
+    var rootStyle = this.root.style;
+    if (!this.launcher) {
+      rootStyle.setProperty('--panel-from-x', '0px');
+      rootStyle.setProperty('--panel-from-y', '24px');
+      rootStyle.setProperty('--panel-from-sx', '.9');
+      rootStyle.setProperty('--panel-from-sy', '.9');
+      rootStyle.setProperty('--panel-closed-radius', '1.375rem');
+      return;
+    }
+    var width = this.panel.offsetWidth;
+    var height = this.panel.offsetHeight;
+    if (!width || !height) return;
+    var vw = window.innerWidth || document.documentElement.clientWidth;
+    var vh = window.innerHeight || document.documentElement.clientHeight;
+    var isLeft = /-left$/.test(p.position);
+    var isMiddle = p.position.indexOf('middle-') === 0;
+    var isTop = p.position.indexOf('top-') === 0;
+    var launcherWidth = this.launcher.offsetWidth;
+    var launcherHeight = this.launcher.offsetHeight;
+    var gapX = launcherWidth + 14;
+    var gapY = launcherHeight + 14;
+    var launcherX = isLeft
+      ? p.offsetX + launcherWidth / 2
+      : vw - p.offsetX - launcherWidth / 2;
+    var panelX = isLeft
+      ? p.offsetX + (isMiddle ? gapX : 0) + width / 2
+      : vw - p.offsetX - (isMiddle ? gapX : 0) - width / 2;
+    var launcherY = isMiddle
+      ? vh / 2 + p.offsetY
+      : isTop
+        ? p.offsetY + launcherHeight / 2
+        : vh - p.offsetY - launcherHeight / 2;
+    var panelY = isMiddle
+      ? vh / 2 + p.offsetY
+      : isTop
+        ? p.offsetY + gapY + height / 2
+        : vh - p.offsetY - gapY - height / 2;
+    rootStyle.setProperty('--panel-from-x', (launcherX - panelX) + 'px');
+    rootStyle.setProperty('--panel-from-y', (launcherY - panelY) + 'px');
+    rootStyle.setProperty('--panel-from-sx', String(launcherWidth / width));
+    rootStyle.setProperty('--panel-from-sy', String(launcherHeight / height));
+    rootStyle.setProperty('--panel-closed-radius', '50%');
   };
   UI.prototype.focusPrimary = function () {
     var v = this.activeView;
