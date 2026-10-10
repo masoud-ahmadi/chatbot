@@ -1497,6 +1497,23 @@
     '.root .btn{background:#00a844;color:#ffffff;border-radius:.75rem}',
     '.root .btn:hover{background:#009a3e}',
 
+    // Welcome form: explicit spacing, independent of browser paragraph margins.
+    '.root .login-view{padding:calc(48px + env(safe-area-inset-top,0px)) 24px calc(24px + env(safe-area-inset-bottom,0px));gap:24px;scroll-padding-block:16px}',
+    '.root .login-view > .hero{flex:none;margin:0}',
+    '.root .login-view .logo{flex:none;margin-bottom:16px}',
+    '.root .login-view .hero h2{margin:0 0 8px;font-size:20px;line-height:1.5}',
+    '.root .login-view .hero p{margin:0;max-width:280px;font-size:16px;line-height:1.75}',
+    '.root .login-form{display:flex;flex-direction:column;gap:16px;flex:none;width:100%;max-width:360px;margin:0 auto}',
+    '.root .login-form .fld{margin:0}',
+    '.root .login-form .fld > span{margin-bottom:8px;font-size:14px;line-height:1.5}',
+    '.root .login-form .inp{height:48px;padding:0 14px;font-size:16px;line-height:1.5;scroll-margin-block:16px}',
+    '.root .login-form .inp:focus-visible{outline:2px solid var(--accent);outline-offset:2px}',
+    '.root .login-actions .err{min-height:40px;margin:0 0 8px;font-size:14px;line-height:20px;overflow-wrap:anywhere}',
+    '.root .login-actions .btn{height:48px;font-size:16px;flex:none}',
+    '.root .login-view > .x{width:44px;height:44px;top:calc(4px + env(safe-area-inset-top,0px));left:4px}',
+    '.root .login-view button:focus-visible{outline:2px solid var(--accent-soft-dark);outline-offset:3px}',
+    '@media(max-width:360px),(max-height:560px){.root .login-view{padding-inline:20px;gap:20px}.root .login-view .logo{width:56px;height:56px;margin-bottom:12px}.root .login-view .hero h2{font-size:18px}.root .login-view .hero p{font-size:14px;line-height:1.7}}',
+
     '.root input.otp-i{border:1px solid #dfe8e2;border-radius:.75rem;background:#ffffff}',
     '.root input.otp-i:focus,.root input.otp-i.filled{border-color:#00c951;box-shadow:0 0 0 .1875rem rgba(0,201,81,.1)}',
 
@@ -1915,6 +1932,20 @@
       placeholder: T.namePh,
       maxlength: '80',
       enterkeyhint: 'next',
+      required: true,
+      'aria-invalid': 'false',
+      'aria-describedby': 'coco-login-error',
+      on: {
+        keydown: function (e) {
+          if (e.key === 'Enter' && !e.isComposing) {
+            e.preventDefault();
+            if (!self.loginBusy) self.mobInp.focus();
+          }
+        },
+        input: function () {
+          if (self.loginErrorField === 'name') self.setLoginError(null, '');
+        },
+      },
     });
     this.mobInp = h('input', {
       class: 'inp',
@@ -1925,8 +1956,18 @@
       placeholder: T.mobilePh,
       maxlength: '16',
       enterkeyhint: 'go',
+      required: true,
+      'aria-invalid': 'false',
+      'aria-describedby': 'coco-login-error',
+      on: {
+        input: function () {
+          if (self.loginErrorField === 'mobile') self.setLoginError(null, '');
+        },
+      },
     });
-    this.loginErr = h('div', { class: 'err', role: 'alert' });
+    this.loginErr = h('div', {
+      id: 'coco-login-error', class: 'err', role: 'alert', 'aria-atomic': 'true',
+    });
     this.loginBtn = h(
       'button',
       { class: 'btn', type: 'submit' },
@@ -1935,22 +1976,23 @@
     var form = h(
       'form',
       {
+        class: 'login-form',
         novalidate: true,
         on: {
           submit: function (e) {
             e.preventDefault();
+            if (self.loginBusy) return;
             self.A.onRequestOtp(self.nameInp.value.trim(), self.mobInp.value);
           },
         },
       },
       h('label', { class: 'fld' }, h('span', { text: T.name }), this.nameInp),
       h('label', { class: 'fld' }, h('span', { text: T.mobile }), this.mobInp),
-      this.loginErr,
-      this.loginBtn
+      h('div', { class: 'login-actions' }, this.loginErr, this.loginBtn)
     );
     return h(
       'section',
-      { class: 'view card-view' },
+      { class: 'view card-view login-view' },
       this.closeBtn(),
       h(
         'div',
@@ -1963,6 +2005,8 @@
     );
   };
   UI.prototype.setLoginBusy = function (b) {
+    this.loginBusy = b;
+    this.views.login.setAttribute('aria-busy', b ? 'true' : 'false');
     this.loginBtn.disabled = b;
     this.nameInp.disabled = b;
     this.mobInp.disabled = b;
@@ -1972,9 +2016,12 @@
     );
   };
   UI.prototype.setLoginError = function (field, msg) {
+    this.loginErrorField = msg ? field : null;
     this.loginErr.textContent = msg || '';
     this.nameInp.classList.toggle('bad', field === 'name');
     this.mobInp.classList.toggle('bad', field === 'mobile');
+    this.nameInp.setAttribute('aria-invalid', field === 'name' ? 'true' : 'false');
+    this.mobInp.setAttribute('aria-invalid', field === 'mobile' ? 'true' : 'false');
     if (field === 'name') this.nameInp.focus();
     else if (field === 'mobile') this.mobInp.focus();
   };
