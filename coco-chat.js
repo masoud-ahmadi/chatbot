@@ -1227,7 +1227,7 @@
       --veil:rgba(236,242,247,.74);
       --cloud:#fff;
       --shadow:0 1.125rem 3.75rem rgba(18,30,45,.24);
-    font-family:"Peyda",Tahoma,"Segoe UI",system-ui,-apple-system,"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;
+    font-family:"CocoChatPeyda",Tahoma,"Segoe UI",system-ui,-apple-system,"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;
     font-size:16px;
     color:var(--text);
     direction:rtl;
@@ -1429,7 +1429,7 @@
     '.message-appendix-out { inset-inline-start: -10px;bottom:-4px;width:11px;height:23px}',
     '.message-appendix-in {inset-inline-end:-11px;transform: scaleX(-1);bottom:-3px;width:12px;height:22px }',
     '.root .row.in .bubble{border-end-start-radius:.9375rem;border-start-end-radius:.9375rem;border-start-start-radius:.9375rem}',
-    '.root .txt{font-size:.9375rem;line-height:1.65;color:inherit;white-space:pre-wrap;overflow-wrap:anywhere}',
+    '.root .txt{font-size:16px;line-height:1.65;color:inherit;white-space:pre-wrap;overflow-wrap:anywhere}',
     '.root .txt a{color:#16834b;text-decoration:underline;text-underline-offset:.125rem}',
     '.root .row.out .txt a{color:#075e35}',
     '.root .meta{margin-top:.125rem;gap:.25rem;font-size:.65625rem;line-height:1.3;color:#64748b;opacity:1}',
@@ -1469,7 +1469,7 @@
     '.root .composer{gap:.5rem;padding:.125rem 0 .25rem;align-items:flex-end}',
     '.root .field{min-height:2.75rem;background:#ffffff;border:1px solid rgba(5,46,22,.07);border-radius:1.375rem;padding:.125rem .3125rem .125rem .4375rem;box-shadow:0 .0625rem .125rem rgba(5,46,22,.13);gap:.125rem}',
     '.root .field:focus-within{box-shadow:0 0 0 .125rem rgba(0,201,81,.2);border-color:rgba(0,201,81,.28)}',
-    '.root .ta{min-height:2.375rem;height:2.375rem;max-height:7.5rem;padding:.5rem .625rem .5rem .25rem;font-size:.9375rem;line-height:1.5;color:#17212b}',
+    '.root .ta{min-height:2.375rem;height:2.375rem;max-height:7.5rem;padding:.5rem .625rem .5rem .25rem;font-size:16px;line-height:1.5;color:#17212b}',
     '.root .ta::placeholder{color:#84918d;opacity:1}',
     '.root .ib{width:2.25rem;height:2.375rem;color:#7a8983;border-radius:50%;transition:color .15s,background .15s}',
     '.root .ib:hover,.root .ib.on{color:#16834b;background:rgba(0,201,81,.07)}',
@@ -1508,7 +1508,7 @@
     '.root .cloud-btn{background:#00a844;color:#ffffff}',
 
     // حالت موبایل
-    '@media(max-width:40rem){.root .panel{width:100%;border:0;box-shadow:none;background:#ffffff}.root .hdr{min-height:calc(3.75rem + env(safe-area-inset-top,0px));padding-top:calc(.5rem + env(safe-area-inset-top,0px));padding-bottom:.5rem}.root .msgs{padding:.625rem .5625rem .75rem}.root .bubble{max-width:86%;padding:.4375rem .5625rem .3125rem}.root .dock{padding-left:.4375rem;padding-right:.4375rem}.root .composer{gap:.4375rem}.root .field{min-height:2.75rem}.root .ta{font-size:1rem}.root .send{width:2.6875rem;height:2.6875rem}}',
+    '@media(max-width:40rem){.root .panel{width:100%;border:0;box-shadow:none;background:#ffffff}.root .hdr{min-height:calc(3.75rem + env(safe-area-inset-top,0px));padding-top:calc(.5rem + env(safe-area-inset-top,0px));padding-bottom:.5rem}.root .msgs{padding:.625rem .5625rem .75rem}.root .bubble{max-width:86%;padding:.4375rem .5625rem .3125rem}.root .dock{padding-left:.4375rem;padding-right:.4375rem}.root .composer{gap:.4375rem}.root .field{min-height:2.75rem}.root .ta{font-size:16px}.root .send{width:2.6875rem;height:2.6875rem}}',
 
     // کاهش انیمیشن برای کاربرانی که ترجیح می‌دهند
     '@media(prefers-reduced-motion:reduce){.root .bubble,.root .menu,.root .emoji{animation:none!important;transition:none!important}}',
@@ -1585,9 +1585,40 @@
     this.mode = 'normal';
   }
 
+  UI.prototype.registerFonts = function () {
+    this.fontFaces = [];
+    if (!window.FontFace || !document.fonts) return;
+    var base = new URL(this.cfg.assetsBase || '.', location.href);
+    if (!/\/$/.test(base.pathname)) base.pathname += '/';
+    var weights = [
+      [300, 'Light'],
+      [400, 'Regular'],
+      [500, 'Medium'],
+      [600, 'SemiBold'],
+      [700, 'Bold'],
+      [800, 'ExtraBold'],
+      [900, 'Black'],
+    ];
+    var self = this;
+    weights.forEach(function (entry) {
+      var url = new URL(
+        'Fonts/peyad/PeydaWebFaNum-' + entry[1] + '.woff2',
+        base.href
+      ).href;
+      var face = new window.FontFace(
+        'CocoChatPeyda',
+        'url(' + JSON.stringify(url) + ') format("woff2")',
+        { weight: String(entry[0]), style: 'normal', display: 'swap' }
+      );
+      document.fonts.add(face);
+      self.fontFaces.push(face);
+    });
+  };
+
   UI.prototype.mount = function (shadow) {
     var self = this,
       cfg = this.cfg;
+    this.registerFonts();
     var style = document.createElement('style');
     style.textContent = CSS;
     shadow.appendChild(style);
@@ -3870,6 +3901,9 @@
     this.streams._cancelRaf();
     this.scenario && this.scenario.destroy();
     this.events.removeAll();
+    (this.ui.fontFaces || []).forEach(function (face) {
+      document.fonts.delete(face);
+    });
     this.store.clear();
     this.mm.clear();
     this.api.clear();
