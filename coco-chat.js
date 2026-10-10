@@ -354,9 +354,10 @@
       assetsBase: o.assetsBase || ds.assetsBase || base,
 
       theme: theme,
-      launcher: (o.launcher !== undefined ? o.launcher : ds.launcher) === 'hidden'
-        ? 'hidden'
-        : 'visible',
+      launcher:
+        (o.launcher !== undefined ? o.launcher : ds.launcher) === 'hidden'
+          ? 'hidden'
+          : 'visible',
 
       position: position,
       offsetX: offsetX,
@@ -376,10 +377,12 @@
 
       waitingAfterMs: o.waitingAfterMs || 45000,
       chatLoadingMinMs: o.chatLoadingMinMs || 2200,
-      maxLength: typeof o.maxLength === 'number' &&
-        Number.isInteger(o.maxLength) && o.maxLength > 0
-        ? o.maxLength
-        : 2000,
+      maxLength:
+        typeof o.maxLength === 'number' &&
+        Number.isInteger(o.maxLength) &&
+        o.maxLength > 0
+          ? o.maxLength
+          : 2000,
     };
   }
 
@@ -1291,7 +1294,7 @@
 
     '@media(max-width:360px){.root .otp-footer{gap:4px}.root .otp-footer button.ghost{padding:6px 4px;font-size:12px}}',
 
-    '.sub{color:var(--muted);text-align:center;margin:0 0 .625rem}.sub bdi{color:var(--accent-soft-dark);font-weight:600;direction:ltr;unicode-bidi:isolate}',
+    '.sub{color:var(--accent-soft-dark);text-align:center;margin:0 0 20px;margin: 0 0 10px;max-width: 280px;}.sub bdi{color:var(--accent-soft-dark);font-weight:bold;direction:ltr;unicode-bidi:isolate}',
     '.hintline{text-align:center;color:var(--muted);font-size:.78125rem;}',
     'button.resend{text-align:center;color:var(--muted);font-size:.78125rem;}',
     '.center{margin:auto;text-align:center;display:flex;flex-direction:column;align-items:center;gap:.75rem;padding:1.5rem}.center p{margin:0;color:var(--muted)}.center h3{margin:0;font-size:1.0625rem}',
@@ -1351,7 +1354,6 @@
   COCO CHAT — TELEGRAM-INSPIRED VISUAL OVERRIDES
   فقط ظاهر رابط کاربری تغییر می‌کند.
   ========================================================= */
-
 
     // پنجره اصلی چت
 
@@ -1456,8 +1458,8 @@
 
     // فرم ورود و تأیید شماره
 
-    '.root .hero h2{margin:0 0 .375rem;font-size:1.25rem;font-weight:700;line-height:1.4;color:var(--accent-soft-dark)}',
-    '.root .hero p{color:var(--accent-soft-dark);max-width:280px}',
+    '.root .hero h2{margin:0 0 20px;font-size:1.25rem;font-weight:700;color:var(--accent-soft-dark)}',
+
     '.root .inp{width:100%;height:3rem;border:2px solid transparent;border-radius:.75rem;padding:0 .875rem;background:#ffffff;outline:0;transition:border-color .15s,box-shadow .15s;font-size:16px;color:#17212b}',
     '.root .inp:focus{border-color:var(--accent)}',
 
@@ -1467,8 +1469,9 @@
     '.root .login-view{padding:calc(48px + env(safe-area-inset-top,0px)) 24px calc(24px + env(safe-area-inset-bottom,0px));gap:24px;scroll-padding-block:16px}',
     '.root .login-view > .hero{flex:none;margin:0}',
     '.root .login-view .logo{flex:none;margin-bottom:16px}',
-    '.root .login-view .hero h2{margin:0 0 8px;font-size:20px;line-height:1.5}',
-    '.root .login-view .hero p{margin:0;max-width:280px;font-size:16px;line-height:1.75}',
+    '.root .login-view .hero h2{margin:0 0 20px;font-size:20px;line-height:1.5}',
+    '.root .login-view .hero p{margin:0;max-width:280px;font-size:16px;color:var(--accent-soft-dark)}',
+
     '.root .login-form{display:flex;flex-direction:column;gap:16px;flex:none;width:100%;max-width:360px;margin:0 auto}',
     '.root .login-form .fld{margin:0}',
     '.root .login-form .fld > span{display:block;margin-bottom:8px;font-size:14px;line-height:1.5;color:var(--accent-soft-dark)}',
@@ -1480,8 +1483,9 @@
     '.root .login-view button:focus-visible{outline:2px solid var(--accent-soft-dark);outline-offset:3px}',
     '@media(max-width:360px),(max-height:560px){.root .login-view{padding-inline:20px;gap:20px}.root .login-view .logo{width:56px;height:56px;margin-bottom:12px}.root .login-view .hero h2{font-size:18px}.root .login-view .hero p{font-size:14px;line-height:1.7}}',
 
-    '.root input.otp-i{border:1px solid #dfe8e2;border-radius:.75rem;background:#ffffff}',
-    '.root input.otp-i:focus,.root input.otp-i.filled{border-color:#00c951;box-shadow:0 0 0 .1875rem rgba(0,201,81,.1)}',
+    '.root input.otp-i{border:2px solid #dfe8e2;border-radius:.75rem;background:#ffffff}',
+    '.root input.otp-i:focus{border-color:var(--accent)}',
+    '.root input.otp-i.filled{border-color:var(--accent-soft-dark);}',
 
     // اعلان‌ها و پیام‌های وضعیت
     '.root .toast{position:absolute;bottom:5.25rem;left:50%;transform:translate(-50%,.75rem);background:rgba(23,33,43,.94);color:#fff;border-radius:999px;padding:.4375rem 1rem;font-size:.8125rem;opacity:0;pointer-events:none;transition:.25s;z-index:9;white-space:nowrap;max-width:90%;overflow:hidden;text-overflow:ellipsis;border:1px solid rgba(255,255,255,.08);box-shadow:0 .25rem 1rem rgba(5,46,22,.16)}',
@@ -1732,12 +1736,16 @@
     if (this.launcher) this.launcher.setAttribute('aria-expanded', 'true');
     this.A.onOpen && this.A.onOpen();
     var self = this;
-    this.focusTimer = this.events.timeout(function () {
-      self.focusTimer = 0;
-      if (self.isOpen()) self.focusPrimary();
-    }, window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches
-      ? 0
-      : 470);
+    this.focusTimer = this.events.timeout(
+      function () {
+        self.focusTimer = 0;
+        if (self.isOpen()) self.focusPrimary();
+      },
+      window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion:reduce)').matches
+        ? 0
+        : 470
+    );
   };
   UI.prototype.close = function () {
     if (!this.isOpen()) return;
@@ -1824,7 +1832,7 @@
       // وسط: پنل در کنار دکمه قرار می‌گیرد.
       if (this.launcher) {
         this.launcher.style.top =
-          'calc(50% - ' + (this.launcher.offsetHeight / 2) + 'px + ' + y + ')';
+          'calc(50% - ' + this.launcher.offsetHeight / 2 + 'px + ' + y + ')';
         this.launcher.style.bottom = 'auto';
       }
 
@@ -1851,7 +1859,10 @@
     var isMiddle = position.indexOf('middle-') === 0;
     var isTop = position.indexOf('top-') === 0;
     rootStyle.setProperty('--panel-origin-x', isLeft ? '0%' : '100%');
-    rootStyle.setProperty('--panel-origin-y', isMiddle ? '50%' : isTop ? '0%' : '100%');
+    rootStyle.setProperty(
+      '--panel-origin-y',
+      isMiddle ? '50%' : isTop ? '0%' : '100%'
+    );
     rootStyle.setProperty('--panel-closed-y', isTop ? '-64px' : '64px');
     rootStyle.setProperty('--panel-tilt', isLeft ? '-6deg' : '6deg');
   };
@@ -1931,7 +1942,10 @@
       },
     });
     this.loginErr = h('div', {
-      id: 'coco-login-error', class: 'form-error', role: 'alert', 'aria-atomic': 'true',
+      id: 'coco-login-error',
+      class: 'form-error',
+      role: 'alert',
+      'aria-atomic': 'true',
     });
     this.loginBtn = h(
       'button',
@@ -1985,8 +1999,14 @@
     this.loginErr.textContent = msg || '';
     this.nameInp.classList.toggle('bad', field === 'name');
     this.mobInp.classList.toggle('bad', field === 'mobile');
-    this.nameInp.setAttribute('aria-invalid', field === 'name' ? 'true' : 'false');
-    this.mobInp.setAttribute('aria-invalid', field === 'mobile' ? 'true' : 'false');
+    this.nameInp.setAttribute(
+      'aria-invalid',
+      field === 'name' ? 'true' : 'false'
+    );
+    this.mobInp.setAttribute(
+      'aria-invalid',
+      field === 'mobile' ? 'true' : 'false'
+    );
     if (field === 'name') this.nameInp.focus();
     else if (field === 'mobile') this.mobInp.focus();
   };
@@ -3637,7 +3657,8 @@
     var serverMaxLength = d.settings.maxLength;
     this.cfg.maxLength =
       typeof serverMaxLength === 'number' &&
-      Number.isInteger(serverMaxLength) && serverMaxLength > 0
+      Number.isInteger(serverMaxLength) &&
+      serverMaxLength > 0
         ? Math.min(this.configuredMaxLength, serverMaxLength)
         : this.configuredMaxLength;
     this.ui.ta.maxLength = this.cfg.maxLength;
@@ -3744,7 +3765,7 @@
     this.busy = false;
     if (this.destroyed) return;
     var u = mm.get(cur);
-    
+
     if (res.status === 'aborted' && this.abortReason === 'network') {
       this.netFailedId = cur;
       this.lastFailed = cur;
