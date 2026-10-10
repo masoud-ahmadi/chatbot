@@ -858,7 +858,7 @@
       this._cancelRaf();
       this._flush();
       if (ctrl.signal.aborted) throw new DOMException('Aborted', 'AbortError');
-      if (!finished && !this.aiId) throw ApiError('invalid_response');
+      if (!finished) throw ApiError('invalid_response');
       if (this.aiId) mm.update(this.aiId, { streaming: false, status: 'done' });
       result = { status: 'done', aiId: this.aiId };
     } catch (e) {
