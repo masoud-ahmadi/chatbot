@@ -354,6 +354,9 @@
       assetsBase: o.assetsBase || ds.assetsBase || base,
 
       theme: theme,
+      launcher: (o.launcher !== undefined ? o.launcher : ds.launcher) === 'hidden'
+        ? 'hidden'
+        : 'visible',
 
       position: position,
       offsetX: offsetX,
@@ -373,7 +376,10 @@
 
       waitingAfterMs: o.waitingAfterMs || 45000,
       chatLoadingMinMs: o.chatLoadingMinMs || 2200,
-      maxLength: o.maxLength || 2000,
+      maxLength: typeof o.maxLength === 'number' &&
+        Number.isInteger(o.maxLength) && o.maxLength > 0
+        ? o.maxLength
+        : 2000,
     };
   }
 
@@ -1733,7 +1739,7 @@
   /* Apply launcher and panel position */
 
   UI.prototype.setPosition = function (settings) {
-    if (!settings || !this.root || !this.launcher || !this.panel) {
+    if (!settings || !this.root || !this.panel) {
       return;
     }
 
@@ -1759,8 +1765,10 @@
     this.root.classList.add('pos-' + position);
 
     // موقعیت افقی لانچر
-    this.launcher.style.left = isLeft ? x : 'auto';
-    this.launcher.style.right = isLeft ? 'auto' : x;
+    if (this.launcher) {
+      this.launcher.style.left = isLeft ? x : 'auto';
+      this.launcher.style.right = isLeft ? 'auto' : x;
+    }
 
     // موقعیت افقی پنل
     this.panel.style.left = isLeft ? panelX : 'auto';
@@ -1768,23 +1776,28 @@
 
     if (position.indexOf('bottom-') === 0) {
       // پایین: پنل به سمت بالا باز می‌شود.
-      this.launcher.style.top = 'auto';
-      this.launcher.style.bottom = y;
+      if (this.launcher) {
+        this.launcher.style.top = 'auto';
+        this.launcher.style.bottom = y;
+      }
 
       this.panel.style.top = 'auto';
       this.panel.style.bottom = offsetY + 70 + 'px';
     } else if (position.indexOf('top-') === 0) {
       // بالا: پنل به سمت پایین باز می‌شود.
-      this.launcher.style.top = y;
-      this.launcher.style.bottom = 'auto';
+      if (this.launcher) {
+        this.launcher.style.top = y;
+        this.launcher.style.bottom = 'auto';
+      }
 
       this.panel.style.top = offsetY + 70 + 'px';
       this.panel.style.bottom = 'auto';
     } else {
       // وسط: پنل در کنار دکمه قرار می‌گیرد.
-      this.launcher.style.top = 'calc(50% - 29px + ' + y + ')';
-
-      this.launcher.style.bottom = 'auto';
+      if (this.launcher) {
+        this.launcher.style.top = 'calc(50% - 29px + ' + y + ')';
+        this.launcher.style.bottom = 'auto';
+      }
 
       this.panel.style.top = 'calc(50% + ' + y + ')';
 
@@ -3145,6 +3158,7 @@
   Widget.prototype.initialize = function (opts) {
     var self = this;
     this.cfg = readConfig(opts);
+    this.configuredMaxLength = this.cfg.maxLength;
     this.positionOverrides = {};
     this.events = new EventManager();
     this.store = new Store();
@@ -3557,6 +3571,14 @@
       status: String(a.status || T.online),
     };
     d.settings = data.settings || {};
+    var serverMaxLength = d.settings.maxLength;
+    this.cfg.maxLength =
+      typeof serverMaxLength === 'number' &&
+      Number.isInteger(serverMaxLength) && serverMaxLength > 0
+        ? Math.min(this.configuredMaxLength, serverMaxLength)
+        : this.configuredMaxLength;
+    this.ui.ta.maxLength = this.cfg.maxLength;
+    this.ui.setComposerText(this.ui.ta.value.slice(0, this.cfg.maxLength));
     d.offHours = !!data.offHours;
     this.scenario.configure(data.scenarios);
     this.ui.setAgent(d.agent);
@@ -3621,10 +3643,15 @@
     mm.update(userId, { status: 'sending' });
     this.store.set('THINKING');
     var cur = userId;
+    var replyMessage = um.replyTo ? mm.get(um.replyTo) : null;
+    var replyTo =
+      replyMessage && replyMessage.metadata.serverId != null
+        ? String(replyMessage.metadata.serverId)
+        : um.replyTo;
     var res = await this.streams.run(
       {
         text: um.content,
-        replyTo: um.replyTo,
+        replyTo: replyTo,
         clientId: userId,
         retryOf: um.metadata.serverId || null,
       },
@@ -3728,6 +3755,7 @@
     this.cancelReplyUi();
   };
   Widget.prototype.commitEdit = async function (text) {
+    text = text.slice(0, this.cfg.maxLength);
     var id = this.editId,
       m = this.mm.get(id);
     if (!m) return this.cancelCompose();
