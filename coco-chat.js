@@ -1253,14 +1253,14 @@
 
     // Spring entrance and circular reveal, without changing the final layout.
     '.root .panel{position:fixed;top:auto;right:auto;bottom:auto;left:auto;width:min(24.5rem,calc(100vw - 2rem));height:min(41.25rem,calc(100vh - 7rem));max-height:calc(100vh - 7rem);background:var(--bg);border-radius:1.375rem;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;opacity:0;visibility:hidden;pointer-events:none;transform-origin:var(--panel-origin-x,100%) var(--panel-origin-y,100%);transform:translateY(calc(var(--panel-base-y,0px) + var(--panel-closed-y,64px))) scale(.5) rotate(var(--panel-tilt,6deg));clip-path:circle(0% at var(--panel-origin-x,100%) var(--panel-origin-y,100%));transition:transform .3s ease-in,clip-path .3s ease-in,opacity .3s ease-in,visibility 0s linear .3s;z-index:2}',
-    '.root.open .panel{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(var(--panel-base-y,0px)) scale(1) rotate(0deg);clip-path:circle(150% at var(--panel-origin-x,100%) var(--panel-origin-y,100%));transition:transform .7s cubic-bezier(.34,1.56,.64,1),clip-path .7s ease-out,opacity .7s cubic-bezier(.34,1.56,.64,1),visibility 0s}',
+    '.root.open .panel{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(var(--panel-base-y,0px)) scale(1) rotate(0deg);clip-path:circle(150% at var(--panel-origin-x,100%) var(--panel-origin-y,100%));transition:transform .45s cubic-bezier(.34,1.56,.64,1),clip-path .45s ease-out,opacity .45s cubic-bezier(.34,1.56,.64,1),visibility 0s}',
     '.root .panel > .view{opacity:0;transform:translateY(10px);transition:opacity .06s linear,transform .12s ease}',
     '.root.open .panel > .view{opacity:1;transform:none;transition:opacity .16s ease .22s,transform .18s ease .2s}',
     '.root .launcher{transition:transform .2s ease,opacity .12s linear .22s}',
     '.root.open .launcher{opacity:0;pointer-events:none;transform:scale(.85);transition:transform .16s ease,opacity .08s linear}',
 
-    // Keep the existing fullscreen mobile layout with the same reveal motion.
-    '@media (max-width:40rem){.root .panel{--panel-base-y:0px;--panel-origin-y:100%;--panel-closed-y:64px;left:0!important;right:0!important;top:var(--vvt,0px)!important;bottom:auto!important;width:auto;height:var(--vvh,100dvh)!important;max-height:none!important;border-radius:0}}',
+    // Mobile keeps the slide-up sheet; the spring and circle reveal are desktop-only.
+    '@media (max-width:40rem){.root .panel{--panel-base-y:0px;left:0!important;right:0!important;top:var(--vvt,0px)!important;bottom:auto!important;width:auto;height:var(--vvh,100dvh)!important;max-height:none!important;border-radius:1.75rem 1.75rem 0 0;transform:translateY(100%);transform-origin:center bottom;clip-path:none;transition:transform .26s cubic-bezier(.4,0,.8,.2),border-radius .26s ease,opacity .06s linear .2s,visibility 0s linear .26s}.root.open .panel{transform:translateY(0);clip-path:none;border-radius:0;transition:transform .42s cubic-bezier(.16,1,.3,1),border-radius .18s ease .22s,opacity .06s linear,visibility 0s}}',
 
     '.view{position:absolute;inset:0;display:none;flex-direction:column}.view.active{display:flex}',
 
@@ -1724,7 +1724,7 @@
       if (self.isOpen()) self.focusPrimary();
     }, window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches
       ? 0
-      : 720);
+      : 470);
   };
   UI.prototype.close = function () {
     if (!this.isOpen()) return;
