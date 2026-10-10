@@ -1,0 +1,1326 @@
+<!doctype html>
+<html
+  lang="fa"
+  dir="rtl"
+  class="h-full overflow-x-hidden overscroll-none [--theme-primary:rgb(0,201,81)]"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>کوکوچت | چت</title>
+
+    <link rel="stylesheet" href="htemplate/Chat/Assets/Css/App/output.css" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              coco: {
+                DEFAULT: "#00c951",
+                dark: "#00a844",
+                ink: "#052e16",
+                bubble: "#e8fed8",
+              },
+            },
+            backgroundImage: {
+              wallpaper:
+                "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120' fill='none' stroke='%23052e16' stroke-opacity='.07' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='18' cy='20' r='6'/%3E%3Cpath d='M62 12l4 8 8 1-6 6 2 8-8-4-8 4 2-8-6-6 8-1z'/%3E%3Cpath d='M98 16v14M91 23h14'/%3E%3Cpath d='M14 66c6-8 12 8 18 0s12 8 18 0'/%3E%3Crect x='76' y='58' width='16' height='12' rx='3'/%3E%3Cpath d='M26 104l10-10 10 10z'/%3E%3Ccircle cx='80' cy='100' r='3'/%3E%3Cpath d='M100 96q8 0 8 8t-8 8'/%3E%3C/svg%3E\"), linear-gradient(165deg, #e6f4d7 0%, #cfe9c9 48%, #b4e0c9 100%)",
+              "tail-in":
+                "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='20' viewBox='0 0 9 20'%3E%3Cpath fill='%23ffffff' d='M3 17h6V0c-.193 2.84-.876 5.767-2.05 8.782-.904 2.325-2.446 4.485-4.625 6.48A1 1 0 003 17z'/%3E%3C/svg%3E\")",
+              "tail-out":
+                "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='20' viewBox='0 0 9 20'%3E%3Cpath fill='%23e8fed8' d='M3 17h6V0c-.193 2.84-.876 5.767-2.05 8.782-.904 2.325-2.446 4.485-4.625 6.48A1 1 0 003 17z'/%3E%3C/svg%3E\")",
+            },
+            keyframes: {
+              "sticker-in": {
+                from: {
+                  opacity: "0",
+                  transform: "translateY(10px) scale(.92)",
+                },
+                to: { opacity: "1", transform: "translateY(0) scale(1)" },
+              },
+              "menu-in": {
+                from: { opacity: "0", transform: "scale(.92)" },
+                to: { opacity: "1", transform: "scale(1)" },
+              },
+              "row-flash": { from: { opacity: "1" }, to: { opacity: "0" } },
+            },
+            animation: {
+              "sticker-in":
+                "sticker-in .55s cubic-bezier(.22,.8,.3,1) .15s both",
+              "menu-in": "menu-in .16s ease-out",
+              "row-flash": "row-flash 1.3s ease-out forwards",
+            },
+          },
+        },
+      };
+    </script>
+
+    <style type="text/tailwindcss">
+      @layer components {
+        /* Telegram-like scrollbar: thin, faint, visible only while scrolling/hovering */
+        .sb-thin,
+        .thin-scroll {
+          @apply [scrollbar-width:thin] [scrollbar-color:transparent_transparent] hover:[scrollbar-color:rgba(5,46,22,.3)_transparent]
+          [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent
+          [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-transparent
+          [&:hover::-webkit-scrollbar-thumb]:bg-[rgba(5,46,22,.28)];
+        }
+        .thin-scroll.is-scrolling {
+          @apply [scrollbar-color:rgba(5,46,22,.3)_transparent] [&::-webkit-scrollbar-thumb]:bg-[rgba(5,46,22,.28)];
+        }
+        /* Row highlight: flash after jumping to a message / menu target / message being edited */
+        .msg.flash::before,
+        .msg.menu-target::before,
+        .msg.is-editing::before {
+          @apply pointer-events-none absolute -inset-x-3 -inset-y-0.5 rounded-[10px] bg-white/60 content-[''];
+        }
+        .msg.flash::before {
+          @apply animate-row-flash;
+        }
+      }
+    </style>
+  </head>
+
+  <body
+    class="h-full overflow-x-hidden overscroll-none bg-white font-sans text-slate-900 antialiased [-webkit-tap-highlight-color:transparent] [-webkit-text-size-adjust:100%] [&_button]:touch-manipulation [&_button]:[-webkit-tap-highlight-color:transparent]"
+  >
+    <main
+      class="chat-page sm:bg-[radial-gradient(1200px_600px_at_50%_-10%,#eaf6ee_0%,#f1f4f2_55%,#eceff0_100%)] h-full w-full sm:flex sm:items-center sm:justify-center"
+    >
+      <section
+        class="chat-container h-[var(--app-h,100vh)] supports-[height:100dvh]:h-[var(--app-h,100dvh)] pl-[env(safe-area-inset-left,0px)] pr-[env(safe-area-inset-right,0px)] sm:pl-0 sm:pr-0 sm:h-[min(820px,calc(var(--app-h,100vh)_-_48px))] sm:supports-[height:100dvh]:h-[min(820px,calc(var(--app-h,100dvh)_-_48px))] relative mx-auto flex w-full flex-col overflow-hidden bg-white sm:max-w-[520px] sm:rounded-3xl sm:shadow-[0_24px_60px_-24px_rgba(5,46,22,.3),0_0_0_1px_rgba(5,46,22,.06)]"
+      >
+        <!-- 1. Header -->
+        <header
+          class="chat-header pt-[env(safe-area-inset-top)] z-10 shrink-0 bg-white shadow-[0_1px_0_rgba(5,46,22,.08)]"
+        >
+          <div class="flex items-center h-14 pe-3 ps-1">
+            <button
+              type="button"
+              id="backBtn"
+              aria-label="بازگشت"
+              class="flex items-center justify-center transition rounded-full h-11 w-11 shrink-0 text-slate-600 hover:bg-slate-100 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-coco"
+            >
+              <svg
+                class="w-6 h-6"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path
+                  d="M9 6l6 6-6 6"
+                  transform="scale(-1 1) translate(-24 0)"
+                />
+              </svg>
+            </button>
+
+            <button
+              type="button"
+              id="openProfile"
+              aria-label="مشاهده پروفایل کوکوچت"
+              class="flex items-center flex-1 min-w-0 gap-3 py-1 transition rounded-xl pe-2 text-start active:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-coco"
+            >
+              <img
+                src="htemplate/Chat/Assets/Images/design/1.png"
+                alt="تصویر پروفایل کوکو"
+                class="object-cover w-10 h-10 rounded-full shrink-0 bg-emerald-50"
+              />
+              <span class="min-w-0">
+                <span
+                  class="flex items-center gap-1 text-base font-bold leading-5"
+                  ><span class="truncate">کوکوچت</span
+                  ><svg
+                    id="headerMuted"
+                    class="hidden w-4 h-4 shrink-0 text-slate-500"
+                    role="img"
+                    aria-label="بی‌صدا"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.9"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path
+                      d="M6 9a6 6 0 1112 0c0 5 2 6.5 2 6.5H4S6 14 6 9zM10 19a2 2 0 004 0"
+                    />
+                    <path d="M4 4l16 16" /></svg
+                ></span>
+                <span
+                  class="flex items-center gap-1.5 text-[13px] leading-4 text-emerald-700"
+                >
+                  <span class="h-1.5 w-1.5 rounded-full bg-coco"></span>آنلاین
+                </span>
+              </span>
+            </button>
+          </div>
+        </header>
+
+        <!-- Wallpaper area: messages + composer share the background (Telegram style) -->
+        <div
+          class="chat-bg bg-[#cfe8c8] bg-wallpaper flex min-h-0 flex-1 flex-col"
+        >
+          <!-- 2. Messages -->
+          <div
+            class="overscroll-contain [-webkit-overflow-scrolling:touch] touch-pan-y thin-scroll [direction:ltr] [&>*]:[direction:rtl] min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-3 py-3"
+            id="messages"
+          >
+            <div class="flex min-h-full flex-col justify-end gap-2.5">
+              <!-- Opening sticker -->
+              <div
+                class="flex flex-col items-center gap-2 pt-2 pb-3 animate-sticker-in motion-reduce:animate-none"
+              >
+                <video
+                  poster="htemplate/Chat/Assets/Images/design/1.png"
+                  class="object-contain pointer-events-none h-44 w-44"
+                  autoplay
+                  muted
+                  loop
+                  playsinline
+                  disablepictureinpicture
+                  controlslist="nodownload nofullscreen noremoteplayback"
+                  aria-label="استیکر کوکو"
+                >
+                  <source
+                    src="htemplate/Chat/Assets/Images/design/1.mp4"
+                    type="video/mp4"
+                  />
+                </video>
+                <p
+                  class="rounded-full bg-slate-900/50 px-3 py-1 text-[13px] font-medium text-white backdrop-blur-sm"
+                >
+                  بزن بریم شروع کنیم 🚀
+                </p>
+              </div>
+
+              <!-- Date chip -->
+              <div class="flex justify-center">
+                <span
+                  class="rounded-full bg-slate-900/50 px-3 py-0.5 text-[13px] font-medium text-white backdrop-blur-sm"
+                  >امروز</span
+                >
+              </div>
+
+              <!-- Incoming group -->
+              <div class="flex flex-col gap-[2px]">
+                <div
+                  class="msg touch-pan-y [transition:transform_.22s_cubic-bezier(.22,.8,.3,1)] [&.is-swiping]:transition-none [&.is-swiping]:select-none [@media(hover:none)]:select-none [@media(hover:none)]:[-webkit-touch-callout:none] motion-reduce:!transition-none group relative flex items-end gap-2.5"
+                  id="m1"
+                  data-author="کوکوچت"
+                  data-text="سلام 👋"
+                >
+                  <span class="w-8 shrink-0" aria-hidden="true"></span>
+                  <div
+                    class="relative shadow-[0_1px_1.5px_rgba(5,46,22,.16)] rounded-2xl bg-white rounded-br-[5px] bubble message-incoming max-w-[80%] px-2.5 py-1.5"
+                  >
+                    <p class="text-[15px] leading-[1.65]">
+                      سلام 👋<span
+                        class="inline-block w-10"
+                        aria-hidden="true"
+                      ></span>
+                    </p>
+                    <time
+                      class="absolute bottom-1 left-2 text-[11px] text-slate-500"
+                      >۱۲:۴۰</time
+                    >
+                  </div>
+                  <button
+                    type="button"
+                    class="reply-btn flex h-7 w-7 shrink-0 items-center justify-center self-center rounded-full bg-[rgba(15,40,25,.3)] text-white opacity-0 pointer-events-none [transition:opacity_.15s] focus-visible:pointer-events-auto focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coco [@media(hover:hover)]:group-hover:pointer-events-auto [@media(hover:hover)]:group-hover:opacity-100 [@media(hover:none)]:hidden"
+                    aria-label="پاسخ به این پیام"
+                  >
+                    <svg
+                      class="w-4 h-4"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"
+                      />
+                    </svg>
+                  </button>
+                </div>
+                <div
+                  class="msg touch-pan-y [transition:transform_.22s_cubic-bezier(.22,.8,.3,1)] [&.is-swiping]:transition-none [&.is-swiping]:select-none [@media(hover:none)]:select-none [@media(hover:none)]:[-webkit-touch-callout:none] motion-reduce:!transition-none group relative flex items-end gap-2.5"
+                  id="m2"
+                  data-author="کوکوچت"
+                  data-text="به کوکوچت خوش اومدی. چطور می‌تونم کمکت کنم؟"
+                >
+                  <img
+                    src="htemplate/Chat/Assets/Images/design/1.png"
+                    alt="کوکو"
+                    class="object-cover w-8 h-8 rounded-full shrink-0 bg-emerald-50"
+                  />
+                  <div
+                    class="relative shadow-[0_1px_1.5px_rgba(5,46,22,.16)] rounded-2xl bg-white rounded-tr-[5px] rounded-br-none after:absolute after:bottom-0 after:h-5 after:w-[9px] after:bg-no-repeat after:content-[''] after:-right-2 after:-scale-x-100 after:bg-tail-in bubble message-incoming max-w-[80%] px-2.5 py-1.5"
+                  >
+                    <p class="text-[15px] leading-[1.65]">
+                      به کوکوچت خوش اومدی.<br />چطور می‌تونم کمکت کنم؟<span
+                        class="inline-block w-10"
+                        aria-hidden="true"
+                      ></span>
+                    </p>
+                    <time
+                      class="absolute bottom-1 left-2 text-[11px] text-slate-500"
+                      >۱۲:۴۰</time
+                    >
+                  </div>
+                  <button
+                    type="button"
+                    class="reply-btn flex h-7 w-7 shrink-0 items-center justify-center self-center rounded-full bg-[rgba(15,40,25,.3)] text-white opacity-0 pointer-events-none [transition:opacity_.15s] focus-visible:pointer-events-auto focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coco [@media(hover:hover)]:group-hover:pointer-events-auto [@media(hover:hover)]:group-hover:opacity-100 [@media(hover:none)]:hidden"
+                    aria-label="پاسخ به این پیام"
+                  >
+                    <svg
+                      class="w-4 h-4"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Outgoing -->
+              <div
+                class="msg touch-pan-y [transition:transform_.22s_cubic-bezier(.22,.8,.3,1)] [&.is-swiping]:transition-none [&.is-swiping]:select-none [@media(hover:none)]:select-none [@media(hover:none)]:[-webkit-touch-callout:none] motion-reduce:!transition-none group relative flex items-end justify-end gap-2"
+                id="m3"
+                data-author="شما"
+                data-text="سلام، می‌خواستم درباره محصولات شما اطلاعات بگیرم."
+              >
+                <button
+                  type="button"
+                  class="reply-btn flex h-7 w-7 shrink-0 items-center justify-center self-center rounded-full bg-[rgba(15,40,25,.3)] text-white opacity-0 pointer-events-none [transition:opacity_.15s] focus-visible:pointer-events-auto focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coco [@media(hover:hover)]:group-hover:pointer-events-auto [@media(hover:hover)]:group-hover:opacity-100 [@media(hover:none)]:hidden"
+                  aria-label="پاسخ به این پیام"
+                >
+                  <svg
+                    class="w-4 h-4"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"
+                    />
+                  </svg>
+                </button>
+                <div
+                  class="relative shadow-[0_1px_1.5px_rgba(5,46,22,.16)] rounded-2xl bg-coco-bubble rounded-bl-none after:absolute after:bottom-0 after:h-5 after:w-[9px] after:bg-no-repeat after:content-[''] after:-left-2 after:bg-tail-out bubble message-outgoing max-w-[80%] px-2.5 py-1.5"
+                >
+                  <p class="text-[15px] leading-[1.65]">
+                    سلام، می‌خواستم درباره محصولات شما اطلاعات بگیرم.<span
+                      class="inline-block w-[60px]"
+                      aria-hidden="true"
+                    ></span>
+                  </p>
+                  <time
+                    class="absolute bottom-1 left-2 flex items-center gap-0.5 text-[11px] text-emerald-800/75"
+                    >۱۲:۴۱
+                    <svg
+                      class="h-3.5 w-3.5"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.4"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-label="خوانده شد"
+                    >
+                      <path d="M2 13l4 4L14 8M10 15l2 2L20 8" /></svg
+                  ></time>
+                </div>
+              </div>
+
+              <!-- Incoming: reply + emoji, then sticker -->
+              <div class="flex flex-col gap-[2px]">
+                <div
+                  class="msg touch-pan-y [transition:transform_.22s_cubic-bezier(.22,.8,.3,1)] [&.is-swiping]:transition-none [&.is-swiping]:select-none [@media(hover:none)]:select-none [@media(hover:none)]:[-webkit-touch-callout:none] motion-reduce:!transition-none group relative flex items-end gap-2.5"
+                  id="m4"
+                  data-author="کوکوچت"
+                  data-text="حتماً! قبلش بگو امروز حالت چطوره؟ 😊"
+                >
+                  <span class="w-8 shrink-0" aria-hidden="true"></span>
+                  <div
+                    class="relative shadow-[0_1px_1.5px_rgba(5,46,22,.16)] rounded-2xl bg-white rounded-br-[5px] bubble message-incoming max-w-[80%] px-2.5 py-1.5"
+                  >
+                    <button
+                      type="button"
+                      data-goto="m3"
+                      class="mb-1 block w-full min-w-[150px] rounded-md border-s-2 border-coco bg-coco/10 px-2 py-0.5 text-start"
+                    >
+                      <span
+                        class="block text-[13px] font-medium leading-5 text-emerald-700"
+                        >شما</span
+                      ><span
+                        class="block truncate text-[13px] leading-5 text-slate-600"
+                        >سلام، می‌خواستم درباره محصولات…</span
+                      >
+                    </button>
+                    <p class="text-[15px] leading-[1.65]">
+                      حتماً! قبلش بگو امروز حالت چطوره؟ 😊<span
+                        class="inline-block w-10"
+                        aria-hidden="true"
+                      ></span>
+                    </p>
+                    <time
+                      class="absolute bottom-1 left-2 text-[11px] text-slate-500"
+                      >۱۲:۴۱</time
+                    >
+                  </div>
+                  <button
+                    type="button"
+                    class="reply-btn flex h-7 w-7 shrink-0 items-center justify-center self-center rounded-full bg-[rgba(15,40,25,.3)] text-white opacity-0 pointer-events-none [transition:opacity_.15s] focus-visible:pointer-events-auto focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coco [@media(hover:hover)]:group-hover:pointer-events-auto [@media(hover:hover)]:group-hover:opacity-100 [@media(hover:none)]:hidden"
+                    aria-label="پاسخ به این پیام"
+                  >
+                    <svg
+                      class="w-4 h-4"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"
+                      />
+                    </svg>
+                  </button>
+                </div>
+                <div
+                  class="msg touch-pan-y [transition:transform_.22s_cubic-bezier(.22,.8,.3,1)] [&.is-swiping]:transition-none [&.is-swiping]:select-none [@media(hover:none)]:select-none [@media(hover:none)]:[-webkit-touch-callout:none] motion-reduce:!transition-none group relative flex items-end gap-2.5"
+                  id="m5"
+                  data-author="کوکوچت"
+                  data-text="استیکر"
+                >
+                  <img
+                    src="htemplate/Chat/Assets/Images/design/1.png"
+                    alt="کوکو"
+                    class="object-cover w-8 h-8 rounded-full shrink-0 bg-emerald-50"
+                  />
+                  <div class="relative mt-1">
+                    <video
+                      poster="htemplate/Chat/Assets/Images/design/1.png"
+                      class="object-contain pointer-events-none h-36 w-36"
+                      autoplay
+                      muted
+                      loop
+                      playsinline
+                      disablepictureinpicture
+                      controlslist="nodownload nofullscreen noremoteplayback"
+                      aria-label="استیکر کوکو"
+                    >
+                      <source
+                        src="htemplate/Chat/Assets/Images/design/1.mp4"
+                        type="video/mp4"
+                      />
+                    </video>
+                    <time
+                      class="absolute bottom-1 start-1 rounded-full bg-slate-900/50 px-2 py-0.5 text-[11px] text-white"
+                      >۱۲:۴۲</time
+                    >
+                  </div>
+                  <button
+                    type="button"
+                    class="reply-btn flex h-7 w-7 shrink-0 items-center justify-center self-center rounded-full bg-[rgba(15,40,25,.3)] text-white opacity-0 pointer-events-none [transition:opacity_.15s] focus-visible:pointer-events-auto focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coco [@media(hover:hover)]:group-hover:pointer-events-auto [@media(hover:hover)]:group-hover:opacity-100 [@media(hover:none)]:hidden"
+                    aria-label="پاسخ به این پیام"
+                  >
+                    <svg
+                      class="w-4 h-4"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Composer (floats over the wallpaper) -->
+          <footer class="px-2 pt-1 chat-composer shrink-0">
+            <div
+              class="grid grid-rows-[0fr] [transition:grid-template-rows_.25s_ease-out] [&.is-open]:grid-rows-[1fr] motion-reduce:!transition-none"
+              id="stickerPanel"
+              aria-hidden="true"
+            >
+              <div class="overflow-hidden">
+                <div
+                  class="mb-2 flex gap-2 rounded-2xl bg-white p-2 shadow-[0_1px_2px_rgba(5,46,22,.15)]"
+                >
+                  <button
+                    type="button"
+                    aria-label="ارسال استیکر کوکو"
+                    tabindex="-1"
+                    class="w-20 h-20 p-1 transition rounded-xl hover:bg-slate-100 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-coco"
+                  >
+                    <video
+                      poster="htemplate/Chat/Assets/Images/design/1.png"
+                      class="object-contain w-full h-full pointer-events-none"
+                      autoplay
+                      muted
+                      loop
+                      playsinline
+                      aria-hidden="true"
+                    >
+                      <source
+                        src="htemplate/Chat/Assets/Images/design/1.mp4"
+                        type="video/mp4"
+                      />
+                    </video>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="pb-[max(12px,env(safe-area-inset-bottom,0px))] flex items-end gap-2"
+            >
+              <div
+                class="min-w-0 flex-1 overflow-hidden rounded-[22px] bg-white shadow-[0_1px_2px_rgba(5,46,22,.15)] transition focus-within:ring-2 focus-within:ring-coco/60"
+              >
+                <!-- Reply bar -->
+                <div
+                  class="grid grid-rows-[0fr] [transition:grid-template-rows_.2s_ease-out] [&.is-open]:grid-rows-[1fr] motion-reduce:!transition-none"
+                  id="replyBar"
+                  aria-hidden="true"
+                >
+                  <div class="overflow-hidden">
+                    <div class="flex items-center gap-2 pt-2 pb-1 pe-3 ps-1">
+                      <span
+                        class="mx-2 shrink-0 text-emerald-700"
+                        aria-hidden="true"
+                      >
+                        <svg
+                          id="barIconReply"
+                          class="w-5 h-5"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                        >
+                          <path
+                            d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"
+                          />
+                        </svg>
+                        <svg
+                          id="barIconEdit"
+                          class="hidden w-5 h-5"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <path
+                            d="M4 20h4L18.5 9.5a2.1 2.1 0 00-3-3L5 17v3zM14 7.5l2.5 2.5"
+                          />
+                        </svg>
+                      </span>
+                      <button
+                        type="button"
+                        id="replyPreview"
+                        tabindex="-1"
+                        aria-label="رفتن به پیام اصلی"
+                        class="flex-1 min-w-0 border-s-2 border-coco ps-2 text-start"
+                      >
+                        <span
+                          class="block truncate text-[13px] font-medium leading-5 text-emerald-700"
+                          id="replyAuthor"
+                        ></span>
+                        <span
+                          class="block truncate text-[13px] leading-5 text-slate-600"
+                          id="replyText"
+                        ></span>
+                      </button>
+                      <button
+                        type="button"
+                        id="replyClose"
+                        tabindex="-1"
+                        aria-label="لغو پاسخ"
+                        class="flex items-center justify-center transition rounded-full h-9 w-9 shrink-0 text-slate-500 hover:bg-slate-100 active:scale-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-coco"
+                      >
+                        <svg
+                          class="w-5 h-5"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          aria-hidden="true"
+                        >
+                          <path d="M6 6l12 12M18 6L6 18" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex items-end">
+                  <button
+                    type="button"
+                    id="stickerBtn"
+                    aria-label="استیکر و ایموجی"
+                    aria-expanded="false"
+                    class="flex items-center justify-center transition rounded-full h-11 w-11 shrink-0 text-slate-500 hover:text-emerald-700 active:scale-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-coco"
+                  >
+                    <svg
+                      class="w-6 h-6"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <circle cx="12" cy="12" r="9.5" />
+                      <path d="M8.5 14.5c.9 1.3 2 2 3.5 2s2.6-.7 3.5-2" />
+                      <path d="M9 9.7h.01M15 9.7h.01" />
+                    </svg>
+                  </button>
+                  <textarea
+                    id="msgInput"
+                    rows="1"
+                    dir="rtl"
+                    placeholder="پیام"
+                    aria-label="متن پیام"
+                    enterkeyhint="send"
+                    class="sb-thin text-[16px] max-h-32 min-h-[44px] min-w-0 flex-1 resize-none bg-transparent py-[10px] pe-4 leading-6 text-slate-900 placeholder:text-slate-500 focus:outline-none"
+                  ></textarea>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                id="sendBtn"
+                aria-label="ارسال پیام"
+                class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-coco-dark text-white shadow-[0_1px_3px_rgba(5,46,22,.3)] transition hover:bg-[#009a3e] active:scale-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coco"
+              >
+                <svg
+                  id="sendIcon"
+                  class="h-[22px] w-[22px] -scale-x-100"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M3.4 20.4l17.45-7.48a1 1 0 000-1.84L3.4 3.6a.99.99 0 00-1.39 1.17L3.5 11l8.5 1-8.5 1-1.49 6.23a.99.99 0 001.39 1.17z"
+                  />
+                </svg>
+                <svg
+                  id="checkIcon"
+                  class="hidden w-6 h-6"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.6"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M5 12.5l4.5 4.5L19 7.5" />
+                </svg>
+              </button>
+            </div>
+          </footer>
+        </div>
+
+        <!-- Message context menu (right-click / long-press) -->
+        <div
+          class="menu-scrim absolute inset-0 z-30 bg-[rgba(5,46,22,.12)] [&[hidden]]:hidden"
+          id="menuScrim"
+          hidden
+        ></div>
+        <div
+          class="msg-menu absolute z-40 w-44 origin-top rounded-[14px] bg-white/[.97] p-1 shadow-[0_10px_30px_rgba(5,46,22,.3),0_0_0_1px_rgba(5,46,22,.06)] animate-menu-in motion-reduce:animate-none [&[hidden]]:hidden"
+          id="msgMenu"
+          role="menu"
+          aria-label="گزینه‌های پیام"
+          hidden
+        >
+          <button
+            type="button"
+            role="menuitem"
+            class="menu-item flex h-11 w-full items-center gap-3 rounded-[10px] px-3 text-start text-[15px] text-slate-900 hover:bg-slate-100 focus-visible:bg-slate-100 focus-visible:outline-none active:bg-slate-200 [&[hidden]]:hidden [&_svg]:h-5 [&_svg]:w-5 [&_svg]:shrink-0 [&_svg]:text-slate-600"
+            data-act="reply"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path
+                d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"
+              /></svg
+            >پاسخ
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            class="menu-item flex h-11 w-full items-center gap-3 rounded-[10px] px-3 text-start text-[15px] text-slate-900 hover:bg-slate-100 focus-visible:bg-slate-100 focus-visible:outline-none active:bg-slate-200 [&[hidden]]:hidden [&_svg]:h-5 [&_svg]:w-5 [&_svg]:shrink-0 [&_svg]:text-slate-600"
+            data-act="edit"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path
+                d="M4 20h4L18.5 9.5a2.1 2.1 0 00-3-3L5 17v3zM14 7.5l2.5 2.5"
+              /></svg
+            >ویرایش
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            class="menu-item flex h-11 w-full items-center gap-3 rounded-[10px] px-3 text-start text-[15px] text-slate-900 hover:bg-slate-100 focus-visible:bg-slate-100 focus-visible:outline-none active:bg-slate-200 [&[hidden]]:hidden [&_svg]:h-5 [&_svg]:w-5 [&_svg]:shrink-0 [&_svg]:text-slate-600"
+            data-act="copy"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <rect x="9" y="9" width="11" height="11" rx="2.5" />
+              <path d="M5 15V6.5A2.5 2.5 0 017.5 4H15" /></svg
+            >کپی متن
+          </button>
+        </div>
+
+        <!-- Profile view -->
+        <aside
+          class="absolute inset-0 z-20 flex flex-col translate-x-full opacity-0 invisible [transition:transform_.32s_cubic-bezier(.22,.8,.3,1),opacity_.25s_ease-out,visibility_0s_linear_.32s] [&.is-open]:translate-x-0 [&.is-open]:opacity-100 [&.is-open]:visible [&.is-open]:[transition-delay:0s] motion-reduce:!transition-none bg-slate-100"
+          id="profileView"
+          role="dialog"
+          aria-modal="true"
+          aria-label="اطلاعات کوکوچت"
+          aria-hidden="true"
+        >
+          <div
+            class="absolute inset-x-0 top-0 z-10 pt-[env(safe-area-inset-top)]"
+          >
+            <button
+              type="button"
+              id="closeProfile"
+              aria-label="بستن پروفایل"
+              tabindex="-1"
+              class="ms-1 mt-1.5 flex h-11 w-11 items-center justify-center rounded-full text-slate-700 transition hover:bg-black/5 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-coco"
+            >
+              <svg
+                class="w-6 h-6"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path
+                  d="M9 6l6 6-6 6"
+                  transform="scale(-1 1) translate(-24 0)"
+                />
+              </svg>
+            </button>
+          </div>
+
+          <div
+            class="thin-scroll [direction:ltr] [&>*]:[direction:rtl] min-h-0 flex-1 overflow-y-auto overscroll-contain pb-[max(16px,env(safe-area-inset-bottom))]"
+          >
+            <!-- Identity -->
+            <div
+              class="flex flex-col items-center px-6 pb-5 text-center bg-white"
+              style="padding-top: calc(3.5rem + env(safe-area-inset-top, 0px))"
+            >
+              <img
+                src="htemplate/Chat/Assets/Images/design/1.png"
+                alt="تصویر بزرگ کوکو"
+                class="object-cover rounded-full h-28 w-28 bg-emerald-50"
+              />
+              <h1 class="mt-3 text-xl font-bold leading-8">کوکوچت</h1>
+              <p class="flex items-center gap-1.5 text-sm text-emerald-700">
+                <span class="w-2 h-2 rounded-full bg-coco"></span>آنلاین
+              </p>
+            </div>
+
+            <!-- Actions -->
+            <div class="grid grid-cols-3 gap-2 px-3 pt-3">
+              <button
+                type="button"
+                id="profileMsg"
+                class="flex flex-col items-center gap-1.5 rounded-xl bg-white px-1 py-3 text-[13px] font-medium text-emerald-700 shadow-[0_1px_1px_rgba(15,23,42,.06)] transition active:scale-[.97] active:bg-slate-50 hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-coco"
+              >
+                <svg
+                  class="w-6 h-6"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.9"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M21 12a8 8 0 01-11.6 7.1L4 20l1-4.6A8 8 0 1121 12z"
+                  />
+                </svg>
+                <span>پیام</span>
+              </button>
+              <button
+                type="button"
+                id="muteBtn"
+                aria-pressed="false"
+                class="flex flex-col items-center gap-1.5 rounded-xl bg-white px-1 py-3 text-[13px] font-medium text-emerald-700 shadow-[0_1px_1px_rgba(15,23,42,.06)] transition active:scale-[.97] active:bg-slate-50 hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-coco"
+              >
+                <svg
+                  id="icBellOff"
+                  class="w-6 h-6"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.9"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M6 9a6 6 0 1112 0c0 5 2 6.5 2 6.5H4S6 14 6 9zM10 19a2 2 0 004 0"
+                  />
+                  <path d="M4 4l16 16" />
+                </svg>
+                <svg
+                  id="icBell"
+                  class="hidden w-6 h-6"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.9"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M6 9a6 6 0 1112 0c0 5 2 6.5 2 6.5H4S6 14 6 9zM10 19a2 2 0 004 0"
+                  />
+                </svg>
+                <span id="muteLabel">بی‌صدا</span>
+              </button>
+              <button
+                type="button"
+                id="shareBtn"
+                class="flex flex-col items-center gap-1.5 rounded-xl bg-white px-1 py-3 text-[13px] font-medium text-emerald-700 shadow-[0_1px_1px_rgba(15,23,42,.06)] transition active:scale-[.97] active:bg-slate-50 hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-coco"
+              >
+                <svg
+                  class="w-6 h-6"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.9"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M12 15V4M7.5 8.5L12 4l4.5 4.5M5 13v5a2 2 0 002 2h10a2 2 0 002-2v-5"
+                  />
+                </svg>
+                <span id="shareLabel">اشتراک‌گذاری</span>
+              </button>
+            </div>
+
+            <!-- Info -->
+            <section
+              class="px-4 py-3 mt-3 bg-white"
+              aria-labelledby="infoTitle"
+            >
+              <h2 id="infoTitle" class="text-sm font-medium text-emerald-700">
+                اطلاعات
+              </h2>
+              <dl class="mt-2 space-y-3">
+                <div class="flex flex-col-reverse">
+                  <dt class="text-[13px] leading-5 text-slate-500">درباره</dt>
+                  <dd class="text-[15px] leading-6">
+                    دستیار هوشمند کسب‌وکار شما
+                  </dd>
+                </div>
+                <div class="flex flex-col-reverse">
+                  <dt class="text-[13px] leading-5 text-slate-500">کاربرد</dt>
+                  <dd class="text-[15px] leading-6">
+                    پاسخ به سؤال‌های شما درباره محصولات و خدمات
+                  </dd>
+                </div>
+                <div class="flex flex-col-reverse">
+                  <dt class="text-[13px] leading-5 text-slate-500">پاسخگویی</dt>
+                  <dd class="text-[15px] leading-6">
+                    همیشه آنلاین و آماده کمک
+                  </dd>
+                </div>
+              </dl>
+            </section>
+
+            <!-- Notifications -->
+            <button
+              type="button"
+              id="muteRow"
+              role="switch"
+              aria-checked="true"
+              class="flex items-center w-full gap-3 px-4 py-3 mt-2 transition bg-white group text-start active:bg-slate-50 hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-coco"
+            >
+              <svg
+                class="w-6 h-6 shrink-0 text-slate-500"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.9"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path
+                  d="M6 9a6 6 0 1112 0c0 5 2 6.5 2 6.5H4S6 14 6 9zM10 19a2 2 0 004 0"
+                />
+              </svg>
+              <span class="flex-1 min-w-0">
+                <span class="block text-[15px] leading-6">اعلان‌ها</span>
+                <span
+                  id="muteState"
+                  class="block text-[13px] leading-5 text-slate-500"
+                  >روشن</span
+                >
+              </span>
+              <span
+                class="switch relative h-[26px] w-11 shrink-0 rounded-full bg-slate-300 [transition:background_.2s] group-aria-[checked=true]:bg-coco-dark motion-reduce:!transition-none after:absolute after:start-0.5 after:top-0.5 after:h-[22px] after:w-[22px] after:rounded-full after:bg-white after:shadow-[0_1px_2px_rgba(15,23,42,.3)] after:content-[''] after:[transition:transform_.2s_cubic-bezier(.22,.8,.3,1)] group-aria-[checked=true]:after:-translate-x-[18px] motion-reduce:after:!transition-none"
+                aria-hidden="true"
+              ></span>
+            </button>
+          </div>
+        </aside>
+      </section>
+    </main>
+
+    <script>
+      (function () {
+        var $ = function (id) {
+          return document.getElementById(id);
+        };
+        var profile = $("profileView"),
+          panel = $("stickerPanel"),
+          stickerBtn = $("stickerBtn"),
+          msgs = $("messages"),
+          input = $("msgInput"),
+          bar = $("replyBar"),
+          sendBtn = $("sendBtn"),
+          menu = $("msgMenu"),
+          scrim = $("menuScrim"),
+          box = document.querySelector(".chat-container");
+        var barRow = null,
+          mode = null,
+          menuRow = null,
+          menuOpenedAt = 0;
+
+        /* ---------- Profile ---------- */
+        function setProfile(open) {
+          profile.classList.toggle("is-open", open);
+          profile.setAttribute("aria-hidden", String(!open));
+          $("closeProfile").tabIndex = open ? 0 : -1;
+          document.querySelector(".chat-header").inert = open; // keep focus inside the profile
+          document.querySelector(".chat-bg").inert = open;
+          if (open) $("closeProfile").focus({ preventScroll: true });
+        }
+        $("openProfile").addEventListener("click", function () {
+          setProfile(true);
+        });
+        $("closeProfile").addEventListener("click", function () {
+          setProfile(false);
+          $("openProfile").focus({ preventScroll: true });
+        });
+        $("profileMsg").addEventListener("click", function () {
+          setProfile(false);
+          input.focus();
+        });
+
+        /* ---------- Profile actions: mute / share (visual state only) ---------- */
+        var muted = false;
+        function setMuted(v) {
+          muted = v;
+          $("headerMuted").classList.toggle("hidden", !v);
+          $("icBellOff").classList.toggle("hidden", v);
+          $("icBell").classList.toggle("hidden", !v);
+          $("muteLabel").textContent = v ? "فعال‌سازی صدا" : "بی‌صدا";
+          $("muteBtn").setAttribute("aria-pressed", String(v));
+          $("muteRow").setAttribute("aria-checked", String(!v));
+          $("muteState").textContent = v ? "خاموش" : "روشن";
+        }
+        $("muteBtn").addEventListener("click", function () {
+          setMuted(!muted);
+        });
+        $("muteRow").addEventListener("click", function () {
+          setMuted(!muted);
+        });
+        $("shareBtn").addEventListener("click", function () {
+          var url = location.href,
+            lab = $("shareLabel");
+          if (navigator.share) {
+            navigator
+              .share({ title: "کوکوچت", url: url })
+              .catch(function () {});
+            return;
+          }
+          if (navigator.clipboard)
+            navigator.clipboard
+              .writeText(url)
+              .then(function () {
+                lab.textContent = "لینک کپی شد";
+                setTimeout(function () {
+                  lab.textContent = "اشتراک‌گذاری";
+                }, 1600);
+              })
+              .catch(function () {});
+        });
+
+        /* ---------- Sticker panel (visual only) ---------- */
+        stickerBtn.addEventListener("click", function () {
+          var open = !panel.classList.contains("is-open");
+          panel.classList.toggle("is-open", open);
+          panel.setAttribute("aria-hidden", String(!open));
+          stickerBtn.setAttribute("aria-expanded", String(open));
+          panel.querySelector("button").tabIndex = open ? 0 : -1;
+        });
+        $("backBtn").addEventListener("click", function () {
+          history.length > 1 ? history.back() : (location.href = "/");
+        });
+
+        /* ---------- Helpers ---------- */
+        var isOwn = function (r) {
+          return !!r.querySelector(".message-outgoing");
+        };
+        var hasText = function (r) {
+          return !!r.querySelector(".bubble");
+        };
+        function grow() {
+          input.style.height = "auto";
+          input.style.height = input.scrollHeight + "px";
+        }
+
+        /* ---------- Reply / Edit bar ---------- */
+        function setBar(row, m) {
+          var wasEdit = mode === "edit";
+          if (barRow) barRow.classList.remove("is-editing");
+          barRow = row;
+          mode = row ? m : null;
+          var open = !!row;
+          if (row) {
+            $("replyAuthor").textContent =
+              m === "edit" ? "ویرایش پیام" : row.dataset.author;
+            $("replyText").textContent = row.dataset.text;
+            $("barIconReply").classList.toggle("hidden", m === "edit");
+            $("barIconEdit").classList.toggle("hidden", m !== "edit");
+            if (m === "edit") row.classList.add("is-editing");
+          }
+          bar.classList.toggle("is-open", open);
+          bar.setAttribute("aria-hidden", String(!open));
+          $("replyClose").tabIndex = $("replyPreview").tabIndex = open ? 0 : -1;
+
+          var editing = mode === "edit";
+          $("sendIcon").classList.toggle("hidden", editing);
+          $("checkIcon").classList.toggle("hidden", !editing);
+          sendBtn.setAttribute(
+            "aria-label",
+            editing ? "ثبت ویرایش" : "ارسال پیام",
+          );
+
+          if (editing) {
+            input.value = row.dataset.text;
+            grow();
+          } else if (wasEdit) {
+            input.value = "";
+            grow();
+          }
+          if (open) {
+            input.focus();
+            var n = input.value.length;
+            input.setSelectionRange(n, n);
+          }
+        }
+        function applyEdit() {
+          var t = input.value.trim();
+          if (!t || !barRow) return;
+          var row = barRow;
+          if (t !== row.dataset.text) {
+            var p = row.querySelector(".bubble p");
+            p.textContent = "";
+            t.split("\n").forEach(function (line, i) {
+              if (i) p.appendChild(document.createElement("br"));
+              p.appendChild(document.createTextNode(line));
+            });
+            var sp = document.createElement("span");
+            sp.className = "inline-block";
+            sp.style.width = "112px";
+            sp.setAttribute("aria-hidden", "true");
+            p.appendChild(sp);
+            var time = row.querySelector("time");
+            if (!time.querySelector("[data-edited]")) {
+              var lab = document.createElement("span");
+              lab.setAttribute("data-edited", "");
+              lab.className = "me-1";
+              lab.textContent = "ویرایش‌شده";
+              time.insertBefore(lab, time.firstChild);
+            }
+            row.dataset.text = t;
+            document
+              .querySelectorAll('[data-goto="' + row.id + '"] span:last-child')
+              .forEach(function (q) {
+                q.textContent = t.replace(/\s+/g, " ");
+              });
+          }
+          setBar(null);
+        }
+        sendBtn.addEventListener("click", function () {
+          if (mode === "edit") applyEdit();
+        });
+        $("replyClose").addEventListener("click", function () {
+          setBar(null);
+        });
+        $("replyPreview").addEventListener("click", function () {
+          if (barRow) goTo(barRow.id);
+        });
+        input.addEventListener("input", grow);
+        input.addEventListener("keydown", function (e) {
+          if (
+            e.key === "Enter" &&
+            !e.shiftKey &&
+            mode === "edit" &&
+            matchMedia("(hover: hover)").matches
+          ) {
+            e.preventDefault();
+            applyEdit();
+          } else if (e.key === "ArrowUp" && !input.value && !mode) {
+            // like Telegram: edit your last message
+            var own = Array.prototype.filter
+              .call(document.querySelectorAll(".msg"), function (r) {
+                return isOwn(r);
+              })
+              .pop();
+            if (own) {
+              e.preventDefault();
+              setBar(own, "edit");
+            }
+          }
+        });
+
+        function goTo(id) {
+          var el = $(id);
+          if (!el) return;
+          el.scrollIntoView({ block: "center", behavior: "smooth" });
+          el.classList.remove("flash");
+          void el.offsetWidth;
+          el.classList.add("flash");
+        }
+        document.querySelectorAll("[data-goto]").forEach(function (b) {
+          b.addEventListener("click", function () {
+            goTo(b.dataset.goto);
+          });
+        });
+
+        /* ---------- Context menu ---------- */
+        function closeMenu() {
+          menu.hidden = true;
+          scrim.hidden = true;
+          if (menuRow) menuRow.classList.remove("menu-target");
+          menuRow = null;
+        }
+        function openMenu(row, x, y) {
+          closeMenu();
+          menuRow = row;
+          row.classList.add("menu-target");
+          menu.querySelector('[data-act="edit"]').hidden = !isOwn(row);
+          menu.querySelector('[data-act="copy"]').hidden = !hasText(row);
+          scrim.hidden = false;
+          menu.hidden = false;
+          var r = box.getBoundingClientRect(),
+            w = menu.offsetWidth,
+            h = menu.offsetHeight;
+          var left = Math.min(Math.max(8, x - r.left - w / 2), r.width - w - 8);
+          var top = y - r.top + 8;
+          if (top + h > r.height - 8) top = y - r.top - h - 8;
+          menu.style.left = left + "px";
+          menu.style.top = Math.max(8, top) + "px";
+          menuOpenedAt = Date.now();
+          menu
+            .querySelector(".menu-item:not([hidden])")
+            .focus({ preventScroll: true });
+        }
+        scrim.addEventListener("click", function () {
+          if (Date.now() - menuOpenedAt > 250) closeMenu();
+        });
+        scrim.addEventListener("contextmenu", function (e) {
+          e.preventDefault();
+          closeMenu();
+        });
+        menu.addEventListener("click", function (e) {
+          var b = e.target.closest("[data-act]");
+          if (!b || !menuRow) return;
+          var row = menuRow,
+            a = b.dataset.act;
+          closeMenu();
+          if (a === "reply") setBar(row, "reply");
+          else if (a === "edit") setBar(row, "edit");
+          else if (a === "copy" && navigator.clipboard)
+            navigator.clipboard
+              .writeText(row.dataset.text)
+              .catch(function () {});
+        });
+
+        document.addEventListener("keydown", function (e) {
+          if (e.key !== "Escape") return;
+          if (!menu.hidden) closeMenu();
+          else if (profile.classList.contains("is-open")) {
+            setProfile(false);
+            $("openProfile").focus({ preventScroll: true });
+          } else if (mode) setBar(null);
+        });
+
+        /* ---------- Messages: reply button, double-click, swipe, long-press, right-click ---------- */
+        document.querySelectorAll(".msg").forEach(function (row) {
+          var hint = document.createElement("span");
+          hint.className =
+            "absolute -right-[42px] top-1/2 -mt-4 flex h-8 w-8 scale-[.6] items-center justify-center rounded-full bg-[rgba(15,40,25,.35)] text-white opacity-0 pointer-events-none";
+          hint.innerHTML =
+            '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/></svg>';
+          row.appendChild(hint);
+          row
+            .querySelector(".reply-btn")
+            .addEventListener("click", function () {
+              setBar(row, "reply");
+            });
+          row.addEventListener("dblclick", function () {
+            setBar(row, "reply");
+          });
+          row.addEventListener("contextmenu", function (e) {
+            e.preventDefault();
+            openMenu(row, e.clientX, e.clientY);
+          });
+
+          var sx = 0,
+            sy = 0,
+            dx = 0,
+            active = false,
+            locked = false,
+            lp;
+          row.addEventListener("pointerdown", function (e) {
+            if (e.target.closest("button")) return;
+            sx = e.clientX;
+            sy = e.clientY;
+            dx = 0;
+            active = true;
+            locked = false;
+            if (e.pointerType !== "mouse")
+              lp = setTimeout(function () {
+                if (!locked) {
+                  active = false;
+                  openMenu(row, sx, sy);
+                }
+              }, 450);
+          });
+          row.addEventListener("pointermove", function (e) {
+            if (!active) return;
+            var mx = e.clientX - sx,
+              my = e.clientY - sy;
+            if (Math.abs(mx) > 8 || Math.abs(my) > 8) clearTimeout(lp);
+            if (!locked) {
+              if (Math.abs(my) > 10) {
+                active = false;
+                return;
+              }
+              if (Math.abs(mx) > 8) {
+                locked = true;
+                row.classList.add("is-swiping");
+              } else return;
+            }
+            dx = Math.max(-72, Math.min(0, mx));
+            var p = Math.min(1, -dx / 56);
+            row.style.transform = "translateX(" + dx + "px)";
+            hint.style.opacity = p;
+            hint.style.transform = "scale(" + (0.6 + 0.4 * p) + ")";
+          });
+          function end() {
+            clearTimeout(lp);
+            if (!active) return;
+            active = false;
+            row.classList.remove("is-swiping");
+            row.style.transform = "";
+            hint.style.opacity = 0;
+            hint.style.transform = "scale(.6)";
+            if (locked && dx <= -56) setBar(row, "reply");
+          }
+          row.addEventListener("pointerup", end);
+          row.addEventListener("pointercancel", end);
+        });
+
+        /* ---------- iOS keyboard / viewport ---------- */
+        if (window.visualViewport) {
+          window.visualViewport.addEventListener("resize", function () {
+            document.documentElement.style.setProperty(
+              "--app-h",
+              window.visualViewport.height + "px",
+            );
+            msgs.scrollTop = msgs.scrollHeight;
+            window.scrollTo(0, 0);
+          });
+          window.visualViewport.addEventListener("scroll", function () {
+            window.scrollTo(0, 0);
+          });
+        }
+
+        /* ---------- Scrollbar only while scrolling ---------- */
+        document.querySelectorAll(".thin-scroll").forEach(function (el) {
+          var t;
+          el.addEventListener(
+            "scroll",
+            function () {
+              el.classList.add("is-scrolling");
+              clearTimeout(t);
+              t = setTimeout(function () {
+                el.classList.remove("is-scrolling");
+              }, 900);
+            },
+            { passive: true },
+          );
+        });
+
+        /* ---------- Stay pinned to the latest message when the area resizes ---------- */
+        var stick = true;
+        msgs.addEventListener(
+          "scroll",
+          function () {
+            stick = msgs.scrollHeight - msgs.scrollTop - msgs.clientHeight < 80;
+          },
+          { passive: true },
+        );
+        if (window.ResizeObserver)
+          new ResizeObserver(function () {
+            if (stick) msgs.scrollTop = msgs.scrollHeight;
+          }).observe(msgs);
+        msgs.scrollTop = msgs.scrollHeight;
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,674 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+
+     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <title>کوکوچت | چت</title>
+
+    <link rel="stylesheet" href="htemplate/Chat/Assets/Css/App/output.css" />
+  </head>
+
+  <body>
+    <main class="size-full chat-page sm:flex sm:items-center sm:justify-center">
+      <section
+        class="chat-container sm:px-0! pl-[env(safe-area-inset-left,0px)] chat-bg pr-[env(safe-area-inset-right,0px)] relative mx-auto flex w-full flex-col overflow-hidden sm:max-w-130 sm:rounded-3xl sm:shadow-[0_24px_60px_-24px_rgba(5,46,22,.3),0_0_0_1px_rgba(5,46,22,.06)]"
+      >
+        <!-- 1. Header -->
+        <header class="z-10 p-1.5 chat-header shrink-0">
+          <div class="flex items-center px-2 py-1.5 gap-1.5">
+            <button
+              type="button"
+              class="flex items-center justify-center transition bg-white rounded-full size-10 shrink-0 text-slate-600 cursor-pointer active:scale-95 shadow-[0_1px_3px_rgba(5,46,22,.3)]"
+            >
+              <i class="text-2xl harmony-icon-right-open-1 harmony-icon"></i>
+            </button>
+
+            <button
+              type="button"
+              class="flex items-center flex-1 h-10 min-w-0 gap-3 p-1 bg-white rounded-full text-start shadow-[0_1px_3px_rgba(5,46,22,.3)]"
+            >
+              <img
+                src="htemplate/Chat/Assets/Images/design/1.png"
+                alt="تصویر پروفایل کوکو"
+                class="object-contain bg-gray-100 rounded-full size-9 shrink-0"
+              />
+              <span class="min-w-0">
+                <span class="flex items-center gap-1"
+                  ><span class="text-sm truncate">کوکوچت</span>
+                </span>
+                <span
+                  class="flex items-center gap-1.5 text-[9px] text-emerald-700"
+                >
+                  <span class="size-1.5 rounded-full bg-green-500"></span>
+                  آنلاین
+                </span>
+              </span>
+            </button>
+          </div>
+        </header>
+
+        <div class="flex flex-col flex-1 min-h-0">
+          <div
+            class="flex-1 min-h-0 px-3 py-3 overflow-x-hidden overflow-y-auto messages thin-scroll overscroll-contain touch-pan-y"
+          >
+            <div class="flex flex-col justify-end min-h-full gap-3">
+              <div class="relative flex justify-start group">
+                <div
+                  class="max-w-max flex-1 rounded-ee-[0.9375rem] rounded-se-[0.9375rem] rounded-ss-[0.9375rem] drop-shadow-[0_2px_1.5px_rgba(5,46,22,0.26)] bg-white p-2 relative"
+                >
+                  <div class="flex flex-col items-center gap-2 pt-2 pb-3">
+                    <video
+                      poster="htemplate/Chat/Assets/Images/design/1.png"
+                      class="object-contain pointer-events-none size-44"
+                      autoplay
+                      muted
+                      loop
+                      playsinline
+                      disablepictureinpicture
+                      controlslist="nodownload nofullscreen noremoteplayback"
+                      aria-label="استیکر کوکو"
+                    >
+                      <source
+                        src="htemplate/Chat/Assets/Images/design/1.mp4"
+                        type="video/mp4"
+                      />
+                    </video>
+                  </div>
+                  <svg
+                    width="9"
+                    height="20"
+                    class="absolute w-2 h-4 -bottom-px -start-2"
+                  >
+                    <defs>
+                      <filter
+                        x="-50%"
+                        y="-14.7%"
+                        width="200%"
+                        height="141.2%"
+                        filterUnits="objectBoundingBox"
+                        id="messageAppendix"
+                      >
+                        <feOffset
+                          dy="1"
+                          in="SourceAlpha"
+                          result="shadowOffsetOuter1"
+                        ></feOffset>
+                        <feGaussianBlur
+                          stdDeviation="1"
+                          in="shadowOffsetOuter1"
+                          result="shadowBlurOuter1"
+                        ></feGaussianBlur>
+                        <feColorMatrix
+                          values="0 0 0 0 0.0621962482 0 0 0 0 0.138574144 0 0 0 0 0.185037364 0 0 0 0.15 0"
+                          in="shadowBlurOuter1"
+                        ></feColorMatrix>
+                      </filter>
+                    </defs>
+                    <g fill="none" fill-rule="evenodd">
+                      <path
+                        d="M6 17H0V0c.193 2.84.876 5.767 2.05 8.782.904 2.325 2.446 4.485 4.625 6.48A1 1 0 016 17z"
+                        fill="#000"
+                        filter="url(#messageAppendix)"
+                      ></path>
+                      <path
+                        d="M6 17H0V0c.193 2.84.876 5.767 2.05 8.782.904 2.325 2.446 4.485 4.625 6.48A1 1 0 016 17z"
+                        fill="#EEFFDE"
+                        class="corner"
+                      ></path>
+                    </g>
+                  </svg>
+                </div>
+              </div>
+
+              <!-- Date chip -->
+              <div class="flex items-center justify-center">
+                <p
+                  class="line-clamp-1 max-w-11/12 text-[9px] text-center py-0.5 px-3 rounded-full bg-green-200"
+                >
+                  شنبه
+                </p>
+              </div>
+
+              <!-- Incoming group -->
+
+              <div class="relative flex justify-start group">
+                <div
+                  class="max-w-[70%] w-full flex-1 rounded-ee-[0.9375rem] rounded-se-[0.9375rem] rounded-ss-[0.9375rem] drop-shadow-[0_2px_1.5px_rgba(5,46,22,0.26)] bg-[#eeffde] p-2 relative"
+                >
+                  <div dir="auto">
+                    <p
+                      class="mb-2 text-sm leading-relaxed wrap-anywhere text-slate-700"
+                    >
+                      به کوکوچت خوش اومدی.چطور می‌تونم کمکت کنم؟
+                      
+                    </p>
+                    <time
+                      class="absolute bottom-1 end-2 flex items-center gap-0.5 text-[11px] text-green-700"
+                      ><span data-edited="" class="me-1">ویرایش‌ شده</span>۱۲:۴۱
+                      <svg
+                        class="h-3.5 w-3.5"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.4"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-label="خوانده شد"
+                      >
+                        <path d="M2 13l4 4L14 8M10 15l2 2L20 8"></path></svg
+                    ></time>
+                  </div>
+                  <svg
+                    width="9"
+                    height="20"
+                    class="absolute w-2 h-4 -bottom-px -start-2"
+                  >
+                    <defs>
+                      <filter
+                        x="-50%"
+                        y="-14.7%"
+                        width="200%"
+                        height="141.2%"
+                        filterUnits="objectBoundingBox"
+                        id="messageAppendix"
+                      >
+                        <feOffset
+                          dy="1"
+                          in="SourceAlpha"
+                          result="shadowOffsetOuter1"
+                        ></feOffset>
+                        <feGaussianBlur
+                          stdDeviation="1"
+                          in="shadowOffsetOuter1"
+                          result="shadowBlurOuter1"
+                        ></feGaussianBlur>
+                        <feColorMatrix
+                          values="0 0 0 0 0.0621962482 0 0 0 0 0.138574144 0 0 0 0 0.185037364 0 0 0 0.15 0"
+                          in="shadowBlurOuter1"
+                        ></feColorMatrix>
+                      </filter>
+                    </defs>
+                    <g fill="none" fill-rule="evenodd">
+                      <path
+                        d="M6 17H0V0c.193 2.84.876 5.767 2.05 8.782.904 2.325 2.446 4.485 4.625 6.48A1 1 0 016 17z"
+                        fill="#000"
+                        filter="url(#messageAppendix)"
+                      ></path>
+                      <path
+                        d="M6 17H0V0c.193 2.84.876 5.767 2.05 8.782.904 2.325 2.446 4.485 4.625 6.48A1 1 0 016 17z"
+                        fill="#EEFFDE"
+                        class="corner"
+                      ></path>
+                    </g>
+                  </svg>
+                  
+                  <button
+                    type="button"
+                    class="absolute flex items-center justify-center text-white -translate-y-1/2 -end-10 rounded-full opacity-0 pointer-events-none reply-btn bg-[#0f28194d] transition-opacity top-1/2 size-7 shrink-0 focus-visible:opacity-100 focus-visible:pointer-events-auto group-hover:pointer-events-auto group-hover:opacity-100"
+                    aria-label="پاسخ به این پیام"
+                  >
+                    <svg
+                      class="size-4"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Outgoing -->
+              <div class="relative flex justify-end group">
+                <div
+                  class="max-w-[70%] w-full flex-1 rounded-se-[0.9375rem] drop-shadow-[0_2px_1.5px_rgba(5,46,22,0.26)] rounded-s-[0.9375rem] bg-[#eeffde] p-2 relative"
+                >
+                  <div dir="auto">
+                    <p
+                      class="mb-2 text-sm leading-relaxed wrap-anywhere text-slate-700"
+                    >
+                      به کوکوچت خوش اومدی.چطور می‌تونم کمکت کنم؟
+                    </p>
+                    <time
+                      class="absolute bottom-1 end-2 flex items-center gap-0.5 text-[11px] text-green-700"
+                      ><span data-edited="" class="me-1">ویرایش‌شده</span>۱۲:۴۱
+                      <svg
+                        class="h-3.5 w-3.5"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.4"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-label="خوانده شد"
+                      >
+                        <path d="M2 13l4 4L14 8M10 15l2 2L20 8"></path></svg
+                    ></time>
+                  </div>
+
+                  <button
+                    type="button"
+                    class="absolute flex items-center justify-center text-white -translate-y-1/2 -start-10 rounded-full opacity-0 pointer-events-none reply-btn bg-[#0f28194d] transition-opacity top-1/2 size-7 shrink-0 focus-visible:opacity-100 focus-visible:pointer-events-auto group-hover:pointer-events-auto group-hover:opacity-100 scale-x-[-1]"
+                    aria-label="پاسخ به این پیام"
+                  >
+                    <svg
+                      class="size-4"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"
+                      />
+                    </svg>
+                  </button>
+                  <svg
+                    width="9"
+                    height="20"
+                    class="absolute -bottom-px w-2 h-4 -end-2 scale-x-[-1]"
+                  >
+                    <defs>
+                      <filter
+                        x="-50%"
+                        y="-14.7%"
+                        width="200%"
+                        height="141.2%"
+                        filterUnits="objectBoundingBox"
+                        id="messageAppendix"
+                      >
+                        <feOffset
+                          dy="1"
+                          in="SourceAlpha"
+                          result="shadowOffsetOuter1"
+                        ></feOffset>
+                        <feGaussianBlur
+                          stdDeviation="1"
+                          in="shadowOffsetOuter1"
+                          result="shadowBlurOuter1"
+                        ></feGaussianBlur>
+                        <feColorMatrix
+                          values="0 0 0 0 0.0621962482 0 0 0 0 0.138574144 0 0 0 0 0.185037364 0 0 0 0.15 0"
+                          in="shadowBlurOuter1"
+                        ></feColorMatrix>
+                      </filter>
+                    </defs>
+                    <g fill="none" fill-rule="evenodd">
+                      <path
+                        d="M6 17H0V0c.193 2.84.876 5.767 2.05 8.782.904 2.325 2.446 4.485 4.625 6.48A1 1 0 016 17z"
+                        fill="#000"
+                        filter="url(#messageAppendix)"
+                      ></path>
+                      <path
+                        d="M6 17H0V0c.193 2.84.876 5.767 2.05 8.782.904 2.325 2.446 4.485 4.625 6.48A1 1 0 016 17z"
+                        fill="#EEFFDE"
+                        class="corner"
+                      ></path>
+                    </g>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+          <footer class="px-2 pt-1 shrink-0">
+            <div
+              class="grid grid-rows-[0fr] transition-[grid-template-rows] duration-250 ease-out [&.is-open]:grid-rows-[1fr] motion-reduce:animate-none"
+            >
+              <div class="overflow-hidden">
+                <div
+                  class="mb-2 flex gap-2 rounded-2xl bg-white p-2 shadow-[0_1px_2px_rgba(5,46,22,.15)]"
+                >
+                  <button
+                    type="button"
+                    aria-label="ارسال استیکر کوکو"
+                    class="p-1 transition size-20 rounded-xl hover:bg-slate-100 active:scale-95"
+                  >
+                    <video
+                      poster="htemplate/Chat/Assets/Images/design/1.png"
+                      class="object-contain pointer-events-none size-full"
+                      autoplay
+                      muted
+                      loop
+                      playsinline
+                      aria-hidden="true"
+                    >
+                      <source
+                        src="htemplate/Chat/Assets/Images/design/1.mp4"
+                        type="video/mp4"
+                      />
+                    </video>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="flex items-end gap-2 pb-[max(12px,env(safe-area-inset-bottom,0px))]"
+            >
+              <div
+                class="min-w-0 flex-1 overflow-hidden rounded-[22px] bg-white shadow-[0_1px_2px_rgba(5,46,22,.15)]"
+              >
+                <div
+                  class="is-open motion-reduce:animate-none grid grid-rows-[0fr] transition-[grid-template-rows] duration-200 ease-out [&.is-open]:grid-rows-[1fr]"
+                >
+                  <div class="overflow-hidden">
+                    <div class="flex items-center gap-2 pt-2 pb-1 pe-3 ps-1">
+                      <span
+                        class="mx-2 shrink-0 text-emerald-700"
+                        aria-hidden="true"
+                      >
+                        <svg
+                          id="barIconReply"
+                          class="size-5"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                        >
+                          <path
+                            d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"
+                          />
+                        </svg>
+                        <svg
+                          id="barIconEdit"
+                          class="hidden size-5"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <path
+                            d="M4 20h4L18.5 9.5a2.1 2.1 0 00-3-3L5 17v3zM14 7.5l2.5 2.5"
+                          />
+                        </svg>
+                      </span>
+                      <button
+                        type="button"
+                        id="replyPreview"
+                        class="flex-1 border-green-500 border-s-2 ps-2 text-start"
+                      >
+                        <span
+                          class="block truncate text-[13px] font-medium leading-5 text-green-700"
+                          id="replyAuthor"
+                          >کوکوچت</span
+                        >
+                        <span
+                          class="block truncate text-[13px] leading-5 text-slate-600"
+                          id="replyText"
+                          >حتماً! قبلش بگو امروز حالت چطوره؟ 😊</span
+                        >
+                      </button>
+
+                      <button
+                        type="button"
+                        class="flex items-center justify-center rounded-full cursor-pointer size-9 shrink-0 text-slate-500 hover:bg-slate-100 active:scale-95"
+                      >
+                        <svg
+                          class="size-5"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          aria-hidden="true"
+                        >
+                          <path d="M6 6l12 12M18 6L6 18" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex items-end">
+                  <button
+                    type="button"
+                    id="stickerBtn"
+                    aria-label="استیکر و ایموجی"
+                    aria-expanded="false"
+                    class="flex items-center justify-center transition rounded-full size-11 shrink-0 text-slate-500 hover:text-emerald-700 active:scale-90"
+                  >
+                    <svg
+                      class="w-6 h-6"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <circle cx="12" cy="12" r="9.5" />
+                      <path d="M8.5 14.5c.9 1.3 2 2 3.5 2s2.6-.7 3.5-2" />
+                      <path d="M9 9.7h.01M15 9.7h.01" />
+                    </svg>
+                  </button>
+                  <textarea
+                    id="msgInput"
+                    rows="1"
+                    dir="rtl"
+                    placeholder="پیام"
+                    aria-label="متن پیام"
+                    enterkeyhint="send"
+                    class="max-h-32 min-h-[44px] min-w-0 flex-1 resize-none bg-transparent py-[10px] pe-4 leading-6 text-slate-900 placeholder:text-slate-500 focus:outline-none"
+                  ></textarea>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                class="flex size-11 shrink-0 items-center justify-center rounded-full bg-green-600 text-white shadow-[0_1px_3px_rgba(5,46,22,.3)] duration-200 hover:bg-green-700 active:scale-95"
+              >
+                <svg
+                  id="sendIcon"
+                  class="size-6 -scale-x-100"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M3.4 20.4l17.45-7.48a1 1 0 000-1.84L3.4 3.6a.99.99 0 00-1.39 1.17L3.5 11l8.5 1-8.5 1-1.49 6.23a.99.99 0 001.39 1.17z"
+                  />
+                </svg>
+                <svg
+                  id="checkIcon"
+                  class="hidden w-6 h-6"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.6"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M5 12.5l4.5 4.5L19 7.5" />
+                </svg>
+              </button>
+            </div>
+          </footer>
+        </div>
+
+        <!-- Profile view -->
+        <aside
+          class="absolute inset-0 z-20 flex flex-col profile-view bg-slate-100 translate-x-full opacity-0 pointer-events-none invisible duration-500 [&.is-open]:translate-x-0 [&.is-open]:opacity-100 [&.is-open]:visible [&.is-open]:pointer-events-auto motion-reduce:animate-none"
+        >
+          <div class="pt-[env(safe-area-inset-top,0px)] bg-white">
+            <button
+              type="button"
+              class="ms-1 mt-1.5 cursor-pointer flex size-11 items-center justify-center rounded-full text-slate-700 hover:bg-slate-100 active:scale-95"
+            >
+              <i class="text-2xl harmony-icon-right-open-1 harmony-icon"></i>
+            </button>
+          </div>
+
+          <div
+            class="thin-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain pb-[max(16px,env(safe-area-inset-bottom))]"
+          >
+            <div class="flex flex-col items-center p-3 text-center bg-white">
+              <img
+                src="htemplate/Chat/Assets/Images/design/1.png"
+                alt="تصویر بزرگ کوکو"
+                class="object-cover rounded-full size-24 bg-emerald-50"
+              />
+              <h1 class="mt-3 text-xl font-bold leading-8">کوکوچت</h1>
+              <p class="flex items-center gap-1.5 text-sm text-emerald-700">
+                <span class="w-2 h-2 bg-green-500 rounded-full"></span>آنلاین
+              </p>
+            </div>
+
+            <!-- Actions -->
+            <div class="grid grid-cols-3 gap-2 px-3 pt-3">
+              <button
+                type="button"
+                id="profileMsg"
+                class="flex flex-col items-center gap-1.5 rounded-xl bg-white px-1 py-3 text-[13px] font-medium text-emerald-700 shadow-[0_1px_1px_rgba(15,23,42,.06)] transition active:scale-95 active:bg-slate-50 hover:bg-slate-50 cursor-pointer"
+              >
+                <svg
+                  class="w-6 h-6"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.9"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M21 12a8 8 0 01-11.6 7.1L4 20l1-4.6A8 8 0 1121 12z"
+                  />
+                </svg>
+                <span>پیام</span>
+              </button>
+              <button
+                type="button"
+                id="muteBtn"
+                aria-pressed="false"
+                class="flex flex-col items-center gap-1.5 rounded-xl bg-white px-1 py-3 text-[13px] font-medium text-emerald-700 shadow-[0_1px_1px_rgba(15,23,42,.06)] transition active:scale-[.97] active:bg-slate-50 hover:bg-slate-50 cursor-pointer"
+              >
+                <svg
+                  id="icBellOff"
+                  class="w-6 h-6"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.9"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M6 9a6 6 0 1112 0c0 5 2 6.5 2 6.5H4S6 14 6 9zM10 19a2 2 0 004 0"
+                  />
+                  <path d="M4 4l16 16" />
+                </svg>
+                <svg
+                  id="icBell"
+                  class="hidden w-6 h-6"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.9"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M6 9a6 6 0 1112 0c0 5 2 6.5 2 6.5H4S6 14 6 9zM10 19a2 2 0 004 0"
+                  />
+                </svg>
+                <span id="muteLabel">بی‌صدا</span>
+              </button>
+              <button
+                type="button"
+                id="shareBtn"
+                class="flex flex-col items-center gap-1.5 rounded-xl bg-white px-1 py-3 text-[13px] font-medium text-emerald-700 shadow-[0_1px_1px_rgba(15,23,42,.06)] transition active:scale-[.97] active:bg-slate-50 hover:bg-slate-50 cursor-pointer"
+              >
+                <svg
+                  class="w-6 h-6"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.9"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M12 15V4M7.5 8.5L12 4l4.5 4.5M5 13v5a2 2 0 002 2h10a2 2 0 002-2v-5"
+                  />
+                </svg>
+                <span id="shareLabel">اشتراک‌گذاری</span>
+              </button>
+            </div>
+
+            <!-- Info -->
+            <section class="px-4 py-3 mt-3 bg-white">
+              <h2 class="text-sm font-medium text-emerald-700">اطلاعات</h2>
+              <dl class="mt-2 space-y-3">
+                <div class="flex flex-col-reverse">
+                  <dt class="text-[13px] leading-5 text-slate-500">درباره</dt>
+                  <dd class="text-[15px] leading-6">
+                    دستیار هوشمند کسب‌وکار شما
+                  </dd>
+                </div>
+                <div class="flex flex-col-reverse">
+                  <dt class="text-[13px] leading-5 text-slate-500">کاربرد</dt>
+                  <dd class="text-[15px] leading-6">
+                    پاسخ به سؤال‌های شما درباره محصولات و خدمات
+                  </dd>
+                </div>
+                <div class="flex flex-col-reverse">
+                  <dt class="text-[13px] leading-5 text-slate-500">پاسخگویی</dt>
+                  <dd class="text-[15px] leading-6">
+                    همیشه آنلاین و آماده کمک
+                  </dd>
+                </div>
+              </dl>
+            </section>
+
+            <!-- Notifications -->
+            <div
+              class="flex items-center w-full gap-3 px-4 py-3 mt-2 transition bg-white text-start"
+            >
+              <svg
+                class="w-6 h-6 shrink-0 text-slate-500"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.9"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path
+                  d="M6 9a6 6 0 1112 0c0 5 2 6.5 2 6.5H4S6 14 6 9zM10 19a2 2 0 004 0"
+                />
+              </svg>
+              <span class="flex-1 min-w-0">
+                <span class="block text-[15px] leading-6">اعلان‌ها</span>
+                <span class="block text-[13px] leading-5 text-slate-500"
+                  >روشن</span
+                >
+              </span>
+              <label
+                class="relative inline-flex w-[44px] h-[26px] shrink-0 cursor-pointer"
+              >
+                <input type="checkbox" class="sr-only peer" />
+
+                <span
+                  class="absolute inset-0 rounded-full bg-[#cbd5e1] transition-[background] duration-200 peer-checked:bg-[#00a844] after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:size-[22px] after:rounded-full after:bg-white after:shadow-[0_1px_2px_rgba(15,23,42,0.3)] after:transition-transform after:duration-200 after:ease-[cubic-bezier(0.22,0.8,0.3,1)] peer-checked:after:-translate-x-[18px] motion-reduce:animate-none"
+                ></span>
+              </label>
+            </div>
+          </div>
+        </aside>
+      </section>
+    </main>
+  </body>
+</html>
