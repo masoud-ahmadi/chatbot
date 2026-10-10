@@ -1251,16 +1251,16 @@
 
     'button.launcher svg{width:1.625rem;height:1.625rem}.launcher:hover{transform:scale(1.07)}.launcher:active{transform:scale(.95)}',
 
-    // Expand from the launcher; keep text hidden during the strongest scaling.
-    '.root .panel{position:fixed;top:auto;right:auto;bottom:auto;left:auto;width:min(24.5rem,calc(100vw - 2rem));height:min(41.25rem,calc(100vh - 7rem));max-height:calc(100vh - 7rem);background:var(--bg);border-radius:var(--panel-closed-radius,50%);box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;opacity:0;visibility:hidden;pointer-events:none;transform-origin:center;transform:translate(var(--panel-from-x,0px),calc(var(--panel-base-y,0px) + var(--panel-from-y,24px))) scale(var(--panel-from-sx,.9),var(--panel-from-sy,.9));transition:transform .24s cubic-bezier(.4,0,.8,.2),border-radius .24s ease,opacity .08s linear .16s,visibility 0s linear .24s;z-index:2}',
-    '.root.open .panel{opacity:1;visibility:visible;pointer-events:auto;border-radius:1.375rem;transform:translate(0,var(--panel-base-y,0px)) scale(1,1);transition:transform .38s cubic-bezier(.16,1,.3,1),border-radius .38s ease,opacity .06s linear,visibility 0s}',
+    // Spring entrance and circular reveal, without changing the final layout.
+    '.root .panel{position:fixed;top:auto;right:auto;bottom:auto;left:auto;width:min(24.5rem,calc(100vw - 2rem));height:min(41.25rem,calc(100vh - 7rem));max-height:calc(100vh - 7rem);background:var(--bg);border-radius:1.375rem;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;opacity:0;visibility:hidden;pointer-events:none;transform-origin:var(--panel-origin-x,100%) var(--panel-origin-y,100%);transform:translateY(calc(var(--panel-base-y,0px) + var(--panel-closed-y,64px))) scale(.5) rotate(var(--panel-tilt,6deg));clip-path:circle(0% at var(--panel-origin-x,100%) var(--panel-origin-y,100%));transition:transform .3s ease-in,clip-path .3s ease-in,opacity .3s ease-in,visibility 0s linear .3s;z-index:2}',
+    '.root.open .panel{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(var(--panel-base-y,0px)) scale(1) rotate(0deg);clip-path:circle(150% at var(--panel-origin-x,100%) var(--panel-origin-y,100%));transition:transform .7s cubic-bezier(.34,1.56,.64,1),clip-path .7s ease-out,opacity .7s cubic-bezier(.34,1.56,.64,1),visibility 0s}',
     '.root .panel > .view{opacity:0;transform:translateY(10px);transition:opacity .06s linear,transform .12s ease}',
     '.root.open .panel > .view{opacity:1;transform:none;transition:opacity .16s ease .22s,transform .18s ease .2s}',
-    '.root .launcher{transition:transform .2s ease,opacity .12s linear .16s}',
+    '.root .launcher{transition:transform .2s ease,opacity .12s linear .22s}',
     '.root.open .launcher{opacity:0;pointer-events:none;transform:scale(.85);transition:transform .16s ease,opacity .08s linear}',
 
-    // Mobile: a sheet slides up and its rounded top settles into fullscreen.
-    '@media (max-width:40rem){.root .panel{--panel-base-y:0px;left:0!important;right:0!important;top:var(--vvt,0px)!important;bottom:auto!important;width:auto;height:var(--vvh,100dvh)!important;max-height:none!important;border-radius:1.75rem 1.75rem 0 0;transform:translateY(100%);transition:transform .26s cubic-bezier(.4,0,.8,.2),border-radius .26s ease,opacity .06s linear .2s,visibility 0s linear .26s}.root.open .panel{transform:translateY(0);border-radius:0;transition:transform .42s cubic-bezier(.16,1,.3,1),border-radius .18s ease .22s,opacity .06s linear,visibility 0s}}',
+    // Keep the existing fullscreen mobile layout with the same reveal motion.
+    '@media (max-width:40rem){.root .panel{--panel-base-y:0px;--panel-origin-y:100%;--panel-closed-y:64px;left:0!important;right:0!important;top:var(--vvt,0px)!important;bottom:auto!important;width:auto;height:var(--vvh,100dvh)!important;max-height:none!important;border-radius:0}}',
 
     '.view{position:absolute;inset:0;display:none;flex-direction:column}.view.active{display:flex}',
 
@@ -1373,6 +1373,7 @@
     '@keyframes bob{0%,100%{transform:translateY(.1875rem) scale(.96)}50%{transform:translateY(-.25rem) scale(1.04)}}',
     '@keyframes morph{0%,100%{border-radius:46% 54% 50% 50%/52% 46% 54% 48%}50%{border-radius:54% 46% 48% 52%/46% 54% 46% 54%}}',
     '@media (prefers-reduced-motion:reduce){.root *,.root *::before,.root *::after{animation-duration:.001ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.001ms!important;transition-delay:0s!important}}',
+    '@media (prefers-reduced-motion:reduce){.root .panel,.root.open .panel{transform:translateY(var(--panel-base-y,0px))!important;clip-path:none!important}}',
     '@media (max-width:40rem){.inp,.ta,input.otp-i{font-size:1rem}}',
 
     /* =========================================================
@@ -1710,7 +1711,7 @@
     if (this.isOpen()) return;
     this.returnFocus = this.shadow.activeElement || document.activeElement;
     this.updatePanelMotion();
-    // Commit the collapsed geometry before starting the transition.
+    // Commit the closed state before starting the transition.
     void this.panel.offsetWidth;
     this.panel.inert = false;
     this.panel.setAttribute('aria-hidden', 'false');
@@ -1723,7 +1724,7 @@
       if (self.isOpen()) self.focusPrimary();
     }, window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches
       ? 0
-      : 430);
+      : 720);
   };
   UI.prototype.close = function () {
     if (!this.isOpen()) return;
@@ -1831,49 +1832,15 @@
   };
   UI.prototype.updatePanelMotion = function () {
     if (!this.panelPosition) return;
-    var p = this.panelPosition;
+    var position = this.panelPosition.position;
     var rootStyle = this.root.style;
-    if (!this.launcher) {
-      rootStyle.setProperty('--panel-from-x', '0px');
-      rootStyle.setProperty('--panel-from-y', '24px');
-      rootStyle.setProperty('--panel-from-sx', '.9');
-      rootStyle.setProperty('--panel-from-sy', '.9');
-      rootStyle.setProperty('--panel-closed-radius', '1.375rem');
-      return;
-    }
-    var width = this.panel.offsetWidth;
-    var height = this.panel.offsetHeight;
-    if (!width || !height) return;
-    var vw = window.innerWidth || document.documentElement.clientWidth;
-    var vh = window.innerHeight || document.documentElement.clientHeight;
-    var isLeft = /-left$/.test(p.position);
-    var isMiddle = p.position.indexOf('middle-') === 0;
-    var isTop = p.position.indexOf('top-') === 0;
-    var launcherWidth = this.launcher.offsetWidth;
-    var launcherHeight = this.launcher.offsetHeight;
-    var gapX = launcherWidth + 14;
-    var gapY = launcherHeight + 14;
-    var launcherX = isLeft
-      ? p.offsetX + launcherWidth / 2
-      : vw - p.offsetX - launcherWidth / 2;
-    var panelX = isLeft
-      ? p.offsetX + (isMiddle ? gapX : 0) + width / 2
-      : vw - p.offsetX - (isMiddle ? gapX : 0) - width / 2;
-    var launcherY = isMiddle
-      ? vh / 2 + p.offsetY
-      : isTop
-        ? p.offsetY + launcherHeight / 2
-        : vh - p.offsetY - launcherHeight / 2;
-    var panelY = isMiddle
-      ? vh / 2 + p.offsetY
-      : isTop
-        ? p.offsetY + gapY + height / 2
-        : vh - p.offsetY - gapY - height / 2;
-    rootStyle.setProperty('--panel-from-x', (launcherX - panelX) + 'px');
-    rootStyle.setProperty('--panel-from-y', (launcherY - panelY) + 'px');
-    rootStyle.setProperty('--panel-from-sx', String(launcherWidth / width));
-    rootStyle.setProperty('--panel-from-sy', String(launcherHeight / height));
-    rootStyle.setProperty('--panel-closed-radius', '50%');
+    var isLeft = /-left$/.test(position);
+    var isMiddle = position.indexOf('middle-') === 0;
+    var isTop = position.indexOf('top-') === 0;
+    rootStyle.setProperty('--panel-origin-x', isLeft ? '0%' : '100%');
+    rootStyle.setProperty('--panel-origin-y', isMiddle ? '50%' : isTop ? '0%' : '100%');
+    rootStyle.setProperty('--panel-closed-y', isTop ? '-64px' : '64px');
+    rootStyle.setProperty('--panel-tilt', isLeft ? '-6deg' : '6deg');
   };
   UI.prototype.focusPrimary = function () {
     var v = this.activeView;
