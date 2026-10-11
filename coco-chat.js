@@ -156,14 +156,24 @@
   // Agent details may be nested under profile or supplied directly by the backend.
   function readAgentProfile(agent) {
     agent = agent || {};
-    var source = agent.profile && typeof agent.profile === 'object'
-      ? agent.profile : agent;
-    var limits = { description: 600, phone: 50, email: 160,
-      website: 500, businessHours: 200, address: 300 };
+    var source =
+      agent.profile && typeof agent.profile === 'object'
+        ? agent.profile
+        : agent;
+    var limits = {
+      description: 600,
+      phone: 50,
+      email: 160,
+      website: 500,
+      businessHours: 200,
+      address: 300,
+    };
     var profile = {};
     Object.keys(limits).forEach(function (key) {
-      profile[key] = typeof source[key] === 'string'
-        ? source[key].trim().slice(0, limits[key]) : '';
+      profile[key] =
+        typeof source[key] === 'string'
+          ? source[key].trim().slice(0, limits[key])
+          : '';
     });
     return profile;
   }
@@ -191,10 +201,13 @@
     down: 'M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z',
     more: 'M12 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm0 6a2 2 0 1 0 0 4 2 2 0 0 0 0-4z',
     chatBack: 'M4 11h12.17l-5.59-5.59L12 4l8 8-8 8-1.41-1.41L16.17 13H4v-2z',
-    phone: 'M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1C10.61 21 3 13.39 3 4c0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z',
+    phone:
+      'M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1C10.61 21 3 13.39 3 4c0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z',
     mail: 'M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z',
-    globe: 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm6.92 6h-3.04a15.65 15.65 0 0 0-1.38-3.56A8.03 8.03 0 0 1 18.92 8zM12 4c.83 1.2 1.46 2.54 1.86 4h-3.72A13.58 13.58 0 0 1 12 4zM4.26 10h3.92a16.56 16.56 0 0 0 0 4H4.26a8.12 8.12 0 0 1 0-4zM5.08 16h3.04c.3 1.26.77 2.46 1.38 3.56A8.03 8.03 0 0 1 5.08 16zm3.04-8H5.08A8.03 8.03 0 0 1 9.5 4.44 15.65 15.65 0 0 0 8.12 8zM12 20a13.58 13.58 0 0 1-1.86-4h3.72A13.58 13.58 0 0 1 12 20zm2.28-6H9.72a14.64 14.64 0 0 1 0-4h4.56a14.64 14.64 0 0 1 0 4zm.22 5.56A15.65 15.65 0 0 0 15.88 16h3.04a8.03 8.03 0 0 1-4.42 3.56zM15.82 14a16.56 16.56 0 0 0 0-4h3.92a8.12 8.12 0 0 1 0 4h-3.92z',
-    location: 'M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z',
+    globe:
+      'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm6.92 6h-3.04a15.65 15.65 0 0 0-1.38-3.56A8.03 8.03 0 0 1 18.92 8zM12 4c.83 1.2 1.46 2.54 1.86 4h-3.72A13.58 13.58 0 0 1 12 4zM4.26 10h3.92a16.56 16.56 0 0 0 0 4H4.26a8.12 8.12 0 0 1 0-4zM5.08 16h3.04c.3 1.26.77 2.46 1.38 3.56A8.03 8.03 0 0 1 5.08 16zm3.04-8H5.08A8.03 8.03 0 0 1 9.5 4.44 15.65 15.65 0 0 0 8.12 8zM12 20a13.58 13.58 0 0 1-1.86-4h3.72A13.58 13.58 0 0 1 12 20zm2.28-6H9.72a14.64 14.64 0 0 1 0-4h4.56a14.64 14.64 0 0 1 0 4zm.22 5.56A15.65 15.65 0 0 0 15.88 16h3.04a8.03 8.03 0 0 1-4.42 3.56zM15.82 14a16.56 16.56 0 0 0 0-4h3.92a8.12 8.12 0 0 1 0 4h-3.92z',
+    location:
+      'M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z',
     back: 'M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z',
   };
   /* Icons are static, trusted constants (never user data). */
@@ -573,14 +586,18 @@
               name: 'کوکو',
               avatarUrl: avatar(),
               status: T.online,
-              profile: Object.assign({
-                description: 'کوکو، همراه شما برای پاسخ به سؤال‌ها و راهنمایی در گفتگو. این اطلاعات برای نمایش نمونه هستند.',
-                phone: '02100000000',
-                email: 'support@example.com',
-                website: 'https://example.com',
-                businessHours: 'شنبه تا چهارشنبه، ساعت ۹ تا ۱۸',
-                address: 'آدرس نمونه: تهران، خیابان نمونه، پلاک ۱',
-              }, mock.profile || {}),
+              profile: Object.assign(
+                {
+                  description:
+                    'کوکو، همراه شما برای پاسخ به سؤال‌ها و راهنمایی در گفتگو. این اطلاعات برای نمایش نمونه هستند.',
+                  phone: '02100000000',
+                  email: 'support@example.com',
+                  website: 'https://example.com',
+                  businessHours: 'شنبه تا چهارشنبه، ساعت ۹ تا ۱۸',
+                  address: 'آدرس نمونه: تهران، خیابان نمونه، پلاک ۱',
+                },
+                mock.profile || {}
+              ),
             },
             settings: { maxLength: 2000 },
             scenarios: sc,
@@ -975,13 +992,15 @@
   };
 
   // Static cloud artwork from the supplied design; each card gets unique SVG IDs.
-  var SCENARIO_CLOUD_SVG = "<svg viewBox=\"0 0 430 370\" preserveAspectRatio=\"none\" aria-hidden=\"true\" focusable=\"false\"><defs><clipPath id=\"cb-clip\"><circle cx=\"230\" cy=\"105\" r=\"85\" /><circle cx=\"120\" cy=\"140\" r=\"60\" /><circle cx=\"72\" cy=\"198\" r=\"48\" /><circle cx=\"330\" cy=\"140\" r=\"62\" /><circle cx=\"366\" cy=\"208\" r=\"46\" /><rect x=\"78\" y=\"150\" width=\"300\" height=\"150\" rx=\"75\" /><circle cx=\"200\" cy=\"248\" r=\"62\" /><circle cx=\"300\" cy=\"246\" r=\"62\" /><path\r\n              d=\"M140 272C150 312 130 336 96 352C158 350 208 326 226 280Z\"\r\n            /></clipPath><filter\r\n            id=\"cb-puffy\"\r\n            x=\"-12%\"\r\n            y=\"-12%\"\r\n            width=\"124%\"\r\n            height=\"124%\"\r\n            color-interpolation-filters=\"sRGB\"\r\n          ><feFlood flood-color=\"#0b1220\" flood-opacity=\".22\" /><feComposite in2=\"SourceAlpha\" operator=\"out\" result=\"outD\" /><feGaussianBlur in=\"outD\" stdDeviation=\"14\" /><feOffset dx=\"-8\" dy=\"-12\" result=\"shD\" /><feComposite\r\n              in=\"shD\"\r\n              in2=\"SourceAlpha\"\r\n              operator=\"in\"\r\n              result=\"innerD\"\r\n            /><feFlood flood-color=\"#ffffff\" flood-opacity=\".85\" /><feComposite in2=\"SourceAlpha\" operator=\"out\" result=\"outL\" /><feGaussianBlur in=\"outL\" stdDeviation=\"7\" /><feOffset dx=\"5\" dy=\"8\" result=\"shL\" /><feComposite\r\n              in=\"shL\"\r\n              in2=\"SourceAlpha\"\r\n              operator=\"in\"\r\n              result=\"innerL\"\r\n            /><feMerge><feMergeNode in=\"SourceGraphic\" /><feMergeNode in=\"innerD\" /><feMergeNode in=\"innerL\" /></feMerge></filter><linearGradient id=\"cb-tone\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#fff\" stop-opacity=\".30\" /><stop offset=\".45\" stop-color=\"#fff\" stop-opacity=\"0\" /><stop offset=\"1\" stop-color=\"#0b1220\" stop-opacity=\".16\" /></linearGradient><radialGradient id=\"cb-floor\"><stop offset=\"0\" stop-color=\"#000\" stop-opacity=\".40\" /><stop offset=\"1\" stop-color=\"#000\" stop-opacity=\"0\" /></radialGradient><linearGradient\r\n            id=\"cb-c1\"\r\n            gradientUnits=\"userSpaceOnUse\"\r\n            x1=\"161\"\r\n            y1=\"73\"\r\n            x2=\"204\"\r\n            y2=\"34\"\r\n          ><stop offset=\"0\" stop-color=\"#fff\" stop-opacity=\"0\" /><stop offset=\".5\" stop-color=\"#fff\" stop-opacity=\".95\" /><stop offset=\"1\" stop-color=\"#fff\" stop-opacity=\"0\" /></linearGradient><linearGradient\r\n            id=\"cb-c2\"\r\n            gradientUnits=\"userSpaceOnUse\"\r\n            x1=\"77\"\r\n            y1=\"120\"\r\n            x2=\"100\"\r\n            y2=\"97\"\r\n          ><stop offset=\"0\" stop-color=\"#fff\" stop-opacity=\"0\" /><stop offset=\".5\" stop-color=\"#fff\" stop-opacity=\".95\" /><stop offset=\"1\" stop-color=\"#fff\" stop-opacity=\"0\" /></linearGradient><filter id=\"cb-b10\" x=\"-50%\" y=\"-50%\" width=\"200%\" height=\"200%\"><feGaussianBlur stdDeviation=\"10\" /></filter><filter id=\"cb-b5\" x=\"-50%\" y=\"-50%\" width=\"200%\" height=\"200%\"><feGaussianBlur stdDeviation=\"5\" /></filter><filter id=\"cb-b1\" x=\"-20%\" y=\"-20%\" width=\"140%\" height=\"140%\"><feGaussianBlur stdDeviation=\"1\" /></filter></defs><ellipse\r\n          class=\"cb-shadow\"\r\n          cx=\"255\"\r\n          cy=\"354\"\r\n          rx=\"165\"\r\n          ry=\"13\"\r\n          fill=\"url(#cb-floor)\"\r\n        /><g class=\"cb-body\"><g filter=\"url(#cb-puffy)\" fill=\"currentColor\"><circle cx=\"230\" cy=\"105\" r=\"85\" /><circle cx=\"120\" cy=\"140\" r=\"60\" /><circle cx=\"72\" cy=\"198\" r=\"48\" /><circle cx=\"330\" cy=\"140\" r=\"62\" /><circle cx=\"366\" cy=\"208\" r=\"46\" /><rect x=\"78\" y=\"150\" width=\"300\" height=\"150\" rx=\"75\" /><circle cx=\"200\" cy=\"248\" r=\"62\" /><circle cx=\"300\" cy=\"246\" r=\"62\" /><path\r\n              d=\"M140 272C150 312 130 336 96 352C158 350 208 326 226 280Z\"\r\n            /></g><g clip-path=\"url(#cb-clip)\"><rect width=\"430\" height=\"370\" fill=\"url(#cb-tone)\" /><ellipse\r\n              cx=\"195\"\r\n              cy=\"60\"\r\n              rx=\"72\"\r\n              ry=\"24\"\r\n              fill=\"#fff\"\r\n              opacity=\".75\"\r\n              transform=\"rotate(-18 195 60)\"\r\n              filter=\"url(#cb-b10)\"\r\n            /><ellipse\r\n              cx=\"102\"\r\n              cy=\"112\"\r\n              rx=\"28\"\r\n              ry=\"12\"\r\n              fill=\"#fff\"\r\n              opacity=\".7\"\r\n              transform=\"rotate(-35 102 112)\"\r\n              filter=\"url(#cb-b5)\"\r\n            /><ellipse\r\n              cx=\"318\"\r\n              cy=\"98\"\r\n              rx=\"26\"\r\n              ry=\"10\"\r\n              fill=\"#fff\"\r\n              opacity=\".45\"\r\n              transform=\"rotate(-25 318 98)\"\r\n              filter=\"url(#cb-b5)\"\r\n            /></g><g\r\n            fill=\"none\"\r\n            stroke-linecap=\"round\"\r\n            stroke-width=\"6\"\r\n            filter=\"url(#cb-b1)\"\r\n          ><path d=\"M161 73A76 76 0 0 1 204 34\" stroke=\"url(#cb-c1)\" /><path d=\"M77 120A48 48 0 0 1 100 97\" stroke=\"url(#cb-c2)\" /></g></g></svg>";
+  var SCENARIO_CLOUD_SVG =
+    '<svg viewBox="0 0 430 370" preserveAspectRatio="none" aria-hidden="true" focusable="false"><defs><clipPath id="cb-clip"><circle cx="230" cy="105" r="85" /><circle cx="120" cy="140" r="60" /><circle cx="72" cy="198" r="48" /><circle cx="330" cy="140" r="62" /><circle cx="366" cy="208" r="46" /><rect x="78" y="150" width="300" height="150" rx="75" /><circle cx="200" cy="248" r="62" /><circle cx="300" cy="246" r="62" /><path\r\n              d="M140 272C150 312 130 336 96 352C158 350 208 326 226 280Z"\r\n            /></clipPath><filter\r\n            id="cb-puffy"\r\n            x="-12%"\r\n            y="-12%"\r\n            width="124%"\r\n            height="124%"\r\n            color-interpolation-filters="sRGB"\r\n          ><feFlood flood-color="#0b1220" flood-opacity=".22" /><feComposite in2="SourceAlpha" operator="out" result="outD" /><feGaussianBlur in="outD" stdDeviation="14" /><feOffset dx="-8" dy="-12" result="shD" /><feComposite\r\n              in="shD"\r\n              in2="SourceAlpha"\r\n              operator="in"\r\n              result="innerD"\r\n            /><feFlood flood-color="#ffffff" flood-opacity=".85" /><feComposite in2="SourceAlpha" operator="out" result="outL" /><feGaussianBlur in="outL" stdDeviation="7" /><feOffset dx="5" dy="8" result="shL" /><feComposite\r\n              in="shL"\r\n              in2="SourceAlpha"\r\n              operator="in"\r\n              result="innerL"\r\n            /><feMerge><feMergeNode in="SourceGraphic" /><feMergeNode in="innerD" /><feMergeNode in="innerL" /></feMerge></filter><linearGradient id="cb-tone" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".30" /><stop offset=".45" stop-color="#fff" stop-opacity="0" /><stop offset="1" stop-color="#0b1220" stop-opacity=".16" /></linearGradient><radialGradient id="cb-floor"><stop offset="0" stop-color="#000" stop-opacity=".40" /><stop offset="1" stop-color="#000" stop-opacity="0" /></radialGradient><linearGradient\r\n            id="cb-c1"\r\n            gradientUnits="userSpaceOnUse"\r\n            x1="161"\r\n            y1="73"\r\n            x2="204"\r\n            y2="34"\r\n          ><stop offset="0" stop-color="#fff" stop-opacity="0" /><stop offset=".5" stop-color="#fff" stop-opacity=".95" /><stop offset="1" stop-color="#fff" stop-opacity="0" /></linearGradient><linearGradient\r\n            id="cb-c2"\r\n            gradientUnits="userSpaceOnUse"\r\n            x1="77"\r\n            y1="120"\r\n            x2="100"\r\n            y2="97"\r\n          ><stop offset="0" stop-color="#fff" stop-opacity="0" /><stop offset=".5" stop-color="#fff" stop-opacity=".95" /><stop offset="1" stop-color="#fff" stop-opacity="0" /></linearGradient><filter id="cb-b10" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="10" /></filter><filter id="cb-b5" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="5" /></filter><filter id="cb-b1" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="1" /></filter></defs><ellipse\r\n          class="cb-shadow"\r\n          cx="255"\r\n          cy="354"\r\n          rx="165"\r\n          ry="13"\r\n          fill="url(#cb-floor)"\r\n        /><g class="cb-body"><g filter="url(#cb-puffy)" fill="currentColor"><circle cx="230" cy="105" r="85" /><circle cx="120" cy="140" r="60" /><circle cx="72" cy="198" r="48" /><circle cx="330" cy="140" r="62" /><circle cx="366" cy="208" r="46" /><rect x="78" y="150" width="300" height="150" rx="75" /><circle cx="200" cy="248" r="62" /><circle cx="300" cy="246" r="62" /><path\r\n              d="M140 272C150 312 130 336 96 352C158 350 208 326 226 280Z"\r\n            /></g><g clip-path="url(#cb-clip)"><rect width="430" height="370" fill="url(#cb-tone)" /><ellipse\r\n              cx="195"\r\n              cy="60"\r\n              rx="72"\r\n              ry="24"\r\n              fill="#fff"\r\n              opacity=".75"\r\n              transform="rotate(-18 195 60)"\r\n              filter="url(#cb-b10)"\r\n            /><ellipse\r\n              cx="102"\r\n              cy="112"\r\n              rx="28"\r\n              ry="12"\r\n              fill="#fff"\r\n              opacity=".7"\r\n              transform="rotate(-35 102 112)"\r\n              filter="url(#cb-b5)"\r\n            /><ellipse\r\n              cx="318"\r\n              cy="98"\r\n              rx="26"\r\n              ry="10"\r\n              fill="#fff"\r\n              opacity=".45"\r\n              transform="rotate(-25 318 98)"\r\n              filter="url(#cb-b5)"\r\n            /></g><g\r\n            fill="none"\r\n            stroke-linecap="round"\r\n            stroke-width="6"\r\n            filter="url(#cb-b1)"\r\n          ><path d="M161 73A76 76 0 0 1 204 34" stroke="url(#cb-c1)" /><path d="M77 120A48 48 0 0 1 100 97" stroke="url(#cb-c2)" /></g></g></svg>';
   function scenarioCloudShape() {
     var template = document.createElement('template');
     var prefix = 'coco-cloud-' + uid() + '-';
-    template.innerHTML = SCENARIO_CLOUD_SVG
-      .replace(/id="cb-/g, 'id="' + prefix)
-      .replace(/url\(#cb-/g, 'url(#' + prefix);
+    template.innerHTML = SCENARIO_CLOUD_SVG.replace(
+      /id="cb-/g,
+      'id="' + prefix
+    ).replace(/url\(#cb-/g, 'url(#' + prefix);
     return template.content.firstChild;
   }
 
@@ -1089,8 +1108,13 @@
         this._media(def),
         h('div', { class: 'cloud-text', text: def.text }),
         /^(chat-loading|thinking|reading|waiting)$/.test(key)
-          ? h('span', { class: 'cloud-pulse', 'aria-hidden': 'true' },
-              h('i'), h('i'), h('i'))
+          ? h(
+              'span',
+              { class: 'cloud-pulse', 'aria-hidden': 'true' },
+              h('i'),
+              h('i'),
+              h('i')
+            )
           : null,
         opts.action
           ? h('button', {
@@ -1102,7 +1126,7 @@
           : null
       )
     );
-  
+
     var card = h('div', { class: 'sc sc-' + def.variant }, cloud);
     this.layer.appendChild(card);
     this.cards.push(card);
@@ -1263,7 +1287,6 @@
   // پیش‌فرض accent و text در CSS است؛ UI.mount فقط رنگ معتبرِ داده‌شده را جایگزین می‌کند.
   // ترتیب قوانین، انتخابگرها و مقدارها برای حفظ ظاهر فعلی نگه داشته شده است.
   var CSS = [
-
     // 01. بازنشانی استایل‌ها
     `:host {
       all: initial
@@ -1994,8 +2017,32 @@
       grid-template-columns: repeat(8,1fr);
       align-content: start;
       gap: .125rem;
+       overscroll-behavior: contain;
+      scrollbar-width: thin;
+      scrollbar-color: transparent transparent;
       direction: ltr
     }`,
+
+    `.egrid:hover {
+  scrollbar-color: rgba(5,46,22,.25) transparent;
+  scrollbar-color: color-mix(in srgb, var(--accent-soft-light) 25%, transparent) transparent
+}`,
+
+    `.egrid::-webkit-scrollbar {
+  width: .25rem
+}`,
+    `.egrid::-webkit-scrollbar-track {
+  background: transparent
+}`,
+    `.egrid::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 999px
+}`,
+    `.egrid:hover::-webkit-scrollbar-thumb {
+  background: rgba(5,46,22,.25);
+  background: color-mix(in srgb, var(--accent-soft-light) 25%, transparent)
+}`,
+
     `.eb:active {
       transform: scale(.88)
     }`,
@@ -2167,49 +2214,25 @@
       color: #222222
     }`,
     `.root .hstat {
-      font-size: 13px;
+      font-size: .75rem;
       color: #3390ec;
       display: flex;
       align-items: center;
       gap: 5px;
-      min-height: 18px;
-      line-height: 18px;
+            
       overflow: hidden
     }`,
-    `.root .hdr>.ib {
-      width: 44px;
-      height: 44px;
-      flex: none;
-      color: #707579;
-      border-radius: 50%
-    }`,
-    `.root .hdr>.ib:hover {
+
+    `.root .ib:hover {
       background: #f1f3f5;
-      color: #3390ec
+      color: var(--accent-soft-dark)
     }`,
     `.root .hstat.bad {
       color: var(--danger)
     }`,
-    `.root .hdr-more {
-      width: 44px;
-      height: 44px;
-      flex: none;
-      color: #707579;
-      border-radius: 50%;
-      display: grid;
-      place-items: center
-    }`,
-    `.root .hdr>.ib svg,.root .hdr-more svg,.root .dock .ib svg,.root .send svg {
-      width: 24px;
-      height: 24px
-    }`,
-    `.root .hdr-more:hover,.root .hdr-more[aria-expanded="true"] {
+    `.root button.ib.on {
       background: #f1f3f5;
-      color: #3390ec
-    }`,
-    `.root .hdr>.ib:focus-visible,.root .hdr-more:focus-visible,.root .dock button:focus-visible {
-      outline: 2px solid #3390ec;
-      outline-offset: 2px
+      color: var(--accent-soft-dark)
     }`,
 
     // 14.1. پنل معرفی و اطلاعات تماس
@@ -2245,12 +2268,7 @@
       font-weight: 600;
       font-size: 16px
     }`,
-    `.root .profile-toolbar .ib {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      color: #707579
-    }`,
+
     `.root .profile-scroll {
       flex: 1;
       min-height: 0;
@@ -2386,7 +2404,7 @@
       color: #222222
     }`,
     `.root a.profile-value { color: #2481cc }`,
-    `.root .profile-toolbar .ib:hover { background: #f1f3f5 }`,
+
     `.root .agent-profile button:focus-visible,.root .agent-profile a:focus-visible {
       outline: 2px solid #3390ec;
       outline-offset: 2px
@@ -2442,22 +2460,24 @@
       scrollbar-color: transparent transparent
     }`,
     `.root .msgs:hover {
-      scrollbar-color: rgba(5,46,22,.25) transparent
-    }`,
+  scrollbar-color: rgba(5,46,22,.25) transparent;
+  scrollbar-color: color-mix(in srgb, var(--accent-soft-light) 25%, transparent) transparent
+}`,
+
     `.root .msgs::-webkit-scrollbar {
-      width: .25rem
-    }`,
+  width: .25rem
+}`,
     `.root .msgs::-webkit-scrollbar-track {
-      background: transparent
-    }`,
+  background: transparent
+}`,
     `.root .msgs::-webkit-scrollbar-thumb {
-      background: transparent;
-      border-radius: 999px
-    }`,
+  background: transparent;
+  border-radius: 999px
+}`,
     `.root .msgs:hover::-webkit-scrollbar-thumb {
-      background: rgba(5,46,22,.22);
-      background: color-mix(in srgb,var(--success) 22%,transparent)
-    }`,
+  background: rgba(5,46,22,.25);
+  background: color-mix(in srgb, var(--accent-soft-light) 25%, transparent)
+}`,
 
     // 17. تاریخ و پیام‌های سیستمی
     `.root .pill {
@@ -2669,19 +2689,19 @@
       border-bottom: 1px solid #edf0f2
     }`,
     `.root .banner .bi {
-      color: #3390ec
+      color: var(--accent)
     }`,
     `.root .banner .bt {
       flex: 1;
       min-width: 0;
-      border-inline-start: 2px solid #3390ec;
+      border-inline-start: 2px solid var(--accent-soft-light);
       padding: 2px 10px;
-      font-size: 13px;
+      font-size: .75rem;
       cursor: pointer
     }`,
     `.root .banner .bt b {
       display: block;
-      color: #3390ec;
+      color: var(--accent);
       font-weight: 600;
       font-size: 13px
     }`,
@@ -2692,17 +2712,6 @@
       overflow: hidden;
       text-overflow: ellipsis;
       unicode-bidi: plaintext
-    }`,
-    `.root .banner .bx {
-      width: 1.875rem;
-      height: 1.875rem;
-      border-radius: 50%;
-      color: #64748b;
-      display: grid;
-      place-items: center
-    }`,
-    `.root .banner .bx:hover {
-      background: #f1f5f3
     }`,
 
     // 23. قسمت ارسال؛ رنگ‌های ثابت زمینه، متن و دکمه
@@ -2758,7 +2767,7 @@
       color: #a2a6a9;
       opacity: 1
     }`,
-    `.root .ib {
+    `.root button.ib {
       width: 44px;
       height: 44px;
       flex: none;
@@ -2768,20 +2777,17 @@
       place-items: center;
       transition: color .15s,background .15s
     }`,
-    `.root .ib:hover,.root .ib.on {
-      color: #3390ec;
-      background: #edf5fd
-    }`,
+
     `.root .ib svg {
-      width: 1.375rem;
-      height: 1.375rem
+      width: 1.25rem;
+      height: 1.25rem
     }`,
     `.root .send {
       width: 44px;
       height: 44px;
       border-radius: 50%;
       background: transparent;
-      color: #3390ec;
+      color: var(--accent);
       display: grid;
       place-items: center;
       flex: none;
@@ -2807,7 +2813,7 @@
       bottom: 100%;
       left: .5rem;
       right: .5rem;
-      height: 16.375rem;
+      height: 16.5rem;
       background: #ffffff;
       border-radius: 1rem 1rem 0 0;
       box-shadow: 0 -.3125rem 1.375rem rgba(5,46,22,.13);
@@ -2831,7 +2837,7 @@
       right: 22%;
       height: .1875rem;
       border-radius: .1875rem .1875rem 0 0;
-      background: #00c951
+      background: var(--accent)
     }`,
     `.root .eb {
       aspect-ratio: 1;
@@ -3172,11 +3178,17 @@
     if (!/\/$/.test(assetsBase.pathname)) assetsBase.pathname += '/';
     this.root.style.setProperty(
       '--chat-texture',
-      'url(' + JSON.stringify(new URL('Image/chat-Textures.png', assetsBase.href).href) + ')'
+      'url(' +
+        JSON.stringify(
+          new URL('Image/chat-Textures.png', assetsBase.href).href
+        ) +
+        ')'
     );
     this.root.style.setProperty(
       '--chat-pattern',
-      'url(' + JSON.stringify(new URL('Image/chat-bg.png', assetsBase.href).href) + ')'
+      'url(' +
+        JSON.stringify(new URL('Image/chat-bg.png', assetsBase.href).href) +
+        ')'
     );
 
     this.launcher =
@@ -3221,8 +3233,10 @@
     shadow.appendChild(this.root);
     if (cfg.mock) {
       // The mock avatar uses the same resolved CSS color as the widget.
-      cfg.resolvedAccent = window.getComputedStyle(this.root)
-        .getPropertyValue('--accent').trim();
+      cfg.resolvedAccent = window
+        .getComputedStyle(this.root)
+        .getPropertyValue('--accent')
+        .trim();
     }
     this.shadow = shadow;
 
@@ -3546,15 +3560,25 @@
         },
       },
       h(
-        'label', { class: 'fld' },
-        h('span', { class: 'login-label-row' },
-          h('span', { id: 'coco-login-name-label', text: T.name }), this.nameErr),
+        'label',
+        { class: 'fld' },
+        h(
+          'span',
+          { class: 'login-label-row' },
+          h('span', { id: 'coco-login-name-label', text: T.name }),
+          this.nameErr
+        ),
         this.nameInp
       ),
       h(
-        'label', { class: 'fld' },
-        h('span', { class: 'login-label-row' },
-          h('span', { id: 'coco-login-mobile-label', text: T.mobile }), this.mobileErr),
+        'label',
+        { class: 'fld' },
+        h(
+          'span',
+          { class: 'login-label-row' },
+          h('span', { id: 'coco-login-mobile-label', text: T.mobile }),
+          this.mobileErr
+        ),
         this.mobInp
       ),
       h('div', { class: 'login-actions' }, this.loginErr, this.loginBtn)
@@ -3926,12 +3950,23 @@
     this.avEl = h('div', { class: 'av' }, h('img', { alt: '' }));
     this.nameEl = h('div', { class: 'hname', text: T.brand });
     this.statEl = h('div', { class: 'hstat' });
-    this.profileBtn = h('button', {
-      class: 'hdr-more', type: 'button',
-      'aria-label': T.profile, 'aria-haspopup': 'dialog',
-      'aria-expanded': 'false', 'aria-controls': 'coco-agent-profile',
-      on: { click: function () { self.openProfile(); } },
-    }, icon('more'));
+    this.profileBtn = h(
+      'button',
+      {
+        class: 'hdr-more ib',
+        type: 'button',
+        'aria-label': T.profile,
+        'aria-haspopup': 'dialog',
+        'aria-expanded': 'false',
+        'aria-controls': 'coco-agent-profile',
+        on: {
+          click: function () {
+            self.openProfile();
+          },
+        },
+      },
+      icon('more')
+    );
     var hdr = h(
       'header',
       { class: 'hdr' },
@@ -4006,7 +4041,7 @@
       h(
         'button',
         {
-          class: 'bx',
+          class: 'bx ib',
           type: 'button',
           'aria-label': T.cancel,
           on: {
@@ -4101,73 +4136,142 @@
   };
   UI.prototype.buildProfile = function () {
     var self = this;
-    this.profileBackBtn = h('button', {
-      class: 'ib', type: 'button', 'aria-label': T.profileBack,
-      on: { click: function () { self.closeProfile(); } },
-    }, icon('chatBack'));
-    this.profileImg = h('img', { alt: '', hidden: true,
-      on: { error: function () { self.profileImg.hidden = true; } } });
+    this.profileBackBtn = h(
+      'button',
+      {
+        class: 'ib',
+        type: 'button',
+        'aria-label': T.profileBack,
+        on: {
+          click: function () {
+            self.closeProfile();
+          },
+        },
+      },
+      icon('chatBack')
+    );
+    this.profileImg = h('img', {
+      alt: '',
+      hidden: true,
+      on: {
+        error: function () {
+          self.profileImg.hidden = true;
+        },
+      },
+    });
     this.profileNameEl = h('h2', { class: 'profile-name', text: T.brand });
     this.profileStatusEl = h('div', { class: 'profile-status' });
     this.profileActions = h('div', { class: 'profile-actions' });
     this.profileDescription = h('p', { class: 'profile-description' });
     this.profileDetails = h('div', { class: 'profile-details' });
-    var panel = h('section', {
-      id: 'coco-agent-profile', class: 'agent-profile', role: 'dialog',
-      'aria-modal': 'true', 'aria-hidden': 'true',
-      'aria-labelledby': 'coco-profile-title',
-      on: { keydown: function (e) {
-        if (e.key === 'Escape') {
-          e.preventDefault(); e.stopPropagation(); self.closeProfile();
-        } else if (e.key === 'Tab') {
-          var controls = Array.prototype.filter.call(
-            panel.querySelectorAll('button:not(:disabled),a[href]'),
-            function (el) { return el.getClientRects().length > 0; });
-          var first = controls[0], last = controls[controls.length - 1];
-          var active = self.shadow.activeElement;
-          if (e.shiftKey && active === first) {
-            e.preventDefault(); last.focus();
-          } else if (!e.shiftKey && active === last) {
-            e.preventDefault(); first.focus();
-          }
-        }
-      } },
-    },
-    h('header', { class: 'profile-toolbar' }, this.profileBackBtn,
-      h('div', { id: 'coco-profile-title', text: T.profile })),
-    h('div', { class: 'profile-scroll' },
-      h('div', { class: 'profile-hero' },
-        h('div', { class: 'profile-avatar' }, icon('chat'), this.profileImg),
-        this.profileNameEl, this.profileStatusEl, this.profileActions),
-      h('section', { class: 'profile-group' },
-        h('h3', { text: T.profileAbout }), this.profileDescription),
-      h('section', { class: 'profile-group' },
-        h('h3', { text: T.profileContact }), this.profileDetails)));
+    var panel = h(
+      'section',
+      {
+        id: 'coco-agent-profile',
+        class: 'agent-profile',
+        role: 'dialog',
+        'aria-modal': 'true',
+        'aria-hidden': 'true',
+        'aria-labelledby': 'coco-profile-title',
+        on: {
+          keydown: function (e) {
+            if (e.key === 'Escape') {
+              e.preventDefault();
+              e.stopPropagation();
+              self.closeProfile();
+            } else if (e.key === 'Tab') {
+              var controls = Array.prototype.filter.call(
+                panel.querySelectorAll('button:not(:disabled),a[href]'),
+                function (el) {
+                  return el.getClientRects().length > 0;
+                }
+              );
+              var first = controls[0],
+                last = controls[controls.length - 1];
+              var active = self.shadow.activeElement;
+              if (e.shiftKey && active === first) {
+                e.preventDefault();
+                last.focus();
+              } else if (!e.shiftKey && active === last) {
+                e.preventDefault();
+                first.focus();
+              }
+            }
+          },
+        },
+      },
+      h(
+        'header',
+        { class: 'profile-toolbar' },
+        this.profileBackBtn,
+        h('div', { id: 'coco-profile-title', text: T.profile })
+      ),
+      h(
+        'div',
+        { class: 'profile-scroll' },
+        h(
+          'div',
+          { class: 'profile-hero' },
+          h('div', { class: 'profile-avatar' }, icon('chat'), this.profileImg),
+          this.profileNameEl,
+          this.profileStatusEl,
+          this.profileActions
+        ),
+        h(
+          'section',
+          { class: 'profile-group' },
+          h('h3', { text: T.profileAbout }),
+          this.profileDescription
+        ),
+        h(
+          'section',
+          { class: 'profile-group' },
+          h('h3', { text: T.profileContact }),
+          this.profileDetails
+        )
+      )
+    );
     panel.inert = true;
     return panel;
   };
   UI.prototype.updateProfile = function () {
-    var self = this, p = this.agentProfile || readAgentProfile({});
+    var self = this,
+      p = this.agentProfile || readAgentProfile({});
     var phone = latin(p.phone).replace(/[\s().-]/g, '');
     var phoneHref = /^\+?\d{7,15}$/.test(phone) ? 'tel:' + phone : null;
     var emailHref = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i.test(p.email)
-      ? 'mailto:' + encodeURIComponent(p.email) : null;
-    var websiteHref = p.website ? safeUrl(p.website, this.cfg.assetsBase) : null;
+      ? 'mailto:' + encodeURIComponent(p.email)
+      : null;
+    var websiteHref = p.website
+      ? safeUrl(p.website, this.cfg.assetsBase)
+      : null;
     function action(label, glyph, href, handler) {
       var props = { class: 'profile-action' };
-      if (handler) { props.type = 'button'; props.on = { click: handler }; }
-      else if (href) {
+      if (handler) {
+        props.type = 'button';
+        props.on = { click: handler };
+      } else if (href) {
         props.href = href;
         if (/^https?:/i.test(href)) {
-          props.target = '_blank'; props.rel = 'noopener noreferrer';
+          props.target = '_blank';
+          props.rel = 'noopener noreferrer';
         }
-      } else { props.type = 'button'; props.disabled = true; }
-      return h(href ? 'a' : 'button', props, icon(glyph), h('span', { text: label }));
+      } else {
+        props.type = 'button';
+        props.disabled = true;
+      }
+      return h(
+        href ? 'a' : 'button',
+        props,
+        icon(glyph),
+        h('span', { text: label })
+      );
     }
     this.profileActions.textContent = '';
     append(this.profileActions, [
       action(T.profileMessage, 'chat', null, function () {
-        self.closeProfile(false); self.focusComposer();
+        self.closeProfile(false);
+        self.focusComposer();
       }),
       action(T.profileCall, 'phone', phoneHref),
       action(T.profileWebsite, 'globe', websiteHref),
@@ -4180,13 +4284,24 @@
       if (href) {
         props.href = href;
         if (/^https?:/i.test(href)) {
-          props.target = '_blank'; props.rel = 'noopener noreferrer';
+          props.target = '_blank';
+          props.rel = 'noopener noreferrer';
         }
       }
-      append(self.profileDetails, h('div', { class: 'profile-row' }, icon(glyph),
-        h('div', { class: 'profile-row-content' },
-          h('div', { class: 'profile-label', text: label }),
-          h(href ? 'a' : 'div', props))));
+      append(
+        self.profileDetails,
+        h(
+          'div',
+          { class: 'profile-row' },
+          icon(glyph),
+          h(
+            'div',
+            { class: 'profile-row-content' },
+            h('div', { class: 'profile-label', text: label }),
+            h(href ? 'a' : 'div', props)
+          )
+        )
+      );
     }
     row(T.profilePhone, p.phone, 'phone', phoneHref, true);
     row(T.profileEmail, p.email, 'mail', emailHref, true);
@@ -4195,11 +4310,14 @@
     row(T.profileAddress, p.address, 'location');
   };
   UI.prototype.openProfile = function () {
-    if (this.profileOpen || this.activeView !== 'chat' || !this.isOpen()) return;
+    if (this.profileOpen || this.activeView !== 'chat' || !this.isOpen())
+      return;
     this.closeMenu();
     this.toggleEmoji(false);
     this.profileOpen = true;
-    this.chatContents.forEach(function (el) { el.inert = true; });
+    this.chatContents.forEach(function (el) {
+      el.inert = true;
+    });
     this.profilePanel.inert = false;
     this.profilePanel.setAttribute('aria-hidden', 'false');
     this.profilePanel.classList.add('on');
@@ -4213,7 +4331,9 @@
     this.profilePanel.setAttribute('aria-hidden', 'true');
     this.profilePanel.classList.remove('on');
     this.profileBtn.setAttribute('aria-expanded', 'false');
-    this.chatContents.forEach(function (el) { el.inert = false; });
+    this.chatContents.forEach(function (el) {
+      el.inert = false;
+    });
     if (restoreFocus !== false && this.isOpen())
       this.profileBtn.focus({ preventScroll: true });
   };
@@ -4331,12 +4451,19 @@
       );
     this.avEl.classList.toggle('off', !!away);
     if (this.profileStatusEl) {
-      this.profileStatusEl.className = 'profile-status' +
-        (kind === 'bad' ? ' bad' : away ? ' away' : '');
+      this.profileStatusEl.className =
+        'profile-status' + (kind === 'bad' ? ' bad' : away ? ' away' : '');
       this.profileStatusEl.textContent = text;
-      if (typing) this.profileStatusEl.appendChild(
-        h('span', { class: 'dots', 'aria-hidden': 'true' }, h('i'), h('i'), h('i'))
-      );
+      if (typing)
+        this.profileStatusEl.appendChild(
+          h(
+            'span',
+            { class: 'dots', 'aria-hidden': 'true' },
+            h('i'),
+            h('i'),
+            h('i')
+          )
+        );
     }
   };
   UI.prototype.toast = function (msg) {
@@ -4794,7 +4921,9 @@
 
       if (e.cancelable) e.preventDefault();
 
-      swipeX = swipeDirection * Math.min(swipeMaxDistance, Math.max(0, dx * swipeDirection));
+      swipeX =
+        swipeDirection *
+        Math.min(swipeMaxDistance, Math.max(0, dx * swipeDirection));
 
       var progress = Math.min(1, Math.abs(swipeX) / swipeReplyThreshold);
 
@@ -4815,7 +4944,8 @@
       if (swipePointerId === null) return;
 
       var pointerId = swipePointerId;
-      var shouldReply = commit && swipeLocked && Math.abs(swipeX) >= swipeReplyThreshold;
+      var shouldReply =
+        commit && swipeLocked && Math.abs(swipeX) >= swipeReplyThreshold;
 
       swipePointerId = null;
       swipeLocked = false;
@@ -4829,7 +4959,8 @@
 
       if (row.hasPointerCapture && row.releasePointerCapture) {
         try {
-          if (row.hasPointerCapture(pointerId)) row.releasePointerCapture(pointerId);
+          if (row.hasPointerCapture(pointerId))
+            row.releasePointerCapture(pointerId);
         } catch (_) {}
       }
       if (shouldReply) A.onReply(m.id);
@@ -4840,7 +4971,8 @@
       // Include the release position, even if the final move was coalesced.
       if (swipeLocked) {
         var distance = (e.clientX - swipeStartX) * swipeDirection;
-        swipeX = swipeDirection * Math.min(swipeMaxDistance, Math.max(0, distance));
+        swipeX =
+          swipeDirection * Math.min(swipeMaxDistance, Math.max(0, distance));
       }
       finishSwipe(true);
     });
