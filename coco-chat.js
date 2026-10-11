@@ -1295,6 +1295,7 @@
       box-sizing: border-box
     }`,
 
+    `a {color: inherit;text-decoration: inherit;}`,
     // 02. رنگ‌های پایه و متغیرهای مشترک
     `.root {
 
@@ -1329,7 +1330,7 @@
       --wall2: #b4e0c9;
 
       /* خطا و وضعیت موفق */
-      --danger: #e2474c;
+      --danger: #ff0008;
       --ok: #00c951;
 
       /* پوشش و ابر وضعیت‌ها */
@@ -2279,7 +2280,7 @@
     }`,
     `.root .profile-hero {
       padding: 24px 16px 16px;
-      background: #ffffff;
+      
       text-align: center
     }`,
     `.root .profile-avatar {
@@ -2292,7 +2293,7 @@
       border-radius: 50%;
       overflow: hidden;
       background: #e7f2fc;
-      color: #3390ec
+    
     }`,
     `.root .profile-avatar svg {
       width: 40px;
@@ -2319,9 +2320,9 @@
       align-items: center;
       gap: 5px;
       min-height: 20px;
-      color: #3390ec;
-      font-size: 13px;
-      line-height: 20px
+      color: var(--accent);
+      font-size: .75rem;
+      
     }`,
     `.root .profile-status.away { color: #707579 }`,
     `.root .profile-status.bad { color: var(--danger) }`,
@@ -2340,30 +2341,30 @@
       padding: 12px 4px;
       min-height: 72px;
       border-radius: 12px;
-      background: #f0f6fc;
-      color: #2481cc;
+      background: #ffffff;
+      
       font-size: 13px;
       line-height: 20px;
       text-decoration: none;
       transition: background .15s
     }`,
-    `.root .profile-actions .profile-action:hover {
-      background: #e2effb
-    }`,
+
     `.root .profile-actions .profile-action:disabled {
       opacity: .45;
       cursor: default
     }`,
     `.root .profile-group {
-      margin-top: 10px;
+      padding:16px
+    }`,
+    `.root .profile-details {
       padding: 16px;
-      background: #ffffff
+      background: #ffffff;
+      border-radius: 12px;
     }`,
     `.root .profile-group h3 {
       margin: 0 0 12px;
       color: #2481cc;
       font-size: 14px;
-      line-height: 22px;
       font-weight: 600
     }`,
     `.root .profile-description {
@@ -2389,26 +2390,22 @@
     `.root .profile-row-content { min-width: 0; flex: 1 }`,
     `.root .profile-label {
       color: #707579;
-      font-size: 12px;
-      line-height: 20px;
+      font-size: .75rem;
+      
       margin-bottom: 2px
     }`,
     `.root .profile-value {
       display: block;
       font-size: 15px;
-      line-height: 24px;
       text-align: right;
       overflow-wrap: anywhere;
       white-space: pre-wrap;
       text-decoration: none;
       color: #222222
     }`,
-    `.root a.profile-value { color: #2481cc }`,
+    `.root a.profile-value { color: var(--accent);    font-weight: bold;
+ }`,
 
-    `.root .agent-profile button:focus-visible,.root .agent-profile a:focus-visible {
-      outline: 2px solid #3390ec;
-      outline-offset: 2px
-    }`,
     `@media(prefers-reduced-motion:reduce) {
       .root .agent-profile { transition: none }
     }`,
@@ -2783,8 +2780,8 @@
     }`,
 
     `.root .ib svg {
-      width: 1.25rem;
-      height: 1.25rem
+      width: 1.5rem;
+      height: 1.5rem
     }`,
     `.root .send {
       width: 44px;
@@ -4109,8 +4106,10 @@
       self.A.onActivity();
     });
     this.ta.addEventListener('focus', function () {
-      self.ta.setAttribute('enterkeyhint',
-        matchMedia('(pointer:coarse)').matches ? 'enter' : 'send');
+      self.ta.setAttribute(
+        'enterkeyhint',
+        matchMedia('(pointer:coarse)').matches ? 'enter' : 'send'
+      );
       self.autosize();
       self.A.onActivity();
     });
@@ -4174,7 +4173,8 @@
     this.profileStatusEl = h('div', { class: 'profile-status' });
     this.profileActions = h('div', { class: 'profile-actions' });
     this.profileDescription = h('p', { class: 'profile-description' });
-    this.profileDetails = h('div', { class: 'profile-details' });
+    this.profileContactTitle = h('h3', { text: T.profileContact });
+    this.profileDetails = h('div', { class: 'profile-details' }, this.profileContactTitle);
     var panel = h(
       'section',
       {
@@ -4228,16 +4228,10 @@
           this.profileStatusEl,
           this.profileActions
         ),
+       
         h(
           'section',
           { class: 'profile-group' },
-          h('h3', { text: T.profileAbout }),
-          this.profileDescription
-        ),
-        h(
-          'section',
-          { class: 'profile-group' },
-          h('h3', { text: T.profileContact }),
           this.profileDetails
         )
       )
@@ -4289,6 +4283,7 @@
     ]);
     this.profileDescription.textContent = p.description || T.profileMissing;
     this.profileDetails.textContent = '';
+    this.profileDetails.appendChild(this.profileContactTitle);
     function row(label, value, glyph, href, ltr) {
       var props = { class: 'profile-value', text: value || T.profileMissing };
       if (ltr && value) props.dir = 'ltr';
@@ -4368,9 +4363,18 @@
       this.focusComposer();
   };
   UI.prototype.onComposerKeydown = function (e) {
-    if (e.key !== 'Enter' || e.shiftKey || e.ctrlKey || e.metaKey || e.altKey ||
-        e.isComposing || this.composing || e.keyCode === 229 ||
-        matchMedia('(pointer:coarse)').matches) return;
+    if (
+      e.key !== 'Enter' ||
+      e.shiftKey ||
+      e.ctrlKey ||
+      e.metaKey ||
+      e.altKey ||
+      e.isComposing ||
+      this.composing ||
+      e.keyCode === 229 ||
+      matchMedia('(pointer:coarse)').matches
+    )
+      return;
     e.preventDefault();
     // Enter sends a message; stopping a response remains an explicit button action.
     if (!e.repeat && !this.busy) this.onSendClick();
@@ -4381,11 +4385,17 @@
     if (!ta || !ta.getClientRects().length || !ta.offsetWidth) return;
     var style = window.getComputedStyle(ta);
     var minHeight = parseFloat(style.minHeight) || 38;
-    var maxHeight = parseFloat(style.getPropertyValue('--composer-max-height')) || 158;
+    var maxHeight =
+      parseFloat(style.getPropertyValue('--composer-max-height')) || 158;
     if (this.panel && this.panel.clientHeight)
-      maxHeight = Math.max(minHeight, Math.min(maxHeight, Math.floor(this.panel.clientHeight * .3)));
-    var previousHeight = ta.offsetHeight, scrollTop = ta.scrollTop;
-    var border = (parseFloat(style.borderTopWidth) || 0) +
+      maxHeight = Math.max(
+        minHeight,
+        Math.min(maxHeight, Math.floor(this.panel.clientHeight * 0.3))
+      );
+    var previousHeight = ta.offsetHeight,
+      scrollTop = ta.scrollTop;
+    var border =
+      (parseFloat(style.borderTopWidth) || 0) +
       (parseFloat(style.borderBottomWidth) || 0);
     ta.style.setProperty('--composer-limit', maxHeight + 'px');
     ta.style.overflowY = 'hidden';
@@ -4400,12 +4410,17 @@
   };
   UI.prototype.observeComposer = function () {
     var self = this;
-    var resize = function () { self.autosize(); };
+    var resize = function () {
+      self.autosize();
+    };
     if (window.ResizeObserver) {
-      var lastWidth = 0, lastPanelHeight = 0;
+      var lastWidth = 0,
+        lastPanelHeight = 0;
       this.composerObserver = new window.ResizeObserver(function () {
-        var width = self.ta.offsetWidth, height = self.panel.clientHeight;
-        if (!width || (width === lastWidth && height === lastPanelHeight)) return;
+        var width = self.ta.offsetWidth,
+          height = self.panel.clientHeight;
+        if (!width || (width === lastWidth && height === lastPanelHeight))
+          return;
         lastWidth = width;
         lastPanelHeight = height;
         resize();
