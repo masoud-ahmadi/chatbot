@@ -940,6 +940,12 @@
     this.current = null;
     this.cards = [];
     this.paused = false;
+    this.mockVideoUrl = null;
+    if (cfg.mock) {
+      var mockAssetsBase = new URL(cfg.assetsBase || '.', location.href);
+      if (!/\/$/.test(mockAssetsBase.pathname)) mockAssetsBase.pathname += '/';
+      this.mockVideoUrl = safeUrl('1.mp4', mockAssetsBase.href);
+    }
   }
   /* Backend payload: { key: { videoUrl, loop, text } } */
   ScenarioManager.prototype.configure = function (map) {
@@ -962,7 +968,7 @@
       variant: d.variant,
       emoji: d.emoji,
       text: r.text || d.text,
-      videoUrl: r.videoUrl || null,
+      videoUrl: r.videoUrl || this.mockVideoUrl || null,
       loop: r.loop !== false,
     };
   };
