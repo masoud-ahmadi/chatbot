@@ -1255,7 +1255,7 @@
     'button.launcher svg{width:1.625rem;height:1.625rem}.launcher:hover{transform:scale(1.07)}.launcher:active{transform:scale(.95)}',
 
     // Spring entrance and circular reveal, without changing the final layout.
-    '.root .panel{position:fixed;top:auto;right:auto;bottom:auto;left:auto;width:min(24.5rem,calc(100vw - 2rem));height:min(41.25rem,calc(100vh - 7rem));max-height:calc(100vh - 7rem);background:var(--accent);border-radius:1.375rem;box-shadow:0 1.5rem 3.75rem -1.5rem rgba(5,46,22,.3),0 0 0 1px rgba(5,46,22,.03);overflow:hidden;display:flex;flex-direction:column;opacity:0;visibility:hidden;pointer-events:none;transform-origin:var(--panel-origin-x,100%) var(--panel-origin-y,100%);transform:translateY(calc(var(--panel-base-y,0px) + var(--panel-closed-y,64px))) scale(.5) rotate(var(--panel-tilt,6deg));clip-path:circle(0% at var(--panel-origin-x,100%) var(--panel-origin-y,100%));transition:transform .3s ease-in,clip-path .3s ease-in,opacity .3s ease-in,visibility 0s linear .3s;z-index:2}',
+    '.root .panel{position:fixed;top:auto;right:auto;bottom:auto;left:auto;width:min(24.5rem,calc(100vw - 2rem));height:min(41.25rem,calc(100vh - 7rem));max-height:calc(100vh - 7rem);background:var(--accent);border-radius:1.25rem;box-shadow:0 1.5rem 3.75rem -1.5rem rgba(5,46,22,.3),0 0 0 1px rgba(5,46,22,.03);overflow:hidden;display:flex;flex-direction:column;opacity:0;visibility:hidden;pointer-events:none;transform-origin:var(--panel-origin-x,100%) var(--panel-origin-y,100%);transform:translateY(calc(var(--panel-base-y,0px) + var(--panel-closed-y,64px))) scale(.5) rotate(var(--panel-tilt,6deg));clip-path:circle(0% at var(--panel-origin-x,100%) var(--panel-origin-y,100%));transition:transform .3s ease-in,clip-path .3s ease-in,opacity .3s ease-in,visibility 0s linear .3s;z-index:2}',
     '.root.open .panel{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(var(--panel-base-y,0px)) scale(1) rotate(0deg);clip-path:circle(150% at var(--panel-origin-x,100%) var(--panel-origin-y,100%));transition:transform .45s cubic-bezier(.34,1.56,.64,1),clip-path .45s ease-out,opacity .45s cubic-bezier(.34,1.56,.64,1),visibility 0s}',
     '.root .panel > .view{opacity:0;transform:translateY(10px);transition:opacity .06s linear,transform .12s ease}',
     '.root.open .panel > .view{opacity:1;transform:none;transition:opacity .16s ease .22s,transform .18s ease .2s}',
@@ -1375,7 +1375,9 @@
     '.root .hdr>.ib:hover{background:#f1f5f3;color:#334155}',
 
     // پس‌زمینه گفتگو با الگوی ظریف
-    '.root .body{position:relative;flex:1;min-height:0;background-image:url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27120%27 height=%27120%27 viewBox=%270 0 120 120%27 fill=%27none%27 stroke=%27%23052e16%27 stroke-opacity=%27.07%27 stroke-width=%271.6%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Ccircle cx=%2718%27 cy=%2720%27 r=%276%27/%3E%3Cpath d=%27M62 12l4 8 8 1-6 6 2 8-8-4-8 4 2-8-6-6 8-1z%27/%3E%3Cpath d=%27M98 16v14M91 23h14%27/%3E%3Cpath d=%27M14 66c6-8 12 8 18 0s12 8 18 0%27/%3E%3Crect x=%2776%27 y=%2758%27 width=%2716%27 height=%2712%27 rx=%273%27/%3E%3Cpath d=%27M26 104l10-10 10 10z%27/%3E%3Ccircle cx=%2780%27 cy=%27100%27 r=%273%27/%3E%3Cpath d=%27M100 96q8 0 8 8t-8 8%27/%3E%3C/svg%3E"),linear-gradient(165deg,#e6f4d7 0%,#cfe9c9 48%,#b4e0c9 100%);background-color:#cfe9c9;background-size:120px 120px,100% 100%;background-repeat:repeat,no-repeat}',
+    '.root .body{background-color:#cfe8c8;position:relative;z-index:1;flex:1;min-height:0}',
+    '.root .body::before{content:"";background-image:var(--chat-texture);position:absolute;inset:0;background-repeat:no-repeat;background-position:center;background-size:cover;z-index:-1;pointer-events:none}',
+    '.root .body::after{content:"";position:absolute;inset:0;background-repeat:repeat;background-position:top right;background-size:510px auto;mix-blend-mode:overlay;background-image:var(--chat-pattern);z-index:-1;pointer-events:none}',
 
     // فهرست پیام‌ها
     '.root .msgs{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding:.75rem .75rem .875rem;display:flex;flex-direction:column;gap:.3125rem;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:transparent transparent}',
@@ -1625,6 +1627,17 @@
       'color-mix(in srgb, var(--accent), white 20%)'
     );
     this.root.style.setProperty('--text', cfg.text);
+
+    var assetsBase = new URL(cfg.assetsBase || '.', location.href);
+    if (!/\/$/.test(assetsBase.pathname)) assetsBase.pathname += '/';
+    this.root.style.setProperty(
+      '--chat-texture',
+      'url(' + JSON.stringify(new URL('Image/chat-Textures.png', assetsBase.href).href) + ')'
+    );
+    this.root.style.setProperty(
+      '--chat-pattern',
+      'url(' + JSON.stringify(new URL('Image/chat-bg.png', assetsBase.href).href) + ')'
+    );
 
     this.launcher =
       cfg.launcher === 'hidden'
