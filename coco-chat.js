@@ -2746,20 +2746,24 @@
       box-shadow: none
     }`,
     `.root .ta {
+      --composer-min-height: 38px;
+      --composer-max-height: 158px;
       flex: 1;
       min-width: 0;
       resize: none;
       border: 0;
       outline: 0;
       background: transparent;
-      max-height: 120px;
-      height: 38px;
+      max-height: var(--composer-limit,var(--composer-max-height));
+      height: var(--composer-min-height);
       padding: 7px 0;
       line-height: 24px;
       font-size: 16px;
-      overflow-y: auto;
+      overflow-y: hidden;
+      overscroll-behavior-y: contain;
+      scrollbar-width: thin;
       unicode-bidi: plaintext;
-      min-height: 38px;
+      min-height: var(--composer-min-height);
       color: #222222;
       margin-block: 3px
     }`,
@@ -3239,6 +3243,7 @@
         .trim();
     }
     this.shadow = shadow;
+    this.observeComposer();
 
     // Mobile keyboard / visual viewport handling (scoped to our own root)
     var vv = window.visualViewport;
@@ -3458,6 +3463,7 @@
     this.activeView = name;
     for (var k in this.views)
       this.views[k].classList.toggle('active', k === name);
+    if (name === 'chat') this.autosize();
     if (this.isOpen()) this.focusPrimary();
   };
 
@@ -4060,7 +4066,9 @@
       placeholder: T.msgPh,
       maxlength: String(this.cfg.maxLength),
       'aria-label': T.msgPh,
-      enterkeyhint: 'send',
+      dir: 'auto',
+      wrap: 'soft',
+      enterkeyhint: matchMedia('(pointer:coarse)').matches ? 'enter' : 'send',
     });
     this.emojiBtn = h(
       'button',
@@ -4101,18 +4109,21 @@
       self.A.onActivity();
     });
     this.ta.addEventListener('focus', function () {
+      self.ta.setAttribute('enterkeyhint',
+        matchMedia('(pointer:coarse)').matches ? 'enter' : 'send');
+      self.autosize();
       self.A.onActivity();
     });
+    this.ta.addEventListener('compositionstart', function () {
+      self.composing = true;
+    });
+    this.ta.addEventListener('compositionend', function () {
+      self.composing = false;
+      self.autosize();
+      self.syncSend();
+    });
     this.ta.addEventListener('keydown', function (e) {
-      if (
-        e.key === 'Enter' &&
-        !e.shiftKey &&
-        !e.isComposing &&
-        !matchMedia('(pointer:coarse)').matches
-      ) {
-        e.preventDefault();
-        self.onSendClick();
-      }
+      self.onComposerKeydown(e);
     });
     var composer = h(
       'div',
@@ -4349,15 +4360,60 @@
   };
   UI.prototype.onSendClick = function () {
     if (this.busy) return this.A.onStop();
-    if (this.locked) return;
+    if (this.locked || this.composing) return;
     var t = this.ta.value.trim();
     if (!t) return;
     this.A.onSend(t);
+    if (this.activeView === 'chat' && this.isOpen() && !this.profileOpen)
+      this.focusComposer();
+  };
+  UI.prototype.onComposerKeydown = function (e) {
+    if (e.key !== 'Enter' || e.shiftKey || e.ctrlKey || e.metaKey || e.altKey ||
+        e.isComposing || this.composing || e.keyCode === 229 ||
+        matchMedia('(pointer:coarse)').matches) return;
+    e.preventDefault();
+    // Enter sends a message; stopping a response remains an explicit button action.
+    if (!e.repeat && !this.busy) this.onSendClick();
   };
   UI.prototype.autosize = function () {
-    this.ta.style.height = '38px';
-    this.ta.style.height =
-      Math.min(120, Math.max(38, this.ta.scrollHeight)) + 'px';
+    var ta = this.ta;
+    // Hidden views cannot measure wrapped text. Recalculate when chat is shown.
+    if (!ta || !ta.getClientRects().length || !ta.offsetWidth) return;
+    var style = window.getComputedStyle(ta);
+    var minHeight = parseFloat(style.minHeight) || 38;
+    var maxHeight = parseFloat(style.getPropertyValue('--composer-max-height')) || 158;
+    if (this.panel && this.panel.clientHeight)
+      maxHeight = Math.max(minHeight, Math.min(maxHeight, Math.floor(this.panel.clientHeight * .3)));
+    var previousHeight = ta.offsetHeight, scrollTop = ta.scrollTop;
+    var border = (parseFloat(style.borderTopWidth) || 0) +
+      (parseFloat(style.borderBottomWidth) || 0);
+    ta.style.setProperty('--composer-limit', maxHeight + 'px');
+    ta.style.overflowY = 'hidden';
+    ta.style.height = minHeight + 'px';
+    var contentHeight = ta.value ? ta.scrollHeight + border : minHeight;
+    var height = Math.min(maxHeight, Math.max(minHeight, contentHeight));
+    ta.style.height = height + 'px';
+    ta.style.overflowY = contentHeight > maxHeight ? 'auto' : 'hidden';
+    ta.scrollTop = contentHeight > maxHeight ? scrollTop : 0;
+    if (height !== previousHeight && this.stick && this.msgs)
+      this.scrollBottom(false);
+  };
+  UI.prototype.observeComposer = function () {
+    var self = this;
+    var resize = function () { self.autosize(); };
+    if (window.ResizeObserver) {
+      var lastWidth = 0, lastPanelHeight = 0;
+      this.composerObserver = new window.ResizeObserver(function () {
+        var width = self.ta.offsetWidth, height = self.panel.clientHeight;
+        if (!width || (width === lastWidth && height === lastPanelHeight)) return;
+        lastWidth = width;
+        lastPanelHeight = height;
+        resize();
+      });
+      this.composerObserver.observe(this.ta);
+      this.composerObserver.observe(this.panel);
+    } else this.events.add(window, 'resize', resize);
+    if (document.fonts) this.events.add(document.fonts, 'loadingdone', resize);
   };
   UI.prototype.setBusy = function (b) {
     this.busy = b;
@@ -4548,7 +4604,7 @@
     var ta = this.ta,
       s = ta.selectionStart == null ? ta.value.length : ta.selectionStart,
       en = ta.selectionEnd == null ? s : ta.selectionEnd;
-    if (ta.value.length + e.length > this.cfg.maxLength) return;
+    if (ta.value.length - (en - s) + e.length > this.cfg.maxLength) return;
     ta.setRangeText(e, s, en, 'end');
     this.recent = [e]
       .concat(
@@ -4560,6 +4616,7 @@
     this.autosize();
     this.syncSend();
     this.A.onActivity();
+    this.focusComposer();
   };
 
   /* ---------- messages ---------- */
@@ -5841,6 +5898,7 @@
     this.streams.abort();
     this.streams._cancelRaf();
     this.scenario && this.scenario.destroy();
+    if (this.ui.composerObserver) this.ui.composerObserver.disconnect();
     this.events.removeAll();
     (this.ui.fontFaces || []).forEach(function (face) {
       document.fonts.delete(face);
