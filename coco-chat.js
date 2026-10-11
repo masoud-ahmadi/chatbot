@@ -963,7 +963,7 @@
   };
 
   /* =====================================================================
-   * 7. SCENARIO MANAGER  (cloud overlay + backend-driven video)
+   * 7. SCENARIO MANAGER  (inline status cards + backend-driven video)
    * ===================================================================== */
   var SCENARIO_DEFAULTS = {
     'chat-loading': {
@@ -1004,10 +1004,11 @@
     return template.content.firstChild;
   }
 
-  function ScenarioManager(layer, cfg, events) {
+  function ScenarioManager(layer, cfg, events, onChange) {
     this.layer = layer;
     this.base = cfg.assetsBase || location.href;
     this.events = events;
+    this.onChange = onChange || function () {};
     this.registry = {};
     this.current = null;
     this.cards = [];
@@ -1045,6 +1046,7 @@
     };
   };
   ScenarioManager.prototype._media = function (def) {
+    var self = this;
     var wrap = h(
       'div',
       { class: 'cloud-media' },
@@ -1065,6 +1067,8 @@
       v.addEventListener('loadeddata', function () {
         v.classList.add('ready');
         wrap.classList.add('media-ready');
+        if (self.paused || !self.current || !self.current.card.contains(v))
+          v.pause();
       });
       v.addEventListener('error', function () {
         wrap.classList.remove('media-ready');
@@ -1095,12 +1099,17 @@
     if (!SCENARIO_DEFAULTS[key]) return;
     opts = opts || {};
     if (this.current && this.current.key === key && !opts.force) return;
-    this._leaveAll();
+    // Replace the previous status in one layout update, without stacked cards.
+    var active = this.layer.getRootNode().activeElement;
+    var restoreFocus = this.cards.some(function (card) {
+      return active && card.contains(active);
+    });
+    this.cards.slice().forEach(this._remove.bind(this));
     var self = this,
       def = this._def(key);
     var cloud = h(
       'div',
-      { class: 'cloud', role: 'status', 'aria-live': 'polite' },
+      { class: 'cloud', role: 'group' },
       scenarioCloudShape(),
       h(
         'div',
@@ -1123,32 +1132,60 @@
               text: opts.action.label,
               on: { click: opts.action.onClick },
             })
+          : null,
+        opts.dismissible
+          ? h('button', {
+              class: 'cloud-dismiss',
+              type: 'button',
+              text: T.close,
+              'aria-label': 'بستن پیام وضعیت',
+              on: { click: function () {
+                self.hide();
+                if (opts.onDismiss) opts.onDismiss();
+              } },
+            })
           : null
       )
     );
 
-    var card = h('div', { class: 'sc sc-' + def.variant }, cloud);
+    var card = h('div', {
+      class: 'sc sc-' + def.variant,
+      'data-scenario': key,
+      'aria-atomic': 'true',
+    }, cloud);
     this.layer.appendChild(card);
     this.cards.push(card);
-    this.current = { key: key, card: card };
+    this.current = { key: key, card: card, opts: opts };
+    this.onChange(restoreFocus);
     if (this.paused) this.pause();
     requestAnimationFrame(function () {
       requestAnimationFrame(function () {
-        card.classList.add('in');
+        if (self.current && self.current.card === card)
+          card.classList.add('in');
       });
     });
   };
+  ScenarioManager.prototype._remove = function (card) {
+    if (card._leaveTimer) this.events.clearTimeout(card._leaveTimer);
+    card.querySelectorAll('video').forEach(ScenarioManager.release);
+    if (card.parentNode) card.parentNode.removeChild(card);
+    this.cards = this.cards.filter(function (c) { return c !== card; });
+  };
   ScenarioManager.prototype._leave = function (card) {
     var self = this;
+    var active = this.layer.getRootNode().activeElement;
+    var restoreFocus = active && card.contains(active);
     card.classList.remove('in');
     card.classList.add('out');
-    this.events.timeout(function () {
-      card.querySelectorAll('video').forEach(ScenarioManager.release);
-      if (card.parentNode) card.parentNode.removeChild(card);
-      self.cards = self.cards.filter(function (c) {
-        return c !== card;
-      });
-    }, 380);
+    card.inert = true;
+    card.setAttribute('aria-hidden', 'true');
+    // Stop media immediately, even while the card finishes its exit animation.
+    card.querySelectorAll('video').forEach(function (v) { v.pause(); });
+    if (restoreFocus) this.onChange(true);
+    card._leaveTimer = this.events.timeout(function () {
+      self._remove(card);
+      self.onChange();
+    }, 220);
   };
   ScenarioManager.prototype._leaveAll = function () {
     var self = this;
@@ -1169,11 +1206,12 @@
       }.call(this)
     );
     if (this.current && this.current.key === key)
-      this.show(key, { force: true });
+      this.show(key, Object.assign({}, this.current.opts, { force: true }));
   };
   ScenarioManager.prototype.play = function () {
     this.paused = false;
-    this.layer.querySelectorAll('video').forEach(function (v) {
+    if (!this.current) return;
+    this.current.card.querySelectorAll('video').forEach(function (v) {
       var p = v.play();
       if (p && p.catch) p.catch(function () {});
     });
@@ -1185,10 +1223,7 @@
     });
   };
   ScenarioManager.prototype.destroy = function () {
-    this.cards.forEach(function (c) {
-      c.querySelectorAll('video').forEach(ScenarioManager.release);
-      if (c.parentNode) c.parentNode.removeChild(c);
-    });
+    this.cards.slice().forEach(this._remove.bind(this));
     this.cards = [];
     this.current = null;
   };
@@ -1793,24 +1828,25 @@
 
     // 10. ابر وضعیت‌ها؛ رنگ ثابت ابر و رنگ‌های وابسته به accent
     `.sc-layer {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      z-index: 5;
-      overflow: hidden
+      position: relative;
+      flex: none;
+      min-width: 0;
+      overflow-anchor: none;
+      width: 100%
+    }`,
+    `.sc-layer:empty {
+      display: none
     }`,
     `.sc {
-      position: absolute;
-      inset: 0;
+      position: relative;
+      width: 100%;
       display: flex;
       align-items: center;
       align-items: safe center;
       justify-content: center;
-      padding: 12px;
-      overflow-y: auto;
-      scrollbar-width: thin;
+      padding: 8px 0 12px;
       opacity: 0;
-      transition: opacity .38s ease
+      transition: opacity .22s ease
     }`,
     `.sc.in {
       opacity: 1
@@ -1819,9 +1855,7 @@
       opacity: 0
     }`,
     `.sc-float {
-      align-items: flex-end;
-      align-items: safe flex-end;
-      padding-bottom: 12px
+      justify-content: flex-end
     }`,
     `.sc.in .cloud {
       transform: none
@@ -1833,16 +1867,16 @@
       position: relative;
       display: flow-root;
       flex: none;
-      width: min(340px,100%);
+      width: min(300px,100%);
       color: #ffffff;
       text-align: center;
       pointer-events: auto;
       transform: translateY(16px) scale(.88);
       transform-origin: 25% 92%;
-      transition: transform .55s cubic-bezier(.2,.9,.3,1.15)
+      transition: transform .3s cubic-bezier(.2,.9,.3,1.15)
     }`,
     `.sc-float .cloud {
-      width: min(290px,100%)
+      width: min(260px,100%)
     }`,
     `.cloud>svg {
       position: absolute;
@@ -1853,7 +1887,7 @@
       pointer-events: none
     }`,
     `.cloud .cb-body,.cloud-in {
-      animation: float 5.5s ease-in-out infinite
+      animation: none
     }`,
     `.cloud .cb-shadow {
       transform-box: fill-box;
@@ -1936,7 +1970,7 @@
     }`,
     `.root .cloud-btn {
       flex: none;
-      min-height: 40px;
+      min-height: 44px;
       max-width: 100%;
       padding: 6px 16px;
       border-radius: 999px;
@@ -1954,6 +1988,15 @@
     `.cloud-btn:active {
       transform: scale(.97)
     }`,
+    `.root .cloud-dismiss {
+      min-height: 44px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      color: #536579
+    }`,
+    `.root .cloud-dismiss:hover {background: rgba(11,18,32,.06)}`,
+    `.root .cloud-dismiss:focus-visible {outline: 2px solid var(--accent);outline-offset: 2px}`,
     `.cloud-btn:focus-visible:focus-visible {
       outline: 2px solid var(--accent);
       outline-offset: 3px
@@ -4023,12 +4066,12 @@
       icon('down')
     );
     this.scLayer = h('div', { class: 'sc-layer' });
+    this.msgs.appendChild(this.scLayer);
     this.toastEl = h('div', { class: 'toast', role: 'status' });
     var body = h(
       'div',
       { class: 'body' },
       this.msgs,
-      this.scLayer,
       this.fab,
       this.toastEl
     );
@@ -4174,7 +4217,11 @@
     this.profileActions = h('div', { class: 'profile-actions' });
     this.profileDescription = h('p', { class: 'profile-description' });
     this.profileContactTitle = h('h3', { text: T.profileContact });
-    this.profileDetails = h('div', { class: 'profile-details' }, this.profileContactTitle);
+    this.profileDetails = h(
+      'div',
+      { class: 'profile-details' },
+      this.profileContactTitle
+    );
     var panel = h(
       'section',
       {
@@ -4228,12 +4275,8 @@
           this.profileStatusEl,
           this.profileActions
         ),
-       
-        h(
-          'section',
-          { class: 'profile-group' },
-          this.profileDetails
-        )
+
+        h('section', { class: 'profile-group' }, this.profileDetails)
       )
     );
     panel.inert = true;
@@ -4636,7 +4679,11 @@
 
   /* ---------- messages ---------- */
   UI.prototype.clearMessages = function () {
-    this.msgs.textContent = '';
+    // Keep the status host mounted when history is reset or reloaded.
+    var self = this;
+    Array.from(this.msgs.children).forEach(function (child) {
+      if (child !== self.scLayer) self.msgs.removeChild(child);
+    });
     this.rows = {};
     this.lastDay = null;
   };
@@ -4650,6 +4697,12 @@
   };
   UI.prototype.nearBottom = function () {
     return this.stick;
+  };
+  UI.prototype.onScenarioChange = function (restoreFocus) {
+    if (this.stick) this.scrollBottom(false);
+    var distance = this.msgs.scrollHeight - this.msgs.scrollTop - this.msgs.clientHeight;
+    this.fab.classList.toggle('show', distance >= 90);
+    if (restoreFocus && this.isOpen() && !this.locked) this.focusComposer();
   };
   UI.prototype.scrollBottom = function (smooth) {
     var m = this.msgs;
@@ -5062,17 +5115,18 @@
     var dk = dayKey(m.timestamp);
     if (dk !== this.lastDay) {
       this.lastDay = dk;
-      this.msgs.appendChild(
+      this.msgs.insertBefore(
         h(
           'div',
           { class: 'row day' },
           h('span', { class: 'pill', text: dayLabel(m.timestamp) })
-        )
+        ),
+        this.scLayer
       );
     }
     var r = this.buildRow(m);
     this.rows[m.id] = r;
-    this.msgs.appendChild(r.el);
+    this.msgs.insertBefore(r.el, this.scLayer);
     if (silent) r.el.style.animation = 'none';
   };
   UI.prototype.onAdd = function (m) {
@@ -5332,7 +5386,10 @@
       }
     });
 
-    this.scenario = new ScenarioManager(this.ui.scLayer, this.cfg, this.events);
+    this.scenario = new ScenarioManager(
+      this.ui.scLayer, this.cfg, this.events,
+      function (restoreFocus) { self.ui.onScenarioChange(restoreFocus); }
+    );
 
     this.store.set('LOGIN');
 
@@ -5510,7 +5567,7 @@
       if (s === 'OFF_HOURS') ui.ta.placeholder = T.offPh;
       if (s === 'NETWORK_ERROR') ui.ta.placeholder = T.netPh;
     }
-    // scenario overlay
+    // Temporary status message at the end of the conversation.
     var key = SC_BY_STATE[s];
     if (key) {
       var o = {};
