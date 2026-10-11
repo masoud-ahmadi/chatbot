@@ -932,6 +932,17 @@
     },
   };
 
+  // Static cloud artwork from the supplied design; each card gets unique SVG IDs.
+  var SCENARIO_CLOUD_SVG = "<svg viewBox=\"0 0 430 370\" preserveAspectRatio=\"none\" aria-hidden=\"true\" focusable=\"false\"><defs><clipPath id=\"cb-clip\"><circle cx=\"230\" cy=\"105\" r=\"85\" /><circle cx=\"120\" cy=\"140\" r=\"60\" /><circle cx=\"72\" cy=\"198\" r=\"48\" /><circle cx=\"330\" cy=\"140\" r=\"62\" /><circle cx=\"366\" cy=\"208\" r=\"46\" /><rect x=\"78\" y=\"150\" width=\"300\" height=\"150\" rx=\"75\" /><circle cx=\"200\" cy=\"248\" r=\"62\" /><circle cx=\"300\" cy=\"246\" r=\"62\" /><path\r\n              d=\"M140 272C150 312 130 336 96 352C158 350 208 326 226 280Z\"\r\n            /></clipPath><filter\r\n            id=\"cb-puffy\"\r\n            x=\"-12%\"\r\n            y=\"-12%\"\r\n            width=\"124%\"\r\n            height=\"124%\"\r\n            color-interpolation-filters=\"sRGB\"\r\n          ><feFlood flood-color=\"#0b1220\" flood-opacity=\".22\" /><feComposite in2=\"SourceAlpha\" operator=\"out\" result=\"outD\" /><feGaussianBlur in=\"outD\" stdDeviation=\"14\" /><feOffset dx=\"-8\" dy=\"-12\" result=\"shD\" /><feComposite\r\n              in=\"shD\"\r\n              in2=\"SourceAlpha\"\r\n              operator=\"in\"\r\n              result=\"innerD\"\r\n            /><feFlood flood-color=\"#ffffff\" flood-opacity=\".85\" /><feComposite in2=\"SourceAlpha\" operator=\"out\" result=\"outL\" /><feGaussianBlur in=\"outL\" stdDeviation=\"7\" /><feOffset dx=\"5\" dy=\"8\" result=\"shL\" /><feComposite\r\n              in=\"shL\"\r\n              in2=\"SourceAlpha\"\r\n              operator=\"in\"\r\n              result=\"innerL\"\r\n            /><feMerge><feMergeNode in=\"SourceGraphic\" /><feMergeNode in=\"innerD\" /><feMergeNode in=\"innerL\" /></feMerge></filter><linearGradient id=\"cb-tone\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#fff\" stop-opacity=\".30\" /><stop offset=\".45\" stop-color=\"#fff\" stop-opacity=\"0\" /><stop offset=\"1\" stop-color=\"#0b1220\" stop-opacity=\".16\" /></linearGradient><radialGradient id=\"cb-floor\"><stop offset=\"0\" stop-color=\"#000\" stop-opacity=\".40\" /><stop offset=\"1\" stop-color=\"#000\" stop-opacity=\"0\" /></radialGradient><linearGradient\r\n            id=\"cb-c1\"\r\n            gradientUnits=\"userSpaceOnUse\"\r\n            x1=\"161\"\r\n            y1=\"73\"\r\n            x2=\"204\"\r\n            y2=\"34\"\r\n          ><stop offset=\"0\" stop-color=\"#fff\" stop-opacity=\"0\" /><stop offset=\".5\" stop-color=\"#fff\" stop-opacity=\".95\" /><stop offset=\"1\" stop-color=\"#fff\" stop-opacity=\"0\" /></linearGradient><linearGradient\r\n            id=\"cb-c2\"\r\n            gradientUnits=\"userSpaceOnUse\"\r\n            x1=\"77\"\r\n            y1=\"120\"\r\n            x2=\"100\"\r\n            y2=\"97\"\r\n          ><stop offset=\"0\" stop-color=\"#fff\" stop-opacity=\"0\" /><stop offset=\".5\" stop-color=\"#fff\" stop-opacity=\".95\" /><stop offset=\"1\" stop-color=\"#fff\" stop-opacity=\"0\" /></linearGradient><filter id=\"cb-b10\" x=\"-50%\" y=\"-50%\" width=\"200%\" height=\"200%\"><feGaussianBlur stdDeviation=\"10\" /></filter><filter id=\"cb-b5\" x=\"-50%\" y=\"-50%\" width=\"200%\" height=\"200%\"><feGaussianBlur stdDeviation=\"5\" /></filter><filter id=\"cb-b1\" x=\"-20%\" y=\"-20%\" width=\"140%\" height=\"140%\"><feGaussianBlur stdDeviation=\"1\" /></filter></defs><ellipse\r\n          class=\"cb-shadow\"\r\n          cx=\"255\"\r\n          cy=\"354\"\r\n          rx=\"165\"\r\n          ry=\"13\"\r\n          fill=\"url(#cb-floor)\"\r\n        /><g class=\"cb-body\"><g filter=\"url(#cb-puffy)\" fill=\"currentColor\"><circle cx=\"230\" cy=\"105\" r=\"85\" /><circle cx=\"120\" cy=\"140\" r=\"60\" /><circle cx=\"72\" cy=\"198\" r=\"48\" /><circle cx=\"330\" cy=\"140\" r=\"62\" /><circle cx=\"366\" cy=\"208\" r=\"46\" /><rect x=\"78\" y=\"150\" width=\"300\" height=\"150\" rx=\"75\" /><circle cx=\"200\" cy=\"248\" r=\"62\" /><circle cx=\"300\" cy=\"246\" r=\"62\" /><path\r\n              d=\"M140 272C150 312 130 336 96 352C158 350 208 326 226 280Z\"\r\n            /></g><g clip-path=\"url(#cb-clip)\"><rect width=\"430\" height=\"370\" fill=\"url(#cb-tone)\" /><ellipse\r\n              cx=\"195\"\r\n              cy=\"60\"\r\n              rx=\"72\"\r\n              ry=\"24\"\r\n              fill=\"#fff\"\r\n              opacity=\".75\"\r\n              transform=\"rotate(-18 195 60)\"\r\n              filter=\"url(#cb-b10)\"\r\n            /><ellipse\r\n              cx=\"102\"\r\n              cy=\"112\"\r\n              rx=\"28\"\r\n              ry=\"12\"\r\n              fill=\"#fff\"\r\n              opacity=\".7\"\r\n              transform=\"rotate(-35 102 112)\"\r\n              filter=\"url(#cb-b5)\"\r\n            /><ellipse\r\n              cx=\"318\"\r\n              cy=\"98\"\r\n              rx=\"26\"\r\n              ry=\"10\"\r\n              fill=\"#fff\"\r\n              opacity=\".45\"\r\n              transform=\"rotate(-25 318 98)\"\r\n              filter=\"url(#cb-b5)\"\r\n            /></g><g\r\n            fill=\"none\"\r\n            stroke-linecap=\"round\"\r\n            stroke-width=\"6\"\r\n            filter=\"url(#cb-b1)\"\r\n          ><path d=\"M161 73A76 76 0 0 1 204 34\" stroke=\"url(#cb-c1)\" /><path d=\"M77 120A48 48 0 0 1 100 97\" stroke=\"url(#cb-c2)\" /></g></g></svg>";
+  function scenarioCloudShape() {
+    var template = document.createElement('template');
+    var prefix = 'coco-cloud-' + uid() + '-';
+    template.innerHTML = SCENARIO_CLOUD_SVG
+      .replace(/id="cb-/g, 'id="' + prefix)
+      .replace(/url\(#cb-/g, 'url(#' + prefix);
+    return template.content.firstChild;
+  }
+
   function ScenarioManager(layer, cfg, events) {
     this.layer = layer;
     this.base = cfg.assetsBase || location.href;
@@ -992,8 +1003,10 @@
       v.disablePictureInPicture = true;
       v.addEventListener('loadeddata', function () {
         v.classList.add('ready');
+        wrap.classList.add('media-ready');
       });
       v.addEventListener('error', function () {
+        wrap.classList.remove('media-ready');
         ScenarioManager.release(v);
       });
       v.src = def.videoUrl;
@@ -1027,11 +1040,16 @@
     var cloud = h(
       'div',
       { class: 'cloud', role: 'status', 'aria-live': 'polite' },
+      scenarioCloudShape(),
       h(
         'div',
         { class: 'cloud-in' },
         this._media(def),
         h('div', { class: 'cloud-text', text: def.text }),
+        /^(chat-loading|thinking|reading|waiting)$/.test(key)
+          ? h('span', { class: 'cloud-pulse', 'aria-hidden': 'true' },
+              h('i'), h('i'), h('i'))
+          : null,
         opts.action
           ? h('button', {
               class: 'cloud-btn',
@@ -1042,24 +1060,7 @@
           : null
       )
     );
-    if (opts.dismissible) {
-      cloud.appendChild(
-        h(
-          'button',
-          {
-            class: 'cloud-x',
-            type: 'button',
-            'aria-label': T.close,
-            on: {
-              click: function () {
-                if (opts.onDismiss) opts.onDismiss();
-              },
-            },
-          },
-          icon('close')
-        )
-      );
-    }
+  
     var card = h('div', { class: 'sc sc-' + def.variant }, cloud);
     this.layer.appendChild(card);
     this.cards.push(card);
@@ -1320,19 +1321,31 @@
     '.row.flash::before{content:"";position:absolute;top:-.125rem;bottom:-.125rem;left:-.1875rem;right:-.1875rem;border-radius:.625rem;background:rgba(255,255,255,.6);pointer-events:none;z-index:3;animation:row-flash 1s ease-out forwards}',
     '.root .fab.show{opacity:1;pointer-events:auto;transform:none}',
 
-    // scenarios
+    // Scenario clouds: shared motion keeps the artwork, video and controls aligned.
     '.sc-layer{position:absolute;inset:0;pointer-events:none;z-index:5;overflow:hidden}',
-    '.sc{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .38s ease}.sc.in{opacity:1}.sc.out{opacity:0}',
-    '.sc-float{align-items:flex-end;padding-bottom:1rem}',
-    '.sc.in .cloud{transform:none}.sc.out .cloud{transform:translateY(.5rem) scale(.96)}',
-    '.cloud::before{width:5.75rem;height:5.75rem;top:-2.375rem;left:1.375rem}.cloud::after{width:4.25rem;height:4.25rem;top:-1.625rem;right:1.875rem}',
-    '.cloud-in{position:relative;z-index:1;animation:float 5.5s ease-in-out infinite}',
-    '.cloud-media{position:relative;width:8.25rem;height:8.25rem;margin:.125rem auto .5rem;overflow:hidden;background:linear-gradient(145deg,var(--accent-soft),transparent);border-radius:46% 54% 50% 50%/52% 46% 54% 48%;animation:morph 9s ease-in-out infinite}',
-    '.cloud-media video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .5s;pointer-events:none}.cloud-media video.ready{opacity:1}',
-    '.cloud-emoji{position:absolute;inset:0;display:grid;place-items:center;font-size:3.5rem;animation:bob 2.6s ease-in-out infinite}',
-    '.cloud-text{font-size:.84375rem;line-height:1.7;padding:0 .25rem}',
-    '.cloud-btn:active{transform:scale(.97)}',
-    '.cloud-x{position:absolute;top:.5rem;left:.75rem;width:1.75rem;height:1.75rem;border-radius:50%;color:var(--muted);display:grid;place-items:center;z-index:2}.cloud-x svg{width:1rem;height:1rem}.cloud-x:hover{background:var(--surface2)}',
+    '.sc{position:absolute;inset:0;display:flex;align-items:center;align-items:safe center;justify-content:center;padding:12px;overflow-y:auto;scrollbar-width:thin;opacity:0;transition:opacity .38s ease}.sc.in{opacity:1}.sc.out{opacity:0}',
+    '.sc-float{align-items:flex-end;align-items:safe flex-end;padding-bottom:12px}',
+    '.sc.in .cloud{transform:none}.sc.out .cloud{transform:translateY(8px) scale(.96)}',
+    '.root .cloud{position:relative;display:flow-root;flex:none;width:min(340px,100%);color:#ffffff;text-align:center;pointer-events:auto;transform:translateY(16px) scale(.88);transform-origin:25% 92%;transition:transform .55s cubic-bezier(.2,.9,.3,1.15)}',
+    '.sc-float .cloud{width:min(290px,100%)}',
+    '.cloud>svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}',
+    '.cloud .cb-body,.cloud-in{animation:float 5.5s ease-in-out infinite}',
+    '.cloud .cb-shadow{transform-box:fill-box;transform-origin:center;animation:cloud-shadow 5.5s ease-in-out infinite}',
+    '.cloud-in{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:8px;margin: 12% 14% 20% 22%;color:#253447}',
+    '.cloud-media{position:relative;flex:none;width:100%;height:104px;margin:0;overflow:hidden}',
+    '.sc-float .cloud-media{height:88px}',
+    '.cloud-media video{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:contain;opacity:0;transition:opacity .3s ease;pointer-events:none}.cloud-media video.ready{opacity:1}',
+    '.cloud-emoji{position:absolute;inset:0;display:grid;place-items:center;font-size:48px;transition:opacity .2s ease}.cloud-media.media-ready .cloud-emoji{opacity:0}',
+    '.cloud-text{font-size:.75rem;overflow-wrap:anywhere}',
+    '.sc-float .cloud-text{font-size:.75rem}',
+    '.cloud-pulse{display:inline-flex;align-items:center;justify-content:center;gap:5px;height:10px;color:var(--accent)}',
+    '.cloud-pulse i{width:5px;height:5px;border-radius:50%;background:currentColor;animation:bounce 1.2s infinite ease-in-out}.cloud-pulse i:nth-child(2){animation-delay:.15s}.cloud-pulse i:nth-child(3){animation-delay:.3s}',
+    '.root .cloud-btn{flex:none;min-height:40px;max-width:100%;padding:6px 16px;border-radius:999px;background:var(--accent);color:var(--text);font-weight:600;font-size:13px;line-height:1.5;box-shadow:0 2px 6px rgba(11,18,32,.12);transition:transform .15s,filter .15s}',
+    '.cloud-btn:hover{filter:brightness(.95)}.cloud-btn:active{transform:scale(.97)}',
+
+    '.cloud-btn:focus-visible:focus-visible{outline:2px solid var(--accent);outline-offset:3px}',
+    '@keyframes cloud-shadow{0%,100%{transform:scale(1);opacity:.75}50%{transform:scale(.88);opacity:.5}}',
+    '@media(max-width:360px),(max-height:560px){.sc{padding:8px}.cloud-in{gap:6px}.cloud-media{height:84px}.sc-float .cloud-media{height:72px}.cloud-text{font-size:13px}}',
 
     // composer
     '.root .banner.on{display:flex}',
@@ -1390,12 +1403,12 @@
     '.root .body::after{content:"";position:absolute;inset:0;background-repeat:repeat;background-position:top right;background-size:510px auto;mix-blend-mode:overlay;background-image:var(--chat-pattern);z-index:-1;pointer-events:none}',
 
     // فهرست پیام‌ها
-    '.root .msgs{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding:.75rem .75rem .875rem;display:flex;flex-direction:column;gap:.3125rem;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:transparent transparent}',
+    '.root .msgs{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding:.75rem .75rem .875rem;display:flex;flex-direction:column;gap:.5rem;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:transparent transparent}',
     '.root .msgs:hover{scrollbar-color:rgba(5,46,22,.25) transparent}',
     '.root .msgs::-webkit-scrollbar{width:.25rem}',
     '.root .msgs::-webkit-scrollbar-track{background:transparent}',
     '.root .msgs::-webkit-scrollbar-thumb{background:transparent;border-radius:999px}',
-    '.root .msgs:hover::-webkit-scrollbar-thumb{background:rgba(5,46,22,.22)}',
+    '.root .msgs:hover::-webkit-scrollbar-thumb{background:rgba(5,46,22,.22);background:color-mix(in srgb,var(--success) 22%,transparent)}',
 
     // تاریخ و پیام‌های سیستمی
     '.root .pill{background:rgba(35,55,43,.48);color:#ffffff;border-radius:999px;padding:.1875rem .6875rem;font-size:.75rem;font-weight:500;box-shadow:0 .0625rem .125rem rgba(0,0,0,.04);backdrop-filter:blur(.3125rem);-webkit-backdrop-filter:blur(.3125rem)}',
@@ -1502,10 +1515,7 @@
 
     // اعلان‌ها و پیام‌های وضعیت
     '.root .toast{position:absolute;bottom:5.25rem;left:50%;transform:translate(-50%,.75rem);background:rgba(23,33,43,.94);color:#fff;border-radius:999px;padding:.4375rem 1rem;font-size:.8125rem;opacity:0;pointer-events:none;transition:.25s;z-index:9;white-space:nowrap;max-width:90%;overflow:hidden;text-overflow:ellipsis;border:1px solid rgba(255,255,255,.08);box-shadow:0 .25rem 1rem rgba(5,46,22,.16)}',
-    '.root .sc-full{background:rgba(240,248,242,.86);-webkit-backdrop-filter:blur(.625rem);backdrop-filter:blur(.625rem);pointer-events:auto}',
-    '.root .cloud{position:relative;width:min(15.25rem,80%);margin-top:1.875rem;padding:.875rem 1rem 1rem;background:#ffffff;border-radius:2.375rem;text-align:center;pointer-events:auto;filter:drop-shadow(0 .5rem 1.125rem rgba(5,46,22,.12));transform:translateY(1rem) scale(.9);transition:transform .55s cubic-bezier(.2,.9,.3,1.25)}',
-    '.root .cloud::before,.root .cloud::after{content:"";position:absolute;background:#ffffff;border-radius:50%}',
-    '.root .cloud-btn{margin-top:.625rem;height:2.25rem;padding:0 1.125rem;border-radius:1.125rem;background:#00a844;color:#ffffff;font-weight:600;font-size:.8125rem}',
+    '.root .sc-full{;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);pointer-events:auto}',
 
     // حالت موبایل
     '@media(max-width:40rem){.root .panel{width:100%;border:0;box-shadow:none;background:#ffffff}.root .hdr{min-height:calc(3.75rem + env(safe-area-inset-top,0px));padding-top:calc(.5rem + env(safe-area-inset-top,0px));padding-bottom:.5rem}.root .msgs{padding:.625rem .5625rem .75rem}.root .bubble{max-width:86%;padding:.4375rem .5625rem .3125rem}.root .dock{padding-left:.4375rem;padding-right:.4375rem}.root .composer{gap:.4375rem}.root .send{width:44px;height:44px}}',
