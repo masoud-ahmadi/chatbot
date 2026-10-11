@@ -1255,7 +1255,7 @@
     'button.launcher svg{width:1.625rem;height:1.625rem}.launcher:hover{transform:scale(1.07)}.launcher:active{transform:scale(.95)}',
 
     // Spring entrance and circular reveal, without changing the final layout.
-    '.root .panel{position:fixed;top:auto;right:auto;bottom:auto;left:auto;width:min(24.5rem,calc(100vw - 2rem));height:min(41.25rem,calc(100vh - 7rem));max-height:calc(100vh - 7rem);background:var(--accent);border-radius:1.25rem;box-shadow:0 1.5rem 3.75rem -1.5rem rgba(5,46,22,.3),0 0 0 1px rgba(5,46,22,.03);overflow:hidden;display:flex;flex-direction:column;opacity:0;visibility:hidden;pointer-events:none;transform-origin:var(--panel-origin-x,100%) var(--panel-origin-y,100%);transform:translateY(calc(var(--panel-base-y,0px) + var(--panel-closed-y,64px))) scale(.5) rotate(var(--panel-tilt,6deg));clip-path:circle(0% at var(--panel-origin-x,100%) var(--panel-origin-y,100%));transition:transform .3s ease-in,clip-path .3s ease-in,opacity .3s ease-in,visibility 0s linear .3s;z-index:2}',
+    '.root .panel{position:fixed;top:auto;right:auto;bottom:auto;left:auto;width:min(24.5rem,calc(100vw - 2rem));height:var(--panel-height,660px);background:var(--accent);border-radius:1.25rem;box-shadow:0 1.5rem 3.75rem -1.5rem rgba(5,46,22,.3),0 0 0 1px rgba(5,46,22,.03);overflow:hidden;display:flex;flex-direction:column;opacity:0;visibility:hidden;pointer-events:none;transform-origin:var(--panel-origin-x,100%) var(--panel-origin-y,100%);transform:translateY(calc(var(--panel-base-y,0px) + var(--panel-closed-y,64px))) scale(.5) rotate(var(--panel-tilt,6deg));clip-path:circle(0% at var(--panel-origin-x,100%) var(--panel-origin-y,100%));transition:transform .3s ease-in,clip-path .3s ease-in,opacity .3s ease-in,visibility 0s linear .3s;z-index:2}',
     '.root.open .panel{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(var(--panel-base-y,0px)) scale(1) rotate(0deg);clip-path:circle(150% at var(--panel-origin-x,100%) var(--panel-origin-y,100%));transition:transform .45s cubic-bezier(.34,1.56,.64,1),clip-path .45s ease-out,opacity .45s cubic-bezier(.34,1.56,.64,1),visibility 0s}',
     '.root .panel > .view{opacity:0;transform:translateY(10px);transition:opacity .06s linear,transform .12s ease}',
     '.root.open .panel > .view{opacity:1;transform:none;transition:opacity .16s ease .22s,transform .18s ease .2s}',
@@ -1364,7 +1364,7 @@
     // '.root .launcher:hover{background:#00b849;box-shadow:0 .4375rem 1.375rem rgba(0,201,81,.32)}',
 
     // هدر تلگرامی
-    '.root .hdr{display:flex;align-items:center;gap:.6875rem;padding:.625rem .75rem;background:#ffffff;border-bottom:1px solid rgba(5,46,22,.08);z-index:6;min-height:4rem}',
+    '.root .hdr{flex-shrink:0;display:flex;align-items:center;gap:.6875rem;padding:.625rem .75rem;background:#ffffff;border-bottom:1px solid rgba(5,46,22,.08);z-index:6;min-height:4rem}',
     '.root .av{position:relative;width:2.625rem;height:2.625rem;border-radius:50%;background:#e8f8ed;flex:none}',
     '.root .av img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}',
     '.root .av::after{content:"";position:absolute;bottom:0;left:0;width:.6875rem;height:.6875rem;border-radius:50%;background:#00c951;border:2px solid #ffffff}',
@@ -1437,7 +1437,7 @@
     '.root .banner .bx:hover{background:#f1f5f3}',
 
     // کادر ارسال پیام
-    '.root .dock{position:relative;background:transparent;border-top:0;z-index:6;padding:.3125rem .5rem calc(.5rem + env(safe-area-inset-bottom,0px))}',
+    '.root .dock{flex-shrink:0;position:relative;background:transparent;border-top:0;z-index:6;padding:.3125rem .5rem calc(.5rem + env(safe-area-inset-bottom,0px))}',
     '.root .composer{display:flex;align-items:flex-end;gap:.5rem;padding:.125rem 0 .25rem}',
     '.root .field{flex:1;min-width:0;display:flex;align-items:flex-end;background:#ffffff;border-radius:1.375rem;padding:.125rem .3125rem .125rem .4375rem;transition:box-shadow .15s;min-height:2.75rem;border:1px solid rgba(5,46,22,.07);box-shadow:0 .0625rem .125rem rgba(5,46,22,.13);gap:.125rem}',
     '.root .field:focus-within{box-shadow:0 0 0 .125rem rgba(0,201,81,.2);border-color:rgba(0,201,81,.28)}',
@@ -1862,7 +1862,10 @@
       ? vh - 2 * offsetY - 32
       : vh - offsetY - launcherGap - 16;
 
-    this.panel.style.maxHeight = Math.max(160, Math.min(660, available)) + 'px';
+    this.root.style.setProperty(
+      '--panel-height',
+      Math.max(0, Math.min(660, available)) + 'px'
+    );
     this.updatePanelMotion();
   };
   UI.prototype.updatePanelMotion = function () {
