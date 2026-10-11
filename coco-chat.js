@@ -73,8 +73,8 @@
     connected: 'اتصال برقرار شد',
     viewChat: 'مشاهده گفتگو',
     stopped: 'پاسخ متوقف شد',
-    nameErr: 'نام و نام خانوادگی را وارد کنید.',
-    mobileErr: 'شماره موبایل معتبر نیست. مثال: 09123456789',
+    nameErr: 'نام کامل را وارد کنید.',
+    mobileErr: 'شماره معتبر نیست.',
     otpIncomplete: 'کد تأیید را کامل وارد کنید.',
     e_otp_invalid: 'کد واردشده درست نیست. دوباره بررسی کنید.',
     e_otp_expired: 'کد منقضی شده است. کد جدید دریافت کنید.',
@@ -1474,7 +1474,8 @@
 
     '.root .login-form{display:flex;flex-direction:column;gap:16px;flex:none;width:100%;max-width:360px;margin:0 auto}',
     '.root .login-form .fld{margin:0}',
-    '.root .login-form .fld > span{display:block;margin-bottom:8px;font-size:.75rem;line-height:1.5;color:var(--accent-soft-dark)}',
+    '.root .login-form .login-label-row{display:flex;align-items:center;justify-content:space-between;gap:8px;height:20px;margin-bottom:8px;font-size:.75rem;line-height:20px;color:var(--accent-soft-dark);white-space:nowrap}',
+    '.root .login-form .field-error{color:var(--danger);text-align:end;font-size:.75rem;}',
 
     '.root .login-actions .form-error{min-height:0;margin:0 0 8px;font-size:.75rem;line-height:20px;overflow-wrap:anywhere}',
     '.root .login-actions .form-error:empty{display:none}',
@@ -1910,7 +1911,8 @@
       enterkeyhint: 'next',
       required: true,
       'aria-invalid': 'false',
-      'aria-describedby': 'coco-login-error',
+      'aria-labelledby': 'coco-login-name-label',
+      'aria-describedby': 'coco-login-name-error',
       on: {
         keydown: function (e) {
           if (e.key === 'Enter' && !e.isComposing) {
@@ -1934,12 +1936,25 @@
       enterkeyhint: 'go',
       required: true,
       'aria-invalid': 'false',
-      'aria-describedby': 'coco-login-error',
+      'aria-labelledby': 'coco-login-mobile-label',
+      'aria-describedby': 'coco-login-mobile-error',
       on: {
         input: function () {
           if (self.loginErrorField === 'mobile') self.setLoginError(null, '');
         },
       },
+    });
+    this.nameErr = h('span', {
+      id: 'coco-login-name-error',
+      class: 'field-error',
+      role: 'alert',
+      'aria-atomic': 'true',
+    });
+    this.mobileErr = h('span', {
+      id: 'coco-login-mobile-error',
+      class: 'field-error',
+      role: 'alert',
+      'aria-atomic': 'true',
     });
     this.loginErr = h('div', {
       id: 'coco-login-error',
@@ -1965,8 +1980,18 @@
           },
         },
       },
-      h('label', { class: 'fld' }, h('span', { text: T.name }), this.nameInp),
-      h('label', { class: 'fld' }, h('span', { text: T.mobile }), this.mobInp),
+      h(
+        'label', { class: 'fld' },
+        h('span', { class: 'login-label-row' },
+          h('span', { id: 'coco-login-name-label', text: T.name }), this.nameErr),
+        this.nameInp
+      ),
+      h(
+        'label', { class: 'fld' },
+        h('span', { class: 'login-label-row' },
+          h('span', { id: 'coco-login-mobile-label', text: T.mobile }), this.mobileErr),
+        this.mobInp
+      ),
       h('div', { class: 'login-actions' }, this.loginErr, this.loginBtn)
     );
     return h(
@@ -1995,8 +2020,11 @@
     );
   };
   UI.prototype.setLoginError = function (field, msg) {
-    this.loginErrorField = msg ? field : null;
-    this.loginErr.textContent = msg || '';
+    field = msg ? field : null;
+    this.loginErrorField = field;
+    this.nameErr.textContent = field === 'name' ? msg : '';
+    this.mobileErr.textContent = field === 'mobile' ? msg : '';
+    this.loginErr.textContent = !field ? msg || '' : '';
     this.nameInp.classList.toggle('bad', field === 'name');
     this.mobInp.classList.toggle('bad', field === 'mobile');
     this.nameInp.setAttribute(
