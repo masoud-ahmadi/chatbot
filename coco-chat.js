@@ -1303,7 +1303,7 @@
     '.hinfo{flex:1;min-width:0}',
     '.hstat.bad{color:var(--danger)}',
     '.dots{display:inline-flex;gap:.1875rem}.dots i{width:.25rem;height:.25rem;border-radius:50%;background:currentColor;animation:bounce 1.1s infinite}.dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}',
-    '.row{display:flex;max-width:100%;animation:pop .22s ease-out;touch-action:pan-y}.row.out{justify-content:flex-start}.row.in{justify-content:flex-end}',
+    '.row{display:flex;max-width:100%;animation:pop .22s ease-out;transition:transform .18s ease-out;touch-action:pan-y pinch-zoom}.row.out{justify-content:flex-start}.row.in{justify-content:flex-end}',
 
     '.streaming .txt::after{content:"";display:inline-block;width:.125rem;height:1em;margin-inline-start:.125rem;vertical-align:-.125rem;background:currentColor;opacity:.6;animation:blink 1s steps(2) infinite}',
     '.meta .ic-retry{display:inline-flex;color:var(--danger);opacity:1}.out .meta .ic-retry{color:#fff}',
@@ -1499,7 +1499,7 @@
 
     // کاهش انیمیشن برای کاربرانی که ترجیح می‌دهند
     '@media(prefers-reduced-motion:reduce){.root .bubble,.root .menu,.root .emoji{animation:none!important;transition:none!important}}',
-    '.row.is-swiping{transition:none!important}',
+    '.row.is-swiping{transition:none!important;user-select:none;-webkit-user-select:none}',
     '.reply-swipe-hint{',
     '  position:absolute;',
 
@@ -2959,6 +2959,10 @@
       clearTimeout(pressT);
       if (longFired) e.preventDefault();
     });
+    bubble.addEventListener('touchcancel', function () {
+      clearTimeout(pressT);
+      longFired = false;
+    });
     bubble.addEventListener('dblclick', function (e) {
       if (!(e.target.closest && e.target.closest('a,button'))) openM();
     });
@@ -2967,8 +2971,11 @@
     var swipeStartX = 0;
     var swipeStartY = 0;
     var swipeX = 0;
-    var swipeActive = false;
+    var swipePointerId = null;
     var swipeLocked = false;
+    var swipeStartThreshold = 20;
+    var swipeReplyThreshold = 56;
+    var swipeMaxDistance = 72;
 
     // پیام کاربر: چپ | پیام دستیار: راست
     var swipeDirection = out ? -1 : 1;
@@ -2986,6 +2993,11 @@
     row.appendChild(swipeHint);
 
     row.addEventListener('pointerdown', function (e) {
+      if (e.isPrimary === false) {
+        finishSwipe(false);
+        return;
+      }
+      if (swipePointerId !== null) return;
       if (e.pointerType === 'mouse' && e.button !== 0) return;
       if (
         e.target.closest &&
@@ -2996,39 +3008,55 @@
       swipeStartX = e.clientX;
       swipeStartY = e.clientY;
       swipeX = 0;
-      swipeActive = true;
+      swipePointerId = e.pointerId;
       swipeLocked = false;
+      longFired = false;
+      // Capture early so the gesture stays attached to this message.
+      if (row.setPointerCapture) {
+        try {
+          row.setPointerCapture(e.pointerId);
+        } catch (_) {}
+      }
     });
 
-    row.addEventListener('pointermove', function (e) {
-      if (!swipeActive) return;
+    function moveSwipe(e) {
+      if (swipePointerId === null || e.pointerId !== swipePointerId) return;
+      if (
+        longFired ||
+        (e.pointerType === 'mouse' && e.buttons != null && !(e.buttons & 1))
+      ) {
+        finishSwipe(false);
+        return;
+      }
 
       var dx = e.clientX - swipeStartX;
       var dy = e.clientY - swipeStartY;
 
-      if (!swipeLocked && Math.abs(dy) > 12) {
-        swipeActive = false;
-        return;
-      }
-
       if (!swipeLocked) {
-        if (dx * swipeDirection < 8) return;
+        var absX = Math.abs(dx);
+        var absY = Math.abs(dy);
+        if (Math.max(absX, absY) < swipeStartThreshold) return;
+        // Let vertical scrolling win; do not reject a mostly horizontal diagonal.
+        if (absY > absX * 1.2) {
+          finishSwipe(false);
+          return;
+        }
+        if (absX < absY * 1.2) return;
+        if (dx * swipeDirection < swipeStartThreshold) {
+          finishSwipe(false);
+          return;
+        }
 
         swipeLocked = true;
+        clearTimeout(pressT);
         row.classList.add('is-swiping');
-
-        if (row.setPointerCapture) {
-          try {
-            row.setPointerCapture(e.pointerId);
-          } catch (_) {}
-        }
       }
 
       if (e.cancelable) e.preventDefault();
 
-      swipeX = swipeDirection * Math.min(72, Math.max(0, dx * swipeDirection));
+      swipeX = swipeDirection * Math.min(swipeMaxDistance, Math.max(0, dx * swipeDirection));
 
-      var progress = Math.min(1, Math.abs(swipeX) / 56);
+      var progress = Math.min(1, Math.abs(swipeX) / swipeReplyThreshold);
 
       row.style.transform = 'translateX(' + swipeX + 'px)';
       swipeHint.style.opacity = String(progress);
@@ -3040,29 +3068,47 @@
         ') scaleX(' +
         scaleX +
         ')';
-    });
+    }
+    row.addEventListener('pointermove', moveSwipe);
 
-    function finishSwipe() {
-      if (!swipeActive && !swipeLocked) return;
+    function finishSwipe(commit) {
+      if (swipePointerId === null) return;
 
-      var shouldReply = swipeLocked && Math.abs(swipeX) >= 56;
+      var pointerId = swipePointerId;
+      var shouldReply = commit && swipeLocked && Math.abs(swipeX) >= swipeReplyThreshold;
 
-      swipeActive = false;
+      swipePointerId = null;
       swipeLocked = false;
+      swipeX = 0;
+      clearTimeout(pressT);
 
       row.classList.remove('is-swiping');
       row.style.transform = '';
       swipeHint.style.opacity = '';
       swipeHint.style.transform = '';
 
+      if (row.hasPointerCapture && row.releasePointerCapture) {
+        try {
+          if (row.hasPointerCapture(pointerId)) row.releasePointerCapture(pointerId);
+        } catch (_) {}
+      }
       if (shouldReply) A.onReply(m.id);
-
-      swipeX = 0;
     }
 
-    row.addEventListener('pointerup', finishSwipe);
-    row.addEventListener('pointercancel', finishSwipe);
-    row.addEventListener('lostpointercapture', finishSwipe);
+    row.addEventListener('pointerup', function (e) {
+      if (e.pointerId !== swipePointerId) return;
+      // Include the release position, even if the final move was coalesced.
+      if (swipeLocked) {
+        var distance = (e.clientX - swipeStartX) * swipeDirection;
+        swipeX = swipeDirection * Math.min(swipeMaxDistance, Math.max(0, distance));
+      }
+      finishSwipe(true);
+    });
+    var cancelSwipe = function (e) {
+      if (e.pointerId === swipePointerId) finishSwipe(false);
+    };
+    row.addEventListener('pointercancel', cancelSwipe);
+    row.addEventListener('lostpointercapture', cancelSwipe);
 
     return { el: row, bubble: bubble, txt: txt };
 
