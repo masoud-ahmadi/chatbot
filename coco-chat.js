@@ -306,16 +306,16 @@
 
     var mockFlag = o.mock !== undefined ? o.mock : ds.mock;
 
-    var accent = o.accent || ds.accent || '#2b8cc4';
+    var accent = o.accent || ds.accent;
 
-    if (!/^#[0-9a-f]{6}$/i.test(accent)) {
-      accent = '#2b8cc4';
+    if (typeof accent !== 'string' || !/^#[0-9a-f]{6}$/i.test(accent)) {
+      accent = null;
     }
 
-    var text = o.text || ds.text || '#1f2937';
+    var text = o.text || ds.text;
 
-    if (!/^#[0-9a-f]{6}$/i.test(text)) {
-      text = '#1f2937';
+    if (typeof text !== 'string' || !/^#[0-9a-f]{6}$/i.test(text)) {
+      text = null;
     }
 
     var rawPosition =
@@ -484,13 +484,16 @@
         }
       });
     }
-    var avatar =
-      'data:image/svg+xml;utf8,' +
-      encodeURIComponent(
-        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5cc4e8"/><stop offset="1" stop-color="' +
-          cfg.accent +
-          '"/></linearGradient></defs><circle cx="32" cy="32" r="32" fill="url(#g)"/><circle cx="24" cy="28" r="4" fill="#fff"/><circle cx="40" cy="28" r="4" fill="#fff"/><path d="M21 40q11 10 22 0" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/></svg>'
+    function avatar() {
+      return (
+        'data:image/svg+xml;utf8,' +
+        encodeURIComponent(
+          '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5cc4e8"/><stop offset="1" stop-color="' +
+            (cfg.accent || cfg.resolvedAccent) +
+            '"/></linearGradient></defs><circle cx="32" cy="32" r="32" fill="url(#g)"/><circle cx="24" cy="28" r="4" fill="#fff"/><circle cx="40" cy="28" r="4" fill="#fff"/><path d="M21 40q11 10 22 0" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/></svg>'
+        )
       );
+    }
     var replies = [
       'سلام! خوشحالم که اینجایید 😊 من دستیار هوشمند کوکو هستم. هر سؤالی دارید بپرسید، سعی می‌کنم سریع و دقیق کمکتان کنم.',
       'حتماً. برای اینکه بهتر راهنمایی‌تان کنم، چند نکته را مرور کردم:\n\nاول اینکه اطلاعات بیشتر در https://example.com/docs موجود است.\nدوم اینکه اگر مورد خاصی مدنظر دارید، دقیق‌تر بنویسید.\n\nمنتظر پیام بعدی شما هستم 🙌',
@@ -537,7 +540,7 @@
             agent: {
               id: cfg.agent,
               name: 'کوکو',
-              avatarUrl: avatar,
+              avatarUrl: avatar(),
               status: T.online,
             },
             settings: { maxLength: 2000 },
@@ -1216,351 +1219,1648 @@
     },
   ];
 
+  // راهنمای رنگ‌ها: متغیرهای پایه در بخش 02 و تغییرات تم در بخش‌های 03 و 04 هستند.
+  // رنگ‌های مستقیم هر بخش کنار استایل همان بخش باقی مانده‌اند.
+  // پیش‌فرض accent و text در CSS است؛ UI.mount فقط رنگ معتبرِ داده‌شده را جایگزین می‌کند.
+  // ترتیب قوانین، انتخابگرها و مقدارها برای حفظ ظاهر فعلی نگه داشته شده است.
   var CSS = [
-    ':host{all:initial}',
-    '*,*::before,*::after{box-sizing:border-box}',
 
-    `.root{--widget-wallpaper:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M54.627 0l.83.828-1.415 1.415L51.8 0h2.827zM5.373 0l-.83.828L5.96 2.243 8.2 0H5.374zM48.97 0l3.657 3.657-1.414 1.414L46.143 0h2.828zM11.03 0L7.372 3.657 8.787 5.07 13.857 0H11.03zm32.284 0L49.8 6.485 48.384 7.9l-7.9-7.9h2.83zM16.686 0L10.2 6.485 11.616 7.9l7.9-7.9h-2.83zm20.97 0l9.315 9.314-1.414 1.414L34.828 0h2.83zM22.344 0L13.03 9.314l1.414 1.414L25.172 0h-2.83zM32 0l12.142 12.142-1.414 1.414L30 .828 17.272 13.556l-1.414-1.414L28 0h4zM.284 0l28 28-1.414 1.414L0 2.544V0h.284zM0 5.373l25.456 25.455-1.414 1.415L0 8.2V5.374zm0 5.656l22.627 22.627-1.414 1.414L0 13.86v-2.83zm0 5.656l19.8 19.8-1.415 1.413L0 19.514v-2.83zm0 5.657l16.97 16.97-1.414 1.415L0 25.172v-2.83zM0 28l14.142 14.142-1.414 1.414L0 30.828V28zm0 5.657L11.314 44.97 9.9 46.386l-9.9-9.9v-2.828zm0 5.657L8.485 47.8 7.07 49.212 0 42.143v-2.83zm0 5.657l5.657 5.657-1.414 1.415L0 47.8v-2.83zm0 5.657l2.828 2.83-1.414 1.413L0 53.456v-2.83zM54.627 60L30 35.373 5.373 60H8.2L30 38.2 51.8 60h2.827zm-5.656 0L30 41.03 11.03 60h2.828L30 43.858 46.142 60h2.83zm-5.656 0L30 46.686 16.686 60h2.83L30 49.515 40.485 60h2.83zm-5.657 0L30 52.343 22.343 60h2.83L30 55.172 34.828 60h2.83zM32 60l-2-2-2 2h4zM59.716 0l-28 28 1.414 1.414L60 2.544V0h-.284zM60 5.373L34.544 30.828l1.414 1.415L60 8.2V5.374zm0 5.656L37.373 33.656l1.414 1.414L60 13.86v-2.83zm0 5.656l-19.8 19.8 1.415 1.413L60 19.514v-2.83zm0 5.657l-16.97 16.97 1.414 1.415L60 25.172v-2.83zM60 28L45.858 42.142l1.414 1.414L60 30.828V28zm0 5.657L48.686 44.97l1.415 1.415 9.9-9.9v-2.828zm0 5.657L51.515 47.8l1.414 1.413 7.07-7.07v-2.83zm0 5.657l-5.657 5.657 1.414 1.415L60 47.8v-2.83zm0 5.657l-2.828 2.83 1.414 1.413L60 53.456v-2.83zM39.9 16.385l1.414-1.414L30 3.658 18.686 14.97l1.415 1.415 9.9-9.9 9.9 9.9zm-2.83 2.828l1.415-1.414L30 9.313 21.515 17.8l1.414 1.413 7.07-7.07 7.07 7.07zm-2.827 2.83l1.414-1.416L30 14.97l-5.657 5.657 1.414 1.415L30 17.8l4.243 4.242zm-2.83 2.827l1.415-1.414L30 20.626l-2.828 2.83 1.414 1.414L30 23.456l1.414 1.414zM56.87 59.414L58.284 58 30 29.716 1.716 58l1.414 1.414L30 32.544l26.87 26.87z' fill='%2338353e' fill-opacity='0.25' fillRule='evenodd'/%3E%3C/svg%3E");
-      --accent:#2b8cc4;
-      --accent-soft:rgba(43,140,196,.14);
-      --ink:#fff;
-      --bg:#fff;
-      --surface:#ffffff;
-      --surface2:#ffffff;
-      --muted:#708090;
-      --line:rgba(5,46,22,.08);
-      --in:#ffffff;
-      --out:#e8fed8;
-      --outtext:#052e16;
-      --wall:#cfe9c9;
-      --wall2:#b4e0c9;
-      --danger:#e2474c;
-      --ok:#00c951;
-      --veil:rgba(236,242,247,.74);
-      --cloud:#ffffff;
-      --shadow:0 1.5rem 3.75rem -1.5rem rgba(5,46,22,.3);
-      font-family:"CocoChatPeyda",Tahoma,"Segoe UI",system-ui,-apple-system,"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;
-      font-size:16px;
-      color:var(--text);
-      direction:rtl;
-      text-align:right;
-      -webkit-text-size-adjust:100%;
-      -webkit-tap-highlight-color:transparent;}`,
-    '.root[data-theme=dark]{--bg:#17212b;--surface:#17212b;--surface2:#232f3d;--muted:#8797a8;--line:#25323f;--in:#212d3a;--wall:#0e1621;--wall2:#101a26;--veil:rgba(12,19,28,.76);--cloud:#202c39;--shadow:0 1.125rem 3.75rem rgba(0,0,0,.55)}',
+    // 01. بازنشانی استایل‌ها
+    `:host {
+      all: initial
+    }`,
+    `*,*::before,*::after {
+      box-sizing: border-box
+    }`,
 
-    '@media (prefers-color-scheme:dark){.root[data-theme=auto]{--bg:#17212b;--surface:#17212b;--surface2:#232f3d;--muted:#8797a8;--line:#25323f;--in:#212d3a;--wall:#0e1621;--wall2:#101a26;--veil:rgba(12,19,28,.76);--cloud:#202c39;--shadow:0 1.125rem 3.75rem rgba(0,0,0,.55)}}',
+    // 02. رنگ‌های پایه و متغیرهای مشترک
+    `.root {
 
-    '.root button,.root input,.root textarea{font:inherit;color:inherit;margin:0;letter-spacing:normal;text-transform:none}',
+      /* الگوی پیش‌فرض پس‌زمینه */
+      --widget-wallpaper: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M54.627 0l.83.828-1.415 1.415L51.8 0h2.827zM5.373 0l-.83.828L5.96 2.243 8.2 0H5.374zM48.97 0l3.657 3.657-1.414 1.414L46.143 0h2.828zM11.03 0L7.372 3.657 8.787 5.07 13.857 0H11.03zm32.284 0L49.8 6.485 48.384 7.9l-7.9-7.9h2.83zM16.686 0L10.2 6.485 11.616 7.9l7.9-7.9h-2.83zm20.97 0l9.315 9.314-1.414 1.414L34.828 0h2.83zM22.344 0L13.03 9.314l1.414 1.414L25.172 0h-2.83zM32 0l12.142 12.142-1.414 1.414L30 .828 17.272 13.556l-1.414-1.414L28 0h4zM.284 0l28 28-1.414 1.414L0 2.544V0h.284zM0 5.373l25.456 25.455-1.414 1.415L0 8.2V5.374zm0 5.656l22.627 22.627-1.414 1.414L0 13.86v-2.83zm0 5.656l19.8 19.8-1.415 1.413L0 19.514v-2.83zm0 5.657l16.97 16.97-1.414 1.415L0 25.172v-2.83zM0 28l14.142 14.142-1.414 1.414L0 30.828V28zm0 5.657L11.314 44.97 9.9 46.386l-9.9-9.9v-2.828zm0 5.657L8.485 47.8 7.07 49.212 0 42.143v-2.83zm0 5.657l5.657 5.657-1.414 1.415L0 47.8v-2.83zm0 5.657l2.828 2.83-1.414 1.413L0 53.456v-2.83zM54.627 60L30 35.373 5.373 60H8.2L30 38.2 51.8 60h2.827zm-5.656 0L30 41.03 11.03 60h2.828L30 43.858 46.142 60h2.83zm-5.656 0L30 46.686 16.686 60h2.83L30 49.515 40.485 60h2.83zm-5.657 0L30 52.343 22.343 60h2.83L30 55.172 34.828 60h2.83zM32 60l-2-2-2 2h4zM59.716 0l-28 28 1.414 1.414L60 2.544V0h-.284zM60 5.373L34.544 30.828l1.414 1.415L60 8.2V5.374zm0 5.656L37.373 33.656l1.414 1.414L60 13.86v-2.83zm0 5.656l-19.8 19.8 1.415 1.413L60 19.514v-2.83zm0 5.657l-16.97 16.97 1.414 1.415L60 25.172v-2.83zM60 28L45.858 42.142l1.414 1.414L60 30.828V28zm0 5.657L48.686 44.97l1.415 1.415 9.9-9.9v-2.828zm0 5.657L51.515 47.8l1.414 1.413 7.07-7.07v-2.83zm0 5.657l-5.657 5.657 1.414 1.415L60 47.8v-2.83zm0 5.657l-2.828 2.83 1.414 1.413L60 53.456v-2.83zM39.9 16.385l1.414-1.414L30 3.658 18.686 14.97l1.415 1.415 9.9-9.9 9.9 9.9zm-2.83 2.828l1.415-1.414L30 9.313 21.515 17.8l1.414 1.413 7.07-7.07 7.07 7.07zm-2.827 2.83l1.414-1.416L30 14.97l-5.657 5.657 1.414 1.415L30 17.8l4.243 4.242zm-2.83 2.827l1.415-1.414L30 20.626l-2.828 2.83 1.414 1.414L30 23.456l1.414 1.414zM56.87 59.414L58.284 58 30 29.716 1.716 58l1.414 1.414L30 32.544l26.87 26.87z' fill='%2338353e' fill-opacity='0.25' fillRule='evenodd'/%3E%3C/svg%3E");
 
-    '.root button{cursor:pointer;background:none;border:0;padding:0;-webkit-appearance:none;appearance:none}',
+      /* رنگ اصلی پایه؛ فقط با رنگ معتبرِ تنظیمات کاربر جایگزین می‌شود */
+      --accent: #0c7933;
+      --accent-soft-dark: color-mix(in srgb, var(--accent), black 40%);
+      --accent-soft-light: color-mix(in srgb, var(--accent), white 20%);
 
-    '.root svg{display:block;flex:none}',
+      /* رنگ نوشتهٔ پایه */
+      --text: #ffffff;
+      --ink: #fff;
 
-    // launcher + panel
-    // launcher + panel: position is applied by UI.setPosition()
+      /* زمینه و سطح‌های پایه */
+      --bg: #fff;
+      --surface: #ffffff;
+      --surface2: #ffffff;
 
-    'button.launcher{position:fixed;top:auto;right:auto;bottom:auto;left:auto;width:3.5rem;height:3.5rem;border-radius:50%;background-color:var(--accent);color:var(--text);display:grid;place-items:center;box-shadow:0 .625rem 1.75rem rgba(18,30,45,.3);transition:transform .2s ease,opacity .12s linear .22s;z-index:1}',
+      /* نوشتهٔ کم‌رنگ و خطوط */
+      --muted: #708090;
+      --line: rgba(5,46,22,.08);
 
-    'button.launcher svg{width:1.625rem;height:1.625rem}.launcher:hover{transform:scale(1.07)}.launcher:active{transform:scale(.95)}',
+      /* رنگ‌های حباب پیام‌ها */
+      --in: #ffffff;
+      --out: #e8fed8;
+      --outtext: #052e16;
 
-    // Spring entrance and circular reveal, without changing the final layout.
-    '.root .panel{position:fixed;top:auto;right:auto;bottom:auto;left:auto;width:min(24.5rem,calc(100vw - 2rem));height:var(--panel-height,660px);background:var(--accent);border-radius:1.25rem;box-shadow:0 1.5rem 3.75rem -1.5rem rgba(5,46,22,.3),0 0 0 1px rgba(5,46,22,.03);overflow:hidden;display:flex;flex-direction:column;opacity:0;visibility:hidden;pointer-events:none;transform-origin:var(--panel-origin-x,100%) var(--panel-origin-y,100%);transform:translateY(calc(var(--panel-base-y,0px) + var(--panel-closed-y,64px))) scale(.5) rotate(var(--panel-tilt,6deg));clip-path:circle(0% at var(--panel-origin-x,100%) var(--panel-origin-y,100%));transition:transform .3s ease-in,clip-path .3s ease-in,opacity .3s ease-in,visibility 0s linear .3s;z-index:2}',
-    '.root.open .panel{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(var(--panel-base-y,0px)) scale(1) rotate(0deg);clip-path:circle(150% at var(--panel-origin-x,100%) var(--panel-origin-y,100%));transition:transform .45s cubic-bezier(.34,1.56,.64,1),clip-path .45s ease-out,opacity .45s cubic-bezier(.34,1.56,.64,1),visibility 0s}',
-    '.root .panel > .view{opacity:0;transform:translateY(10px);transition:opacity .06s linear,transform .12s ease}',
-    '.root.open .panel > .view{opacity:1;transform:none;transition:opacity .16s ease .22s,transform .18s ease .2s}',
-    '.root.open .launcher{opacity:0;pointer-events:none;transform:scale(.85);transition:transform .16s ease,opacity .08s linear}',
+      /* رنگ‌های پس‌زمینهٔ گفتگو */
+      --wall: #cfe9c9;
+      --wall2: #b4e0c9;
 
-    // Mobile keeps the slide-up sheet; the spring and circle reveal are desktop-only.
-    '@media (max-width:40rem){.root .panel{--panel-base-y:0px;left:0!important;right:0!important;top:var(--vvt,0px)!important;bottom:auto!important;width:auto;height:var(--vvh,100dvh)!important;max-height:none!important;border-radius:1.75rem 1.75rem 0 0;transform:translateY(100%);transform-origin:center bottom;clip-path:none;transition:transform .26s cubic-bezier(.4,0,.8,.2),border-radius .26s ease,opacity .06s linear .2s,visibility 0s linear .26s}.root.open .panel{transform:translateY(0);clip-path:none;border-radius:0;transition:transform .42s cubic-bezier(.16,1,.3,1),border-radius .18s ease .22s,opacity .06s linear,visibility 0s}}',
+      /* خطا و وضعیت موفق */
+      --danger: #e2474c;
+      --ok: #00c951;
 
-    '.view{position:absolute;inset:0;display:none;flex-direction:column}.view.active{display:flex}',
+      /* پوشش و ابر وضعیت‌ها */
+      --veil: rgba(236,242,247,.74);
+      --cloud: #ffffff;
 
-    // login / otp / boot / expired
-    '.card-view{padding:calc(1.25rem + env(safe-area-inset-top,0px)) 1.5rem calc(1.5rem + env(safe-area-inset-bottom,0px));overflow-y:auto;}',
-    'button.x{position:absolute;top:calc(.625rem + env(safe-area-inset-top,0px));left:.625rem;width:2rem;height:2rem;border-radius:50%;color:var(--accent-soft-dark);display:grid;place-items:center;transition:background .15s}.x:hover{background:var(--accent);border:1px solid var(--accent-soft-dark)}',
-    '.hero{display:flex;flex-direction:column;align-items:center;text-align:center;margin:2.125rem 0 1.375rem}',
-    '.logo{width:4.25rem;height:4.25rem;border-radius:1.5rem 1.5rem 1.5rem .5rem;background:var(--accent);color:var(--text);display:grid;place-items:center;margin-bottom:1rem;box-shadow:0 .75rem 1.625rem -.5rem var(--accent)}.logo svg{width:2rem;height:2rem}',
-    '.fld{display:block;margin-bottom:.875rem}',
+      /* سایهٔ مشترک */
+      --shadow: 0 1.5rem 3.75rem -1.5rem rgba(5,46,22,.3);
 
-    '.inp[dir=ltr]{text-align:left}.inp::placeholder{color:var(--muted);opacity:.7}',
-    '.form-error{min-height:1.25rem;color:var(--danger);font-size:.75rem;margin:.125rem 0 .5rem}',
-    'button.btn{width:100%;height:3rem;border-radius:.75rem;background:var(--accent);color:var(--text);font-weight:600;font-size:.9375rem;display:flex;align-items:center;justify-content:center;gap:.5rem;transition:transform .12s,opacity .15s}',
-    '.btn:active{transform:scale(.98)}.btn[disabled]{opacity:.6;cursor:default}',
+      /* فونت و قواعد پایهٔ نمایش */
+      font-family: "CocoChatPeyda",Tahoma,"Segoe UI",system-ui,-apple-system,"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;
+      font-size: 16px;
+      color: var(--text);
+      direction: rtl;
+      text-align: right;
+      -webkit-text-size-adjust: 100%;
+      -webkit-tap-highlight-color: transparent;
+    }`,
 
-    '.spin{width:1.125rem;height:1.125rem;border-radius:50%;border:2.5px solid currentColor;border-top-color:transparent;animation:spin .7s linear infinite}',
-    '.otp-row{display:flex;gap:.5rem;justify-content:center;direction:ltr;margin:.375rem 0 .5rem}',
-    'input.otp-i{width:3rem;height:3rem;color:var(--accent);border:2px solid transparent;border-radius:.875rem;text-align:center;font-size:1rem;background:var(--surface);outline:0;padding:0;transition:border-color .15s,box-shadow .15s,transform .15s}',
-    'input.otp-i:focus{border-color:var(--accent);}input.otp-i.filled{border-color:var(--accent-soft-dark)}',
-    '.otp-row.shake{animation:shake .4s}.otp-row.shake input.otp-i{border-color:var(--danger)}',
+    // 03. رنگ‌های تم تاریک
+    `.root[data-theme=dark] {
+      --bg: #17212b;
+      --surface: #17212b;
+      --surface2: #232f3d;
+      --muted: #8797a8;
+      --line: #25323f;
+      --in: #212d3a;
+      --wall: #0e1621;
+      --wall2: #101a26;
+      --veil: rgba(12,19,28,.76);
+      --cloud: #202c39;
+      --shadow: 0 1.125rem 3.75rem rgba(0,0,0,.55)
+    }`,
 
-    '.root .otp-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;margin-top:12px}',
+    // 04. تم خودکار بر اساس تنظیمات مرورگر
+    `@media (prefers-color-scheme:dark) {
+      .root[data-theme=auto] {
+        --bg: #17212b;
+        --surface: #17212b;
+        --surface2: #232f3d;
+        --muted: #8797a8;
+        --line: #25323f;
+        --in: #212d3a;
+        --wall: #0e1621;
+        --wall2: #101a26;
+        --veil: rgba(12,19,28,.76);
+        --cloud: #202c39;
+        --shadow: 0 1.125rem 3.75rem rgba(0,0,0,.55)
+      }
+    }`,
 
-    '.root .otp-footer-resend{display:flex;align-items:center;gap:6px;min-width:0;flex-wrap:wrap}',
+    // 05. قواعد مشترک کنترل‌ها
+    `.root button,.root input,.root textarea {
+      font: inherit;
+      color: inherit;
+      margin: 0;
+      letter-spacing: normal;
+      text-transform: none
+    }`,
+    `.root button {
+      cursor: pointer;
+      background: none;
+      border: 0;
+      padding: 0;
+      -webkit-appearance: none;
+      appearance: none
+    }`,
+    `.root svg {
+      display: block;
+      flex: none
+    }`,
 
-    '.root .otp-footer button.ghost{width:auto;flex-shrink:0;color:var(--accent-soft-dark)}',
+    // 06. دکمهٔ بازکردن و پنل چت
+    `button.launcher {
+      position: fixed;
+      top: auto;
+      right: auto;
+      bottom: auto;
+      left: auto;
+      width: 3.5rem;
+      height: 3.5rem;
+      border-radius: 50%;
+      background-color: var(--accent);
+      color: var(--text);
+      display: grid;
+      place-items: center;
+      box-shadow: 0 .625rem 1.75rem rgba(18,30,45,.3);
+      transition: transform .2s ease,opacity .12s linear .22s;
+      z-index: 1
+    }`,
+    `button.launcher svg {
+      width: 1.625rem;
+      height: 1.625rem
+    }`,
+    `.launcher:hover {
+      transform: scale(1.07)
+    }`,
+    `.launcher:active {
+      transform: scale(.95)
+    }`,
+    `.root .panel {
+      position: fixed;
+      top: auto;
+      right: auto;
+      bottom: auto;
+      left: auto;
+      width: min(24.5rem,calc(100vw - 2rem));
+      height: var(--panel-height,660px);
+      background: var(--accent);
+      border-radius: 1.25rem;
+      box-shadow: 0 1.5rem 3.75rem -1.5rem rgba(5,46,22,.3),0 0 0 1px rgba(5,46,22,.03);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform-origin: var(--panel-origin-x,100%) var(--panel-origin-y,100%);
+      transform: translateY(calc(var(--panel-base-y,0px) + var(--panel-closed-y,64px))) scale(.5) rotate(var(--panel-tilt,6deg));
+      clip-path: circle(0% at var(--panel-origin-x,100%) var(--panel-origin-y,100%));
+      transition: transform .3s ease-in,clip-path .3s ease-in,opacity .3s ease-in,visibility 0s linear .3s;
+      z-index: 2
+    }`,
+    `.root.open .panel {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateY(var(--panel-base-y,0px)) scale(1) rotate(0deg);
+      clip-path: circle(150% at var(--panel-origin-x,100%) var(--panel-origin-y,100%));
+      transition: transform .45s cubic-bezier(.34,1.56,.64,1),clip-path .45s ease-out,opacity .45s cubic-bezier(.34,1.56,.64,1),visibility 0s
+    }`,
+    `.root .panel > .view {
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity .06s linear,transform .12s ease
+    }`,
+    `.root.open .panel > .view {
+      opacity: 1;
+      transform: none;
+      transition: opacity .16s ease .22s,transform .18s ease .2s
+    }`,
+    `.root.open .launcher {
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(.85);
+      transition: transform .16s ease,opacity .08s linear
+    }`,
+    `@media (max-width:40rem) {
+      .root .panel {
+        --panel-base-y: 0px;
+        left: 0!important;
+        right: 0!important;
+        top: var(--vvt,0px)!important;
+        bottom: auto!important;
+        width: auto;
+        height: var(--vvh,100dvh)!important;
+        max-height: none!important;
+        border-radius: 1.75rem 1.75rem 0 0;
+        transform: translateY(100%);
+        transform-origin: center bottom;
+        clip-path: none;
+        transition: transform .26s cubic-bezier(.4,0,.8,.2),border-radius .26s ease,opacity .06s linear .2s,visibility 0s linear .26s
+      }
+      .root.open .panel {
+        transform: translateY(0);
+        clip-path: none;
+        border-radius: 0;
+        transition: transform .42s cubic-bezier(.16,1,.3,1),border-radius .18s ease .22s,opacity .06s linear,visibility 0s
+      }
+    }`,
 
-    '.root .otp-footer-resend [hidden]{display:none!important}',
+    // 07. صفحات داخلی و فرم‌های عمومی
+    `.view {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column
+    }`,
+    `.view.active {
+      display: flex
+    }`,
+    `.card-view {
+      padding: calc(1.25rem + env(safe-area-inset-top,0px)) 1.5rem calc(1.5rem + env(safe-area-inset-bottom,0px));
+      overflow-y: auto;
+    }`,
+    `button.x {
+      position: absolute;
+      top: calc(.625rem + env(safe-area-inset-top,0px));
+      left: .625rem;
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      color: var(--accent-soft-dark);
+      display: grid;
+      place-items: center;
+      transition: background .15s
+    }`,
+    `.x:hover {
+      background: var(--accent);
+      border: 1px solid var(--accent-soft-dark)
+    }`,
+    `.hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      margin: 2.125rem 0 1.375rem
+    }`,
+    `.logo {
+      width: 4.25rem;
+      height: 4.25rem;
+      border-radius: 1.5rem 1.5rem 1.5rem .5rem;
+      background: var(--accent);
+      color: var(--text);
+      display: grid;
+      place-items: center;
+      margin-bottom: 1rem;
+      box-shadow: 0 .75rem 1.625rem -.5rem var(--accent)
+    }`,
+    `.logo svg {
+      width: 2rem;
+      height: 2rem
+    }`,
+    `.fld {
+      display: block;
+      margin-bottom: .875rem
+    }`,
+    `.inp[dir=ltr] {
+      text-align: left
+    }`,
+    `.inp::placeholder {
+      color: var(--muted);
+      opacity: .7
+    }`,
+    `.form-error {
+      min-height: 1.25rem;
+      color: var(--danger);
+      font-size: .75rem;
+      margin: .125rem 0 .5rem
+    }`,
+    `button.btn {
+      width: 100%;
+      height: 3rem;
+      border-radius: .75rem;
+      background: var(--accent);
+      color: var(--text);
+      font-weight: 600;
+      font-size: .9375rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: .5rem;
+      transition: transform .12s,opacity .15s
+    }`,
+    `.btn:active {
+      transform: scale(.98)
+    }`,
+    `.btn[disabled] {
+      opacity: .6;
+      cursor: default
+    }`,
+    `.spin {
+      width: 1.125rem;
+      height: 1.125rem;
+      border-radius: 50%;
+      border: 2.5px solid currentColor;
+      border-top-color: transparent;
+      animation: spin .7s linear infinite
+    }`,
 
-    '@media(max-width:360px){.root .otp-footer{gap:4px}.root .otp-footer button.ghost{padding:6px 4px;font-size:12px}}',
+    // 08. کد تأیید و ورود
+    `.otp-row {
+      display: flex;
+      gap: .5rem;
+      justify-content: center;
+      direction: ltr;
+      margin: .375rem 0 .5rem
+    }`,
+    `input.otp-i {
+      width: 3rem;
+      height: 3rem;
+      color: var(--accent);
+      border: 2px solid transparent;
+      border-radius: .875rem;
+      text-align: center;
+      font-size: 1rem;
+      background: var(--surface);
+      outline: 0;
+      padding: 0;
+      transition: border-color .15s,box-shadow .15s,transform .15s
+    }`,
+    `input.otp-i:focus {
+      border-color: var(--accent);
+    }`,
+    `input.otp-i.filled {
+      border-color: var(--accent-soft-dark)
+    }`,
+    `.otp-row.shake {
+      animation: shake .4s
+    }`,
+    `.otp-row.shake input.otp-i {
+      border-color: var(--danger)
+    }`,
+    `.root .otp-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      width: 100%;
+      margin-top: 12px
+    }`,
+    `.root .otp-footer-resend {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+      flex-wrap: wrap
+    }`,
+    `.root .otp-footer button.ghost {
+      width: auto;
+      flex-shrink: 0;
+      color: var(--accent-soft-dark)
+    }`,
+    `.root .otp-footer-resend [hidden] {
+      display: none!important
+    }`,
+    `@media(max-width:360px) {
+      .root .otp-footer {
+        gap: 4px
+      }
+      .root .otp-footer button.ghost {
+        padding: 6px 4px;
+        font-size: 12px
+      }
+    }`,
+    `.sub {
+      color: var(--accent-soft-dark);
+      text-align: center;
+      margin: 0 0 20px;
+      margin: 0 0 10px;
+      max-width: 280px;
+    }`,
+    `.sub bdi {
+      color: var(--accent-soft-dark);
+      font-weight: bold;
+      direction: ltr;
+      unicode-bidi: isolate
+    }`,
+    `.hintline {
+      text-align: center;
+      color: var(--accent-soft-light);
+      font-size: .75rem;
+    }`,
+    `button.resend {
+      text-align: center;
+      color: var(--muted);
+      font-size: .75rem;
+    }`,
+    `.center {
+      margin: auto;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .75rem;
+      padding: 1.5rem
+    }`,
+    `.center p {
+      margin: 0;
+      color: var(--muted)
+    }`,
+    `.center h3 {
+      margin: 0;
+      font-size: 1.0625rem
+    }`,
 
-    '.sub{color:var(--accent-soft-dark);text-align:center;margin:0 0 20px;margin: 0 0 10px;max-width: 280px;}.sub bdi{color:var(--accent-soft-dark);font-weight:bold;direction:ltr;unicode-bidi:isolate}',
-    '.hintline{text-align:center;color:var(--accent-soft-light);font-size:.75rem;}',
-    'button.resend{text-align:center;color:var(--muted);font-size:.75rem;}',
-    '.center{margin:auto;text-align:center;display:flex;flex-direction:column;align-items:center;gap:.75rem;padding:1.5rem}.center p{margin:0;color:var(--muted)}.center h3{margin:0;font-size:1.0625rem}',
+    // 09. حالت‌های عمومی پیام‌ها و وضعیت هدر
+    `.hinfo {
+      flex: 1;
+      min-width: 0
+    }`,
+    `.hstat.bad {
+      color: var(--danger)
+    }`,
+    `.dots {
+      display: inline-flex;
+      gap: .1875rem
+    }`,
+    `.dots i {
+      width: .25rem;
+      height: .25rem;
+      border-radius: 50%;
+      background: currentColor;
+      animation: bounce 1.1s infinite
+    }`,
+    `.dots i:nth-child(2) {
+      animation-delay: .15s
+    }`,
+    `.dots i:nth-child(3) {
+      animation-delay: .3s
+    }`,
+    `.row {
+      display: flex;
+      max-width: 100%;
+      animation: pop .22s ease-out;
+      transition: transform .18s ease-out;
+      touch-action: pan-y pinch-zoom
+    }`,
+    `.row.out {
+      justify-content: flex-start
+    }`,
+    `.row.in {
+      justify-content: flex-end
+    }`,
+    `.streaming .txt::after {
+      content: "";
+      display: inline-block;
+      width: .125rem;
+      height: 1em;
+      margin-inline-start: .125rem;
+      vertical-align: -.125rem;
+      background: currentColor;
+      opacity: .6;
+      animation: blink 1s steps(2) infinite
+    }`,
+    `.meta .ic-retry {
+      display: inline-flex;
+      color: var(--danger);
+      opacity: 1
+    }`,
+    `.out .meta .ic-retry {
+      color: #fff
+    }`,
+    `.meta .bad {
+      color: var(--danger);
+      font-weight: 600;
+      opacity: 1
+    }`,
+    `.in .quote {
+      color: var(--accent)
+    }`,
+    `.row.flash::before {
+      content: "";
+      position: absolute;
+      top: -.125rem;
+      bottom: -.125rem;
+      left: -.1875rem;
+      right: -.1875rem;
+      border-radius: .625rem;
+      background: rgba(255,255,255,.6);
+      pointer-events: none;
+      z-index: 3;
+      animation: row-flash 1s ease-out forwards
+    }`,
+    `.root .fab.show {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none
+    }`,
 
-    // chat
-    '.hinfo{flex:1;min-width:0}',
-    '.hstat.bad{color:var(--danger)}',
-    '.dots{display:inline-flex;gap:.1875rem}.dots i{width:.25rem;height:.25rem;border-radius:50%;background:currentColor;animation:bounce 1.1s infinite}.dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}',
-    '.row{display:flex;max-width:100%;animation:pop .22s ease-out;transition:transform .18s ease-out;touch-action:pan-y pinch-zoom}.row.out{justify-content:flex-start}.row.in{justify-content:flex-end}',
+    // 10. ابر وضعیت‌ها؛ رنگ ثابت ابر و رنگ‌های وابسته به accent
+    `.sc-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 5;
+      overflow: hidden
+    }`,
+    `.sc {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      align-items: safe center;
+      justify-content: center;
+      padding: 12px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      opacity: 0;
+      transition: opacity .38s ease
+    }`,
+    `.sc.in {
+      opacity: 1
+    }`,
+    `.sc.out {
+      opacity: 0
+    }`,
+    `.sc-float {
+      align-items: flex-end;
+      align-items: safe flex-end;
+      padding-bottom: 12px
+    }`,
+    `.sc.in .cloud {
+      transform: none
+    }`,
+    `.sc.out .cloud {
+      transform: translateY(8px) scale(.96)
+    }`,
+    `.root .cloud {
+      position: relative;
+      display: flow-root;
+      flex: none;
+      width: min(340px,100%);
+      color: #ffffff;
+      text-align: center;
+      pointer-events: auto;
+      transform: translateY(16px) scale(.88);
+      transform-origin: 25% 92%;
+      transition: transform .55s cubic-bezier(.2,.9,.3,1.15)
+    }`,
+    `.sc-float .cloud {
+      width: min(290px,100%)
+    }`,
+    `.cloud>svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      pointer-events: none
+    }`,
+    `.cloud .cb-body,.cloud-in {
+      animation: float 5.5s ease-in-out infinite
+    }`,
+    `.cloud .cb-shadow {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: cloud-shadow 5.5s ease-in-out infinite
+    }`,
+    `.cloud-in {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      margin: 12% 14% 20% 22%;
+      color: #253447
+    }`,
+    `.cloud-media {
+      position: relative;
+      flex: none;
+      width: 100%;
+      height: 104px;
+      margin: 0;
+      overflow: hidden
+    }`,
+    `.sc-float .cloud-media {
+      height: 88px
+    }`,
+    `.cloud-media video {
+      position: absolute;
+      inset: 0;
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      opacity: 0;
+      transition: opacity .3s ease;
+      pointer-events: none
+    }`,
+    `.cloud-media video.ready {
+      opacity: 1
+    }`,
+    `.cloud-emoji {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      font-size: 48px;
+      transition: opacity .2s ease
+    }`,
+    `.cloud-media.media-ready .cloud-emoji {
+      opacity: 0
+    }`,
+    `.cloud-text {
+      font-size: .75rem;
+      overflow-wrap: anywhere
+    }`,
+    `.sc-float .cloud-text {
+      font-size: .75rem
+    }`,
+    `.cloud-pulse {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      height: 10px;
+      color: var(--accent)
+    }`,
+    `.cloud-pulse i {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: currentColor;
+      animation: bounce 1.2s infinite ease-in-out
+    }`,
+    `.cloud-pulse i:nth-child(2) {
+      animation-delay: .15s
+    }`,
+    `.cloud-pulse i:nth-child(3) {
+      animation-delay: .3s
+    }`,
+    `.root .cloud-btn {
+      flex: none;
+      min-height: 40px;
+      max-width: 100%;
+      padding: 6px 16px;
+      border-radius: 999px;
+      background: var(--accent);
+      color: var(--text);
+      font-weight: 600;
+      font-size: 13px;
+      line-height: 1.5;
+      box-shadow: 0 2px 6px rgba(11,18,32,.12);
+      transition: transform .15s,filter .15s
+    }`,
+    `.cloud-btn:hover {
+      filter: brightness(.95)
+    }`,
+    `.cloud-btn:active {
+      transform: scale(.97)
+    }`,
+    `.cloud-btn:focus-visible:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px
+    }`,
+    `@keyframes cloud-shadow {
+      0%,100% {
+        transform: scale(1);
+        opacity: .75
+      }
+      50% {
+        transform: scale(.88);
+        opacity: .5
+      }
+    }`,
+    `@media(max-width:360px),(max-height:560px) {
+      .sc {
+        padding: 8px
+      }
+      .cloud-in {
+        gap: 6px
+      }
+      .cloud-media {
+        height: 84px
+      }
+      .sc-float .cloud-media {
+        height: 72px
+      }
+      .cloud-text {
+        font-size: 13px
+      }
+    }`,
 
-    '.streaming .txt::after{content:"";display:inline-block;width:.125rem;height:1em;margin-inline-start:.125rem;vertical-align:-.125rem;background:currentColor;opacity:.6;animation:blink 1s steps(2) infinite}',
-    '.meta .ic-retry{display:inline-flex;color:var(--danger);opacity:1}.out .meta .ic-retry{color:#fff}',
-    '.meta .bad{color:var(--danger);font-weight:600;opacity:1}',
-    '.in .quote{color:var(--accent)}',
-    '.row.flash::before{content:"";position:absolute;top:-.125rem;bottom:-.125rem;left:-.1875rem;right:-.1875rem;border-radius:.625rem;background:rgba(255,255,255,.6);pointer-events:none;z-index:3;animation:row-flash 1s ease-out forwards}',
-    '.root .fab.show{opacity:1;pointer-events:auto;transform:none}',
+    // 11. حالت‌های فعال کنترل‌های ارسال و ایموجی
+    `.root .banner.on {
+      display: flex
+    }`,
+    `.send svg {
+      width: 1.375rem;
+      height: 1.375rem
+    }`,
+    `.send .flip {
+      transform: scaleX(-1)
+    }`,
+    `.root .emoji.on {
+      display: flex
+    }`,
+    `.etab {
+      flex: 1;
+      height: 2.625rem;
+      font-size: 1.25rem;
+      position: relative;
+      opacity: .55
+    }`,
+    `.etab.on {
+      opacity: 1
+    }`,
+    `.egrid {
+      flex: 1;
+      overflow-y: auto;
+      padding: .5rem;
+      display: grid;
+      grid-template-columns: repeat(8,1fr);
+      align-content: start;
+      gap: .125rem;
+      direction: ltr
+    }`,
+    `.eb:active {
+      transform: scale(.88)
+    }`,
+    `.elabel {
+      grid-column: 1/-1;
+      font-size: .75rem;
+      color: var(--muted);
+      padding: .375rem .25rem .125rem;
+      direction: rtl
+    }`,
+    `.toast.on {
+      opacity: 1;
+      transform: translate(-50%,0)
+    }`,
 
-    // Scenario clouds: shared motion keeps the artwork, video and controls aligned.
-    '.sc-layer{position:absolute;inset:0;pointer-events:none;z-index:5;overflow:hidden}',
-    '.sc{position:absolute;inset:0;display:flex;align-items:center;align-items:safe center;justify-content:center;padding:12px;overflow-y:auto;scrollbar-width:thin;opacity:0;transition:opacity .38s ease}.sc.in{opacity:1}.sc.out{opacity:0}',
-    '.sc-float{align-items:flex-end;align-items:safe flex-end;padding-bottom:12px}',
-    '.sc.in .cloud{transform:none}.sc.out .cloud{transform:translateY(8px) scale(.96)}',
-    '.root .cloud{position:relative;display:flow-root;flex:none;width:min(340px,100%);color:#ffffff;text-align:center;pointer-events:auto;transform:translateY(16px) scale(.88);transform-origin:25% 92%;transition:transform .55s cubic-bezier(.2,.9,.3,1.15)}',
-    '.sc-float .cloud{width:min(290px,100%)}',
-    '.cloud>svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}',
-    '.cloud .cb-body,.cloud-in{animation:float 5.5s ease-in-out infinite}',
-    '.cloud .cb-shadow{transform-box:fill-box;transform-origin:center;animation:cloud-shadow 5.5s ease-in-out infinite}',
-    '.cloud-in{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:8px;margin: 12% 14% 20% 22%;color:#253447}',
-    '.cloud-media{position:relative;flex:none;width:100%;height:104px;margin:0;overflow:hidden}',
-    '.sc-float .cloud-media{height:88px}',
-    '.cloud-media video{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:contain;opacity:0;transition:opacity .3s ease;pointer-events:none}.cloud-media video.ready{opacity:1}',
-    '.cloud-emoji{position:absolute;inset:0;display:grid;place-items:center;font-size:48px;transition:opacity .2s ease}.cloud-media.media-ready .cloud-emoji{opacity:0}',
-    '.cloud-text{font-size:.75rem;overflow-wrap:anywhere}',
-    '.sc-float .cloud-text{font-size:.75rem}',
-    '.cloud-pulse{display:inline-flex;align-items:center;justify-content:center;gap:5px;height:10px;color:var(--accent)}',
-    '.cloud-pulse i{width:5px;height:5px;border-radius:50%;background:currentColor;animation:bounce 1.2s infinite ease-in-out}.cloud-pulse i:nth-child(2){animation-delay:.15s}.cloud-pulse i:nth-child(3){animation-delay:.3s}',
-    '.root .cloud-btn{flex:none;min-height:40px;max-width:100%;padding:6px 16px;border-radius:999px;background:var(--accent);color:var(--text);font-weight:600;font-size:13px;line-height:1.5;box-shadow:0 2px 6px rgba(11,18,32,.12);transition:transform .15s,filter .15s}',
-    '.cloud-btn:hover{filter:brightness(.95)}.cloud-btn:active{transform:scale(.97)}',
+    // 12. انیمیشن‌های مشترک و تنظیمات کاهش حرکت
+    `@keyframes spin {
+      to {
+        transform: rotate(360deg)
+      }
+    }`,
+    `@keyframes pop {
+      from {
+        opacity: 0;
+        transform: translateY(.375rem) scale(.98)
+      }
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }`,
+    `@keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(.625rem)
+      }
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }`,
+    `@keyframes bounce {
+      0%,60%,100% {
+        transform: translateY(0)
+      }
+      30% {
+        transform: translateY(-.25rem)
+      }
+    }`,
+    `@keyframes blink {
+      50% {
+        opacity: 0
+      }
+    }`,
+    `@keyframes shake {
+      20%,60% {
+        transform: translateX(-.375rem)
+      }
+      40%,80% {
+        transform: translateX(.375rem)
+      }
+    }`,
+    `@keyframes row-flash {
+      0%,35% {
+        opacity: 1
+      }
+      70% {
+        opacity: .65
+      }
+      100% {
+        opacity: 0
+      }
+    }`,
+    `@keyframes float {
+      0%,100% {
+        transform: translateY(0)
+      }
+      50% {
+        transform: translateY(-.375rem)
+      }
+    }`,
+    `@keyframes bob {
+      0%,100% {
+        transform: translateY(.1875rem) scale(.96)
+      }
+      50% {
+        transform: translateY(-.25rem) scale(1.04)
+      }
+    }`,
+    `@keyframes morph {
+      0%,100% {
+        border-radius: 46% 54% 50% 50%/52% 46% 54% 48%
+      }
+      50% {
+        border-radius: 54% 46% 48% 52%/46% 54% 46% 54%
+      }
+    }`,
+    `@media (prefers-reduced-motion:reduce) {
+      .root *,.root *::before,.root *::after {
+        animation-duration: .001ms!important;
+        animation-delay: 0s!important;
+        animation-iteration-count: 1!important;
+        transition-duration: .001ms!important;
+        transition-delay: 0s!important
+      }
+    }`,
+    `@media (prefers-reduced-motion:reduce) {
+      .root .panel,.root.open .panel {
+        transform: translateY(var(--panel-base-y,0px))!important;
+        clip-path: none!important
+      }
+    }`,
+    `@media (max-width:40rem) {
+      .inp,.ta,input.otp-i {
+        font-size: 1rem
+      }
+    }`,
 
-    '.cloud-btn:focus-visible:focus-visible{outline:2px solid var(--accent);outline-offset:3px}',
-    '@keyframes cloud-shadow{0%,100%{transform:scale(1);opacity:.75}50%{transform:scale(.88);opacity:.5}}',
-    '@media(max-width:360px),(max-height:560px){.sc{padding:8px}.cloud-in{gap:6px}.cloud-media{height:84px}.sc-float .cloud-media{height:72px}.cloud-text{font-size:13px}}',
+    // 13. پوشش پس‌زمینهٔ پنل
+    `.root .cover_content {
+      position: absolute;
+      inset: 0;
+      height: 100%;
+      background-color: var(--accent);
+      background-image: linear-gradient(180deg, #0000 -11.43%, #fff 82%), var(--widget-wallpaper);
+      background-repeat: repeat;
+      transition: min-height .25s ease-out 0s,max-height .25s ease-out 0s;
+      z-index: -1;
+      max-height: 100%;
+      min-height: 100%
+    }`,
 
-    // composer
-    '.root .banner.on{display:flex}',
-    '.send svg{width:1.375rem;height:1.375rem}.send .flip{transform:scaleX(-1)}',
-    '.root .emoji.on{display:flex}',
-    '.etab{flex:1;height:2.625rem;font-size:1.25rem;position:relative;opacity:.55}.etab.on{opacity:1}',
-    '.egrid{flex:1;overflow-y:auto;padding:.5rem;display:grid;grid-template-columns:repeat(8,1fr);align-content:start;gap:.125rem;direction:ltr}',
-    '.eb:active{transform:scale(.88)}',
-    '.elabel{grid-column:1/-1;font-size:.75rem;color:var(--muted);padding:.375rem .25rem .125rem;direction:rtl}',
-    '.toast.on{opacity:1;transform:translate(-50%,0)}',
+    // 14. هدر؛ رنگ‌های ثابت نوشته، وضعیت و آیکن‌ها
+    `.root .hdr {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px;
+      background: #ffffff;
+      border-bottom: 1px solid #e7e9eb;
+      box-shadow: 0 1px 3px rgba(0,0,0,.04);
+      z-index: 6;
+      min-height: 64px
+    }`,
+    `.root .av {
+      position: relative;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #e8f0f7;
+      flex: none;
+      overflow: hidden
+    }`,
+    `.root .av img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block
+    }`,
+    `.root .hname {
+      font-weight: 600;
+      font-size: 16px;
+      line-height: 24px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: #222222
+    }`,
+    `.root .hstat {
+      font-size: 13px;
+      color: #3390ec;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      min-height: 18px;
+      line-height: 18px;
+      overflow: hidden
+    }`,
+    `.root .hdr>.ib {
+      width: 44px;
+      height: 44px;
+      flex: none;
+      color: #707579;
+      border-radius: 50%
+    }`,
+    `.root .hdr>.ib:hover {
+      background: #f1f3f5;
+      color: #3390ec
+    }`,
+    `.root .hstat.bad {
+      color: var(--danger)
+    }`,
+    `.root .hdr-more {
+      width: 44px;
+      height: 44px;
+      flex: none;
+      color: #707579;
+      display: grid;
+      place-items: center
+    }`,
+    `.root .hdr>.ib svg,.root .hdr-more svg,.root .dock .ib svg,.root .send svg {
+      width: 24px;
+      height: 24px
+    }`,
+    `.root .hdr>.ib:focus-visible,.root .dock button:focus-visible {
+      outline: 2px solid #3390ec;
+      outline-offset: 2px
+    }`,
 
-    '@keyframes spin{to{transform:rotate(360deg)}}',
-    '@keyframes pop{from{opacity:0;transform:translateY(.375rem) scale(.98)}to{opacity:1;transform:none}}',
-    '@keyframes rise{from{opacity:0;transform:translateY(.625rem)}to{opacity:1;transform:none}}',
-    '@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-.25rem)}}',
-    '@keyframes blink{50%{opacity:0}}',
-    '@keyframes shake{20%,60%{transform:translateX(-.375rem)}40%,80%{transform:translateX(.375rem)}}',
-    '@keyframes row-flash{0%,35%{opacity:1}70%{opacity:.65}100%{opacity:0}}',
-    '@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-.375rem)}}',
-    '@keyframes bob{0%,100%{transform:translateY(.1875rem) scale(.96)}50%{transform:translateY(-.25rem) scale(1.04)}}',
-    '@keyframes morph{0%,100%{border-radius:46% 54% 50% 50%/52% 46% 54% 48%}50%{border-radius:54% 46% 48% 52%/46% 54% 46% 54%}}',
-    '@media (prefers-reduced-motion:reduce){.root *,.root *::before,.root *::after{animation-duration:.001ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.001ms!important;transition-delay:0s!important}}',
-    '@media (prefers-reduced-motion:reduce){.root .panel,.root.open .panel{transform:translateY(var(--panel-base-y,0px))!important;clip-path:none!important}}',
-    '@media (max-width:40rem){.inp,.ta,input.otp-i{font-size:1rem}}',
+    // 15. پس‌زمینهٔ گفتگو و لایه‌های تصاویر
+    `.root .body {
+      background-color: #cfe8c8;
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      min-height: 0
+    }`,
+    `.root .body::before {
+      content: "";
+      background-image: var(--chat-texture);
+      position: absolute;
+      inset: 0;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: cover;
+      z-index: -1;
+      pointer-events: none
+    }`,
+    `.root .body::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-repeat: repeat;
+      background-position: top right;
+      background-size: 510px auto;
+      mix-blend-mode: overlay;
+      background-image: var(--chat-pattern);
+      z-index: -1;
+      pointer-events: none
+    }`,
 
-    /* =========================================================
-  COCO CHAT — TELEGRAM-INSPIRED VISUAL OVERRIDES
-  فقط ظاهر رابط کاربری تغییر می‌کند.
-  ========================================================= */
+    // 16. فهرست پیام‌ها و اسکرول‌بار
+    `.root .msgs {
+      position: absolute;
+      inset: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: .75rem .75rem .875rem;
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+      scrollbar-color: transparent transparent
+    }`,
+    `.root .msgs:hover {
+      scrollbar-color: rgba(5,46,22,.25) transparent
+    }`,
+    `.root .msgs::-webkit-scrollbar {
+      width: .25rem
+    }`,
+    `.root .msgs::-webkit-scrollbar-track {
+      background: transparent
+    }`,
+    `.root .msgs::-webkit-scrollbar-thumb {
+      background: transparent;
+      border-radius: 999px
+    }`,
+    `.root .msgs:hover::-webkit-scrollbar-thumb {
+      background: rgba(5,46,22,.22);
+      background: color-mix(in srgb,var(--success) 22%,transparent)
+    }`,
 
-    // پنجره اصلی چت
+    // 17. تاریخ و پیام‌های سیستمی
+    `.root .pill {
+      background: rgba(35,55,43,.48);
+      color: #ffffff;
+      border-radius: 999px;
+      padding: .1875rem .6875rem;
+      font-size: .75rem;
+      font-weight: 500;
+      box-shadow: 0 .0625rem .125rem rgba(0,0,0,.04);
+      backdrop-filter: blur(.3125rem);
+      -webkit-backdrop-filter: blur(.3125rem)
+    }`,
+    `.root .row.day,.root .row.sys {
+      justify-content: center;
+      margin: .4375rem 0
+    }`,
 
-    '.root .cover_content{position:absolute;inset:0;height:100%;background-color:var(--accent);background-image: linear-gradient(180deg, #0000 -11.43%, #fff 82%), var(--widget-wallpaper);background-repeat:repeat;transition:min-height .25s ease-out 0s,max-height .25s ease-out 0s;z-index:-1;max-height:100%;min-height:100%}',
+    // 18. حباب پیام‌ها، نوشته و اطلاعات ارسال
+    `.root .row.out .bubble {
+      border-end-end-radius: .9375rem;
+      border-start-end-radius: .9375rem;
+      border-start-start-radius: .9375rem
+    }`,
+    `.bubble {
+      background-color: #eeffde;
+      color: #334155;
+      max-width: 70%;
+      position: relative;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      cursor: default;
+      filter: drop-shadow(0 .125rem .09375rem rgba(5,46,22,0.26));
+      padding: .5rem
+    }`,
+    `.message-appendix .corner {
+      fill: var(--message-appendix-color,#EEFFDE)
+    }`,
+    `.root .row .bubble .message-appendix {
+      position: absolute;
+      display: block;
+      pointer-events: none;
+      z-index: 2;
+    }`,
+    `.message-appendix-out {
+      inset-inline-start: -10px;
+      bottom: -4px;
+      width: 11px;
+      height: 23px
+    }`,
+    `.message-appendix-in {
+      inset-inline-end: -11px;
+      transform: scaleX(-1);
+      bottom: -3px;
+      width: 12px;
+      height: 22px
+    }`,
+    `.root .row.in .bubble {
+      border-end-start-radius: .9375rem;
+      border-start-end-radius: .9375rem;
+      border-start-start-radius: .9375rem
+    }`,
+    `.root .txt {
+      white-space: pre-wrap;
+      font-size: 16px;
+      unicode-bidi: plaintext;
+      line-height: 1.65;
+      color: inherit;
+      overflow-wrap: anywhere
+    }`,
+    `.root .txt a {
+      color: #16834b;
+      text-decoration: underline;
+      text-underline-offset: .125rem;
+      direction: ltr;
+      unicode-bidi: isolate
+    }`,
+    `.root .row.out .txt a {
+      color: #075e35
+    }`,
+    `.root .meta {
+      display: flex;
+      align-items: center;
+      gap: .25rem;
+      justify-content: flex-end;
+      margin-top: .125rem;
+      font-size: .65625rem;
+      opacity: 1;
+      direction: rtl;
+      line-height: 1.3;
+      color: #64748b
+    }`,
+    `.root .row.out .meta {
+      color: rgba(5,46,22,.62)
+    }`,
+    `.root .meta svg {
+      width: .875rem;
+      height: .875rem
+    }`,
+    `.root .row.out .meta svg {
+      color: #16834b
+    }`,
+    `.root .bubble.err {
+      outline: .0625rem solid #e2474c
+    }`,
 
-    // لانچر
-    // '.root .launcher{background:#00c951;color:#ffffff;box-shadow:0 .3125rem 1.125rem rgba(0,201,81,.28)}',
-    // '.root .launcher:hover{background:#00b849;box-shadow:0 .4375rem 1.375rem rgba(0,201,81,.32)}',
+    // 19. پیش‌نمایش ریپلای
+    `.root .quote {
+      display: block;
+      width: 100%;
+      text-align: right;
+      border-inline-start: 3px solid #00c951;
+      background: rgba(0,201,81,.09);
+      border-radius: .3125rem;
+      padding: .25rem .5rem;
+      margin: 0 0 .375rem;
+      font-size: .75rem;
+      overflow: hidden
+    }`,
+    `.root .quote b {
+      display: block;
+      font-weight: 600;
+      opacity: .9;
+      color: #16834b;
+      font-size: .75rem
+    }`,
+    `.root .quote span {
+      display: block;
+      opacity: .85;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      unicode-bidi: plaintext;
+      color: #526273
+    }`,
+    `.root .row.out .quote {
+      border-inline-start-color: #16834b
+    }`,
 
-    // هدر تلگرامی
-    '.root .hdr{flex-shrink:0;display:flex;align-items:center;gap:10px;padding:8px;background:#ffffff;border-bottom:1px solid #e7e9eb;box-shadow:0 1px 3px rgba(0,0,0,.04);z-index:6;min-height:64px}',
-    '.root .av{position:relative;width:42px;height:42px;border-radius:50%;background:#e8f0f7;flex:none;overflow:hidden}',
-    '.root .av img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}',
-    '.root .hname{font-weight:600;font-size:16px;line-height:24px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#222222}',
-    '.root .hstat{font-size:13px;color:#3390ec;display:flex;align-items:center;gap:5px;min-height:18px;line-height:18px;overflow:hidden}',
-    '.root .hdr>.ib{width:44px;height:44px;flex:none;color:#707579;border-radius:50%}',
-    '.root .hdr>.ib:hover{background:#f1f3f5;color:#3390ec}',
-    '.root .hstat.bad{color:var(--danger)}',
-    '.root .hdr-more{width:44px;height:44px;flex:none;color:#707579;display:grid;place-items:center}',
-    '.root .hdr>.ib svg,.root .hdr-more svg,.root .dock .ib svg,.root .send svg{width:24px;height:24px}',
-    '.root .hdr>.ib:focus-visible,.root .dock button:focus-visible{outline:2px solid #3390ec;outline-offset:2px}',
+    // 20. دکمهٔ رفتن به آخر گفتگو
+    `.root .fab {
+      position: absolute;
+      bottom: .875rem;
+      left: .75rem;
+      width: 2.375rem;
+      height: 2.375rem;
+      border-radius: 50%;
+      background: #ffffff;
+      color: #536579;
+      box-shadow: 0 .125rem .5rem rgba(5,46,22,.16);
+      display: grid;
+      place-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(.5rem);
+      transition: .2s;
+      z-index: 4;
+      border: 1px solid rgba(5,46,22,.06)
+    }`,
+    `.root .fab:hover {
+      background: #f8faf9;
+      color: #16834b
+    }`,
 
-    // پس‌زمینه گفتگو با الگوی ظریف
-    '.root .body{background-color:#cfe8c8;position:relative;z-index:1;flex:1;min-height:0}',
-    '.root .body::before{content:"";background-image:var(--chat-texture);position:absolute;inset:0;background-repeat:no-repeat;background-position:center;background-size:cover;z-index:-1;pointer-events:none}',
-    '.root .body::after{content:"";position:absolute;inset:0;background-repeat:repeat;background-position:top right;background-size:510px auto;mix-blend-mode:overlay;background-image:var(--chat-pattern);z-index:-1;pointer-events:none}',
+    // 21. منوی عملیات پیام
+    `.root .menu {
+      position: absolute;
+      z-index: 8;
+      min-width: 10.25rem;
+      background: rgba(255,255,255,.98);
+      border-radius: .8125rem;
+      padding: .25rem;
+      box-shadow: 0 .5rem 1.75rem rgba(5,46,22,.2);
+      animation: pop .15s ease-out;
+      border: 1px solid rgba(5,46,22,.06);
+      backdrop-filter: blur(.75rem);
+      -webkit-backdrop-filter: blur(.75rem)
+    }`,
+    `.root .menu button {
+      display: flex;
+      align-items: center;
+      gap: .5625rem;
+      width: 100%;
+      padding: .5625rem .6875rem;
+      border-radius: .5625rem;
+      font-size: .8125rem;
+      text-align: right;
+      min-height: 2.5rem;
+      color: #17212b
+    }`,
+    `.root .menu button:hover {
+      background: #f0f5f2
+    }`,
+    `.root .menu button:active {
+      background: #e7eee9
+    }`,
+    `.root .menu svg {
+      color: #657568;
+      width: 1.125rem;
+      height: 1.125rem
+    }`,
 
-    // فهرست پیام‌ها
-    '.root .msgs{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding:.75rem .75rem .875rem;display:flex;flex-direction:column;gap:.5rem;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:transparent transparent}',
-    '.root .msgs:hover{scrollbar-color:rgba(5,46,22,.25) transparent}',
-    '.root .msgs::-webkit-scrollbar{width:.25rem}',
-    '.root .msgs::-webkit-scrollbar-track{background:transparent}',
-    '.root .msgs::-webkit-scrollbar-thumb{background:transparent;border-radius:999px}',
-    '.root .msgs:hover::-webkit-scrollbar-thumb{background:rgba(5,46,22,.22);background:color-mix(in srgb,var(--success) 22%,transparent)}',
+    // 22. نوار ریپلای و ویرایش
+    `.root .banner {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-bottom: 1px solid #edf0f2
+    }`,
+    `.root .banner .bi {
+      color: #3390ec
+    }`,
+    `.root .banner .bt {
+      flex: 1;
+      min-width: 0;
+      border-inline-start: 2px solid #3390ec;
+      padding: 2px 10px;
+      font-size: 13px;
+      cursor: pointer
+    }`,
+    `.root .banner .bt b {
+      display: block;
+      color: #3390ec;
+      font-weight: 600;
+      font-size: 13px
+    }`,
+    `.root .banner .bt span {
+      display: block;
+      color: #64748b;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      unicode-bidi: plaintext
+    }`,
+    `.root .banner .bx {
+      width: 1.875rem;
+      height: 1.875rem;
+      border-radius: 50%;
+      color: #64748b;
+      display: grid;
+      place-items: center
+    }`,
+    `.root .banner .bx:hover {
+      background: #f1f5f3
+    }`,
 
-    // تاریخ و پیام‌های سیستمی
-    '.root .pill{background:rgba(35,55,43,.48);color:#ffffff;border-radius:999px;padding:.1875rem .6875rem;font-size:.75rem;font-weight:500;box-shadow:0 .0625rem .125rem rgba(0,0,0,.04);backdrop-filter:blur(.3125rem);-webkit-backdrop-filter:blur(.3125rem)}',
-    '.root .row.day,.root .row.sys{justify-content:center;margin:.4375rem 0}',
+    // 23. قسمت ارسال؛ رنگ‌های ثابت زمینه، متن و دکمه
+    `.root .dock {
+      flex-shrink: 0;
+      position: relative;
+      background: #ffffff;
+      border-top: 1px solid #e7e9eb;
+      z-index: 6;
+      padding: 0 8px env(safe-area-inset-bottom,0px)
+    }`,
+    `.root .composer {
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+      padding: 7px 0
+    }`,
+    `.root .field {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: flex-end;
+      background: transparent;
+      border-radius: 0;
+      padding: 0;
+      min-height: 44px;
+      border: 0;
+      box-shadow: none;
+      gap: 4px
+    }`,
+    `.root .field:focus-within {
+      box-shadow: none
+    }`,
+    `.root .ta {
+      flex: 1;
+      min-width: 0;
+      resize: none;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      max-height: 120px;
+      height: 38px;
+      padding: 7px 0;
+      line-height: 24px;
+      font-size: 16px;
+      overflow-y: auto;
+      unicode-bidi: plaintext;
+      min-height: 38px;
+      color: #222222;
+      margin-block: 3px
+    }`,
+    `.root .ta::placeholder {
+      color: #a2a6a9;
+      opacity: 1
+    }`,
+    `.root .ib {
+      width: 44px;
+      height: 44px;
+      flex: none;
+      border-radius: 50%;
+      color: #707579;
+      display: grid;
+      place-items: center;
+      transition: color .15s,background .15s
+    }`,
+    `.root .ib:hover,.root .ib.on {
+      color: #3390ec;
+      background: #edf5fd
+    }`,
+    `.root .ib svg {
+      width: 1.375rem;
+      height: 1.375rem
+    }`,
+    `.root .send {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: transparent;
+      color: #3390ec;
+      display: grid;
+      place-items: center;
+      flex: none;
+      transition: background .15s,transform .15s,color .15s;
+      box-shadow: none
+    }`,
+    `.root .send:hover {
+      background: #edf5fd
+    }`,
+    `.root .send:active {
+      transform: scale(.92)
+    }`,
+    `.root .send[disabled] {
+      opacity: 1;
+      cursor: default;
+      background: transparent;
+      color: #a2a6a9
+    }`,
 
-    // حباب پیام‌ها
-    // '.root .bubble{max-width:82%;padding:7px 10px 5px;border-radius:15px;font-size:15px;line-height:1.65;box-shadow:0 1px 1.5px rgba(5,46,22,.13);overflow-wrap:anywhere}',
-    '.root .row.out .bubble{border-end-end-radius:.9375rem;border-start-end-radius:.9375rem;border-start-start-radius:.9375rem}',
+    // 24. پنل ایموجی
+    `.root .emoji {
+      position: absolute;
+      bottom: 100%;
+      left: .5rem;
+      right: .5rem;
+      height: 16.375rem;
+      background: #ffffff;
+      border-radius: 1rem 1rem 0 0;
+      box-shadow: 0 -.3125rem 1.375rem rgba(5,46,22,.13);
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      animation: rise .2s ease-out;
+      z-index: 7;
+      border: 1px solid rgba(5,46,22,.07);
+      border-bottom: 0
+    }`,
+    `.root .etabs {
+      display: flex;
+      border-bottom: 1px solid rgba(5,46,22,.08)
+    }`,
+    `.root .etab.on::after {
+      content: "";
+      position: absolute;
+      bottom: -.0625rem;
+      left: 22%;
+      right: 22%;
+      height: .1875rem;
+      border-radius: .1875rem .1875rem 0 0;
+      background: #00c951
+    }`,
+    `.root .eb {
+      aspect-ratio: 1;
+      font-size: 1.5rem;
+      line-height: 1;
+      border-radius: .5625rem;
+      display: grid;
+      place-items: center;
+      font-family: "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif
+    }`,
+    `.root .eb:hover {
+      background: #f0f6f2
+    }`,
 
-    '.bubble{background-color:#eeffde;color:#334155;max-width:70%;position:relative;overflow-wrap:anywhere;word-break:break-word;cursor:default;filter:drop-shadow(0 .125rem .09375rem rgba(5,46,22,0.26));padding:.5rem}',
-    '.message-appendix .corner{fill:var(--message-appendix-color,#EEFFDE)}',
-    '.root .row .bubble .message-appendix{position:absolute;display:block;pointer-events:none;z-index:2;}',
-    '.message-appendix-out { inset-inline-start: -10px;bottom:-4px;width:11px;height:23px}',
-    '.message-appendix-in {inset-inline-end:-11px;transform: scaleX(-1);bottom:-3px;width:12px;height:22px }',
-    '.root .row.in .bubble{border-end-start-radius:.9375rem;border-start-end-radius:.9375rem;border-start-start-radius:.9375rem}',
-    '.root .txt{white-space:pre-wrap;font-size:16px;unicode-bidi:plaintext;line-height:1.65;color:inherit;overflow-wrap:anywhere}',
-    '.root .txt a{color:#16834b;text-decoration:underline;text-underline-offset:.125rem;direction:ltr;unicode-bidi:isolate}',
-    '.root .row.out .txt a{color:#075e35}',
-    '.root .meta{display:flex;align-items:center;gap:.25rem;justify-content:flex-end;margin-top:.125rem;font-size:.65625rem;opacity:1;direction:rtl;line-height:1.3;color:#64748b}',
-    '.root .row.out .meta{color:rgba(5,46,22,.62)}',
-    '.root .meta svg{width:.875rem;height:.875rem}',
-    '.root .row.out .meta svg{color:#16834b}',
-    '.root .bubble.err{outline:.0625rem solid #e2474c}',
+    // 25. فرم ورود؛ رنگ‌های وابسته به تنظیمات و رنگ خطا
+    `.root .hero h2 {
+      margin: 0 0 20px;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--accent-soft-dark)
+    }`,
+    `.root .inp {
+      width: 100%;
+      height: 3rem;
+      border: 2px solid transparent;
+      border-radius: .75rem;
+      padding: 0 .875rem;
+      background: #ffffff;
+      outline: 0;
+      transition: border-color .15s,box-shadow .15s;
+      font-size: 16px;
+      color: #17212b
+    }`,
+    `.root .inp:focus {
+      border-color: var(--accent)
+    }`,
+    `.root .inp.bad {
+      border-color: #e2474c
+    }`,
 
-    // پیش‌نمایش پاسخ
-    '.root .quote{display:block;width:100%;text-align:right;border-inline-start:3px solid #00c951;background:rgba(0,201,81,.09);border-radius:.3125rem;padding:.25rem .5rem;margin:0 0 .375rem;font-size:.75rem;overflow:hidden}',
-    '.root .quote b{display:block;font-weight:600;opacity:.9;color:#16834b;font-size:.75rem}',
-    '.root .quote span{display:block;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;unicode-bidi:plaintext;color:#526273}',
-    '.root .row.out .quote{border-inline-start-color:#16834b}',
+    // 26. فاصله‌ها و خطاهای اختصاصی فرم ورود
+    `.root .login-view {
+      padding: calc(60px + env(safe-area-inset-top,0px)) 24px calc(24px + env(safe-area-inset-bottom,0px));
+      gap: 24px;
+      scroll-padding-block: 16px
+    }`,
+    `.root .login-view > .hero {
+      flex: none;
+      margin: 0
+    }`,
+    `.root .login-view .logo {
+      flex: none;
+      margin-bottom: 16px
+    }`,
+    `.root .login-view .hero h2 {
+      margin: 0 0 20px;
+      font-size: 20px;
+      line-height: 1.5
+    }`,
+    `.root .login-view .hero p {
+      margin: 0;
+      max-width: 280px;
+      font-size: 16px;
+      color: var(--accent-soft-dark)
+    }`,
+    `.root .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      flex: none;
+      width: 100%;
+      max-width: 360px;
+      margin: 0 auto
+    }`,
+    `.root .login-form .fld {
+      margin: 0
+    }`,
+    `.root .login-form .login-label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      height: 20px;
+      margin-bottom: 8px;
+      font-size: .75rem;
+      line-height: 20px;
+      color: var(--accent-soft-dark);
+      white-space: nowrap
+    }`,
+    `.root .login-form .field-error {
+      color: var(--danger);
+      text-align: end;
+      font-size: .75rem;
+    }`,
+    `.root .login-actions .form-error {
+      min-height: 0;
+      margin: 0 0 8px;
+      font-size: .75rem;
+      line-height: 20px;
+      overflow-wrap: anywhere
+    }`,
+    `.root .login-actions .form-error:empty {
+      display: none
+    }`,
+    `.root .login-view > .x {
+      width: 44px;
+      height: 44px;
+      top: calc(4px + env(safe-area-inset-top,0px));
+      left: 4px
+    }`,
+    `.root .login-view button:focus-visible {
+      outline: 2px solid var(--accent-soft-dark);
+      outline-offset: 3px
+    }`,
+    `@media(max-width:360px),(max-height:560px) {
+      .root .login-view {
+        padding-inline: 20px;
+        gap: 20px
+      }
+      .root .login-view .logo {
+        width: 56px;
+        height: 56px;
+        margin-bottom: 12px
+      }
+      .root .login-view .hero h2 {
+        font-size: 18px
+      }
+      .root .login-view .hero p {
+        font-size: .75rem;
+        line-height: 1.7
+      }
+    }`,
 
-    // دکمه رفتن به آخرین پیام
-    '.root .fab{position:absolute;bottom:.875rem;left:.75rem;width:2.375rem;height:2.375rem;border-radius:50%;background:#ffffff;color:#536579;box-shadow:0 .125rem .5rem rgba(5,46,22,.16);display:grid;place-items:center;opacity:0;pointer-events:none;transform:translateY(.5rem);transition:.2s;z-index:4;border:1px solid rgba(5,46,22,.06)}',
-    '.root .fab:hover{background:#f8faf9;color:#16834b}',
+    // 27. ظاهر نهایی ورودی‌های کد تأیید
+    `.root input.otp-i {
+      border: 2px solid #dfe8e2;
+      border-radius: .75rem;
+      background: #ffffff
+    }`,
+    `.root input.otp-i:focus {
+      border-color: var(--accent)
+    }`,
+    `.root input.otp-i.filled {
+      border-color: var(--accent-soft-dark);
+    }`,
 
-    // منوی عملیات پیام
-    '.root .menu{position:absolute;z-index:8;min-width:10.25rem;background:rgba(255,255,255,.98);border-radius:.8125rem;padding:.25rem;box-shadow:0 .5rem 1.75rem rgba(5,46,22,.2);animation:pop .15s ease-out;border:1px solid rgba(5,46,22,.06);backdrop-filter:blur(.75rem);-webkit-backdrop-filter:blur(.75rem)}',
-    '.root .menu button{display:flex;align-items:center;gap:.5625rem;width:100%;padding:.5625rem .6875rem;border-radius:.5625rem;font-size:.8125rem;text-align:right;min-height:2.5rem;color:#17212b}',
-    '.root .menu button:hover{background:#f0f5f2}',
-    '.root .menu button:active{background:#e7eee9}',
-    '.root .menu svg{color:#657568;width:1.125rem;height:1.125rem}',
+    // 28. اعلان‌ها و وضعیت تمام‌صفحه
+    `.root .toast {
+      position: absolute;
+      bottom: 5.25rem;
+      left: 50%;
+      transform: translate(-50%,.75rem);
+      background: rgba(23,33,43,.94);
+      color: #fff;
+      border-radius: 999px;
+      padding: .4375rem 1rem;
+      font-size: .8125rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: .25s;
+      z-index: 9;
+      white-space: nowrap;
+      max-width: 90%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: 0 .25rem 1rem rgba(5,46,22,.16)
+    }`,
+    `.root .sc-full {
+      ;
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      pointer-events: auto
+    }`,
 
-    // نوار پاسخ و ویرایش
-    '.root .banner{display:none;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid #edf0f2}',
-    '.root .banner .bi{color:#3390ec}',
-    '.root .banner .bt{flex:1;min-width:0;border-inline-start:2px solid #3390ec;padding:2px 10px;font-size:13px;cursor:pointer}',
-    '.root .banner .bt b{display:block;color:#3390ec;font-weight:600;font-size:13px}',
-    '.root .banner .bt span{display:block;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;unicode-bidi:plaintext}',
-    '.root .banner .bx{width:1.875rem;height:1.875rem;border-radius:50%;color:#64748b;display:grid;place-items:center}',
-    '.root .banner .bx:hover{background:#f1f5f3}',
+    // 29. ظاهر موبایل و کاهش حرکت
+    `@media(max-width:40rem) {
+      .root .panel {
+        width: 100%;
+        border: 0;
+        box-shadow: none;
+        background: #ffffff
+      }
+      .root .hdr {
+        min-height: calc(3.75rem + env(safe-area-inset-top,0px));
+        padding-top: calc(.5rem + env(safe-area-inset-top,0px));
+        padding-bottom: .5rem
+      }
+      .root .msgs {
+        padding: .625rem .5625rem .75rem
+      }
+      .root .bubble {
+        max-width: 86%;
+        padding: .4375rem .5625rem .3125rem
+      }
+      .root .dock {
+        padding-left: .4375rem;
+        padding-right: .4375rem
+      }
+      .root .composer {
+        gap: .4375rem
+      }
+      .root .send {
+        width: 44px;
+        height: 44px
+      }
+    }`,
+    `@media(prefers-reduced-motion:reduce) {
+      .root .bubble,.root .menu,.root .emoji {
+        animation: none!important;
+        transition: none!important
+      }
+    }`,
 
-    // کادر ارسال پیام
-    '.root .dock{flex-shrink:0;position:relative;background:#ffffff;border-top:1px solid #e7e9eb;z-index:6;padding:0 8px env(safe-area-inset-bottom,0px)}',
-    '.root .composer{display:flex;align-items:flex-end;gap:4px;padding:7px 0}',
-    '.root .field{flex:1;min-width:0;display:flex;align-items:flex-end;background:transparent;border-radius:0;padding:0;min-height:44px;border:0;box-shadow:none;gap:4px}',
-    '.root .field:focus-within{box-shadow:none}',
-    '.root .ta{flex:1;min-width:0;resize:none;border:0;outline:0;background:transparent;max-height:120px;height:38px;padding:7px 0;line-height:24px;font-size:16px;overflow-y:auto;unicode-bidi:plaintext;min-height:38px;color:#222222;margin-block:3px}',
-    '.root .ta::placeholder{color:#a2a6a9;opacity:1}',
-    '.root .ib{width:44px;height:44px;flex:none;border-radius:50%;color:#707579;display:grid;place-items:center;transition:color .15s,background .15s}',
-    '.root .ib:hover,.root .ib.on{color:#3390ec;background:#edf5fd}',
-    '.root .ib svg{width:1.375rem;height:1.375rem}',
-    '.root .send{width:44px;height:44px;border-radius:50%;background:transparent;color:#3390ec;display:grid;place-items:center;flex:none;transition:background .15s,transform .15s,color .15s;box-shadow:none}',
-    '.root .send:hover{background:#edf5fd}',
-    '.root .send:active{transform:scale(.92)}',
-    '.root .send[disabled]{opacity:1;cursor:default;background:transparent;color:#a2a6a9}',
-
-    // پنل ایموجی
-    '.root .emoji{position:absolute;bottom:100%;left:.5rem;right:.5rem;height:16.375rem;background:#ffffff;border-radius:1rem 1rem 0 0;box-shadow:0 -.3125rem 1.375rem rgba(5,46,22,.13);display:none;flex-direction:column;overflow:hidden;animation:rise .2s ease-out;z-index:7;border:1px solid rgba(5,46,22,.07);border-bottom:0}',
-    '.root .etabs{display:flex;border-bottom:1px solid rgba(5,46,22,.08)}',
-    '.root .etab.on::after{content:"";position:absolute;bottom:-.0625rem;left:22%;right:22%;height:.1875rem;border-radius:.1875rem .1875rem 0 0;background:#00c951}',
-    '.root .eb{aspect-ratio:1;font-size:1.5rem;line-height:1;border-radius:.5625rem;display:grid;place-items:center;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}',
-    '.root .eb:hover{background:#f0f6f2}',
-
-    // فرم ورود و تأیید شماره
-
-    '.root .hero h2{margin:0 0 20px;font-size:1.25rem;font-weight:700;color:var(--accent-soft-dark)}',
-
-    '.root .inp{width:100%;height:3rem;border:2px solid transparent;border-radius:.75rem;padding:0 .875rem;background:#ffffff;outline:0;transition:border-color .15s,box-shadow .15s;font-size:16px;color:#17212b}',
-    '.root .inp:focus{border-color:var(--accent)}',
-
-    '.root .inp.bad{border-color:#e2474c}',
-
-    // Welcome form: explicit spacing, independent of browser paragraph margins.
-    '.root .login-view{padding:calc(60px + env(safe-area-inset-top,0px)) 24px calc(24px + env(safe-area-inset-bottom,0px));gap:24px;scroll-padding-block:16px}',
-    '.root .login-view > .hero{flex:none;margin:0}',
-    '.root .login-view .logo{flex:none;margin-bottom:16px}',
-    '.root .login-view .hero h2{margin:0 0 20px;font-size:20px;line-height:1.5}',
-    '.root .login-view .hero p{margin:0;max-width:280px;font-size:16px;color:var(--accent-soft-dark)}',
-
-    '.root .login-form{display:flex;flex-direction:column;gap:16px;flex:none;width:100%;max-width:360px;margin:0 auto}',
-    '.root .login-form .fld{margin:0}',
-    '.root .login-form .login-label-row{display:flex;align-items:center;justify-content:space-between;gap:8px;height:20px;margin-bottom:8px;font-size:.75rem;line-height:20px;color:var(--accent-soft-dark);white-space:nowrap}',
-    '.root .login-form .field-error{color:var(--danger);text-align:end;font-size:.75rem;}',
-
-    '.root .login-actions .form-error{min-height:0;margin:0 0 8px;font-size:.75rem;line-height:20px;overflow-wrap:anywhere}',
-    '.root .login-actions .form-error:empty{display:none}',
-
-    '.root .login-view > .x{width:44px;height:44px;top:calc(4px + env(safe-area-inset-top,0px));left:4px}',
-    '.root .login-view button:focus-visible{outline:2px solid var(--accent-soft-dark);outline-offset:3px}',
-    '@media(max-width:360px),(max-height:560px){.root .login-view{padding-inline:20px;gap:20px}.root .login-view .logo{width:56px;height:56px;margin-bottom:12px}.root .login-view .hero h2{font-size:18px}.root .login-view .hero p{font-size:.75rem;line-height:1.7}}',
-
-    '.root input.otp-i{border:2px solid #dfe8e2;border-radius:.75rem;background:#ffffff}',
-    '.root input.otp-i:focus{border-color:var(--accent)}',
-    '.root input.otp-i.filled{border-color:var(--accent-soft-dark);}',
-
-    // اعلان‌ها و پیام‌های وضعیت
-    '.root .toast{position:absolute;bottom:5.25rem;left:50%;transform:translate(-50%,.75rem);background:rgba(23,33,43,.94);color:#fff;border-radius:999px;padding:.4375rem 1rem;font-size:.8125rem;opacity:0;pointer-events:none;transition:.25s;z-index:9;white-space:nowrap;max-width:90%;overflow:hidden;text-overflow:ellipsis;border:1px solid rgba(255,255,255,.08);box-shadow:0 .25rem 1rem rgba(5,46,22,.16)}',
-    '.root .sc-full{;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);pointer-events:auto}',
-
-    // حالت موبایل
-    '@media(max-width:40rem){.root .panel{width:100%;border:0;box-shadow:none;background:#ffffff}.root .hdr{min-height:calc(3.75rem + env(safe-area-inset-top,0px));padding-top:calc(.5rem + env(safe-area-inset-top,0px));padding-bottom:.5rem}.root .msgs{padding:.625rem .5625rem .75rem}.root .bubble{max-width:86%;padding:.4375rem .5625rem .3125rem}.root .dock{padding-left:.4375rem;padding-right:.4375rem}.root .composer{gap:.4375rem}.root .send{width:44px;height:44px}}',
-
-    // کاهش انیمیشن برای کاربرانی که ترجیح می‌دهند
-    '@media(prefers-reduced-motion:reduce){.root .bubble,.root .menu,.root .emoji{animation:none!important;transition:none!important}}',
-    '.row.is-swiping{transition:none!important;user-select:none;-webkit-user-select:none}',
-    '.reply-swipe-hint{',
-    '  position:absolute;',
-
-    '  top:50%;',
-    '  width:28px;',
-    '  height:28px;',
-    '  display:flex;',
-    '  align-items:center;',
-    '  justify-content:center;',
-    '  border-radius:50%;',
-    '  color:var(--accent);',
-    '  background:rgba(0,201,81,.16);',
-    '  opacity:0;',
-    '  transform:translateY(-50%) scale(.6);',
-    '  pointer-events:none;',
-    '  transition:opacity .12s ease,transform .12s ease;',
-    '}',
-
-    // پیام ارسالی کاربر: آیکون سمت راست
-    '.row.out .reply-swipe-hint{',
-    '  right:-34px;',
-    '  left:auto;',
-    '}',
-
-    // پیام دریافتی: آیکون سمت چپ
-    '.row.in .reply-swipe-hint{',
-    '  left:-34px;',
-    '  right:auto;',
-    '  transform:translateY(-50%) scale(.6) scaleX(-1);',
-    '}',
-
-    '.row.flash .bubble{',
-    '  animation:coco-reply-flash .9s ease;',
-    '}',
-    '@keyframes coco-reply-flash{',
-    '  0%,100%{box-shadow:0 0 0 0 rgba(0,201,81,0)}',
-    '  35%{box-shadow:0 0 0 .25rem rgba(0,201,81,.3)}',
-    '}',
+    // 30. نمایش کشیدن پیام برای ریپلای
+    `.row.is-swiping {
+      transition: none!important;
+      user-select: none;
+      -webkit-user-select: none
+    }`,
+    `.reply-swipe-hint {
+      position: absolute;
+      top: 50%;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      color: var(--accent);
+      background: rgba(0,201,81,.16);
+      opacity: 0;
+      transform: translateY(-50%) scale(.6);
+      pointer-events: none;
+      transition: opacity .12s ease,transform .12s ease;
+    }`,
+    `.row.out .reply-swipe-hint {
+      right: -34px;
+      left: auto;
+    }`,
+    `.row.in .reply-swipe-hint {
+      left: -34px;
+      right: auto;
+      transform: translateY(-50%) scale(.6) scaleX(-1);
+    }`,
+    `.row.flash .bubble {
+      animation: coco-reply-flash .9s ease;
+    }`,
+    `@keyframes coco-reply-flash {
+      0%,100% {
+        box-shadow: 0 0 0 0 rgba(0,201,81,0)
+      }
+      35% {
+        box-shadow: 0 0 0 .25rem rgba(0,201,81,.3)
+      }
+    }`,
   ].join('\n');
 
   function hexToRgba(hex, a) {
@@ -1637,16 +2937,8 @@
       dir: 'rtl',
       lang: 'fa',
     });
-    this.root.style.setProperty('--accent', cfg.accent);
-    this.root.style.setProperty(
-      '--accent-soft-dark',
-      'color-mix(in srgb, var(--accent), black 40%)'
-    );
-    this.root.style.setProperty(
-      '--accent-soft-light',
-      'color-mix(in srgb, var(--accent), white 20%)'
-    );
-    this.root.style.setProperty('--text', cfg.text);
+    if (cfg.accent) this.root.style.setProperty('--accent', cfg.accent);
+    if (cfg.text) this.root.style.setProperty('--text', cfg.text);
 
     var assetsBase = new URL(cfg.assetsBase || '.', location.href);
     if (!/\/$/.test(assetsBase.pathname)) assetsBase.pathname += '/';
@@ -1699,6 +2991,11 @@
     if (this.launcher) this.root.appendChild(this.launcher);
     this.root.appendChild(this.panel);
     shadow.appendChild(this.root);
+    if (cfg.mock) {
+      // The mock avatar uses the same resolved CSS color as the widget.
+      cfg.resolvedAccent = window.getComputedStyle(this.root)
+        .getPropertyValue('--accent').trim();
+    }
     this.shadow = shadow;
 
     // Mobile keyboard / visual viewport handling (scoped to our own root)
