@@ -50,6 +50,18 @@
     editing: 'ویرایش پیام',
     cancel: 'انصراف',
     close: 'بستن',
+    profile: 'اطلاعات و ارتباط با ما',
+    profileBack: 'بازگشت به گفتگو',
+    profileMessage: 'ارسال پیام',
+    profileCall: 'تماس با ما',
+    profileWebsite: 'وب‌سایت',
+    profileAbout: 'درباره ما',
+    profileContact: 'اطلاعات تماس',
+    profilePhone: 'شماره تماس',
+    profileEmail: 'ایمیل',
+    profileHours: 'ساعت پاسخ‌گویی',
+    profileAddress: 'آدرس',
+    profileMissing: 'هنوز ثبت نشده',
     open: 'گفتگو با ما',
     reply: 'پاسخ',
     copy: 'کپی',
@@ -141,6 +153,21 @@
     return s;
   }
 
+  // Agent details may be nested under profile or supplied directly by the backend.
+  function readAgentProfile(agent) {
+    agent = agent || {};
+    var source = agent.profile && typeof agent.profile === 'object'
+      ? agent.profile : agent;
+    var limits = { description: 600, phone: 50, email: 160,
+      website: 500, businessHours: 200, address: 300 };
+    var profile = {};
+    Object.keys(limits).forEach(function (key) {
+      profile[key] = typeof source[key] === 'string'
+        ? source[key].trim().slice(0, limits[key]) : '';
+    });
+    return profile;
+  }
+
   var SVG_NS = { tpl: null };
   var ICONS = {
     chat: 'M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z',
@@ -164,6 +191,10 @@
     down: 'M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z',
     more: 'M12 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm0 6a2 2 0 1 0 0 4 2 2 0 0 0 0-4z',
     chatBack: 'M4 11h12.17l-5.59-5.59L12 4l8 8-8 8-1.41-1.41L16.17 13H4v-2z',
+    phone: 'M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1C10.61 21 3 13.39 3 4c0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z',
+    mail: 'M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z',
+    globe: 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm6.92 6h-3.04a15.65 15.65 0 0 0-1.38-3.56A8.03 8.03 0 0 1 18.92 8zM12 4c.83 1.2 1.46 2.54 1.86 4h-3.72A13.58 13.58 0 0 1 12 4zM4.26 10h3.92a16.56 16.56 0 0 0 0 4H4.26a8.12 8.12 0 0 1 0-4zM5.08 16h3.04c.3 1.26.77 2.46 1.38 3.56A8.03 8.03 0 0 1 5.08 16zm3.04-8H5.08A8.03 8.03 0 0 1 9.5 4.44 15.65 15.65 0 0 0 8.12 8zM12 20a13.58 13.58 0 0 1-1.86-4h3.72A13.58 13.58 0 0 1 12 20zm2.28-6H9.72a14.64 14.64 0 0 1 0-4h4.56a14.64 14.64 0 0 1 0 4zm.22 5.56A15.65 15.65 0 0 0 15.88 16h3.04a8.03 8.03 0 0 1-4.42 3.56zM15.82 14a16.56 16.56 0 0 0 0-4h3.92a8.12 8.12 0 0 1 0 4h-3.92z',
+    location: 'M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z',
     back: 'M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z',
   };
   /* Icons are static, trusted constants (never user data). */
@@ -542,6 +573,14 @@
               name: 'کوکو',
               avatarUrl: avatar(),
               status: T.online,
+              profile: Object.assign({
+                description: 'کوکو، همراه شما برای پاسخ به سؤال‌ها و راهنمایی در گفتگو. این اطلاعات برای نمایش نمونه هستند.',
+                phone: '02100000000',
+                email: 'support@example.com',
+                website: 'https://example.com',
+                businessHours: 'شنبه تا چهارشنبه، ساعت ۹ تا ۱۸',
+                address: 'آدرس نمونه: تهران، خیابان نمونه، پلاک ۱',
+              }, mock.profile || {}),
             },
             settings: { maxLength: 2000 },
             scenarios: sc,
@@ -2156,6 +2195,7 @@
       height: 44px;
       flex: none;
       color: #707579;
+      border-radius: 50%;
       display: grid;
       place-items: center
     }`,
@@ -2163,9 +2203,196 @@
       width: 24px;
       height: 24px
     }`,
-    `.root .hdr>.ib:focus-visible,.root .dock button:focus-visible {
+    `.root .hdr-more:hover,.root .hdr-more[aria-expanded="true"] {
+      background: #f1f3f5;
+      color: #3390ec
+    }`,
+    `.root .hdr>.ib:focus-visible,.root .hdr-more:focus-visible,.root .dock button:focus-visible {
       outline: 2px solid #3390ec;
       outline-offset: 2px
+    }`,
+
+    // 14.1. پنل معرفی و اطلاعات تماس
+    `.root .agent-profile {
+      position: absolute;
+      inset: 0;
+      z-index: 12;
+      display: flex;
+      flex-direction: column;
+      background: #f4f4f5;
+      color: #222222;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translateX(-100%);
+      transition: transform .24s cubic-bezier(.2,.8,.2,1),visibility .24s;
+      overflow: hidden
+    }`,
+    `.root .agent-profile.on {
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateX(0)
+    }`,
+    `.root .profile-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: calc(64px + env(safe-area-inset-top,0px));
+      padding: env(safe-area-inset-top,0px) 12px 0;
+      flex: none;
+      background: #ffffff;
+      box-shadow: 0 1px 0 rgba(0,0,0,.06);
+      z-index: 1;
+      font-weight: 600;
+      font-size: 16px
+    }`,
+    `.root .profile-toolbar .ib {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      color: #707579
+    }`,
+    `.root .profile-scroll {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding-bottom: calc(16px + env(safe-area-inset-bottom,0px));
+      scrollbar-width: thin
+    }`,
+    `.root .profile-hero {
+      padding: 24px 16px 16px;
+      background: #ffffff;
+      text-align: center
+    }`,
+    `.root .profile-avatar {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: 96px;
+      height: 96px;
+      margin: 0 auto 14px;
+      border-radius: 50%;
+      overflow: hidden;
+      background: #e7f2fc;
+      color: #3390ec
+    }`,
+    `.root .profile-avatar svg {
+      width: 40px;
+      height: 40px
+    }`,
+    `.root .profile-avatar img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover
+    }`,
+    `.root .profile-avatar img[hidden] { display: none }`,
+    `.root .profile-name {
+      margin: 0 0 4px;
+      font-size: 20px;
+      line-height: 30px;
+      font-weight: 600;
+      overflow-wrap: anywhere
+    }`,
+    `.root .profile-status {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 5px;
+      min-height: 20px;
+      color: #3390ec;
+      font-size: 13px;
+      line-height: 20px
+    }`,
+    `.root .profile-status.away { color: #707579 }`,
+    `.root .profile-status.bad { color: var(--danger) }`,
+    `.root .profile-actions {
+      display: grid;
+      grid-template-columns: repeat(3,minmax(0,1fr));
+      gap: 8px;
+      margin-top: 20px
+    }`,
+    `.root .profile-actions .profile-action {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 7px;
+      padding: 12px 4px;
+      min-height: 72px;
+      border-radius: 12px;
+      background: #f0f6fc;
+      color: #2481cc;
+      font-size: 13px;
+      line-height: 20px;
+      text-decoration: none;
+      transition: background .15s
+    }`,
+    `.root .profile-actions .profile-action:hover {
+      background: #e2effb
+    }`,
+    `.root .profile-actions .profile-action:disabled {
+      opacity: .45;
+      cursor: default
+    }`,
+    `.root .profile-group {
+      margin-top: 10px;
+      padding: 16px;
+      background: #ffffff
+    }`,
+    `.root .profile-group h3 {
+      margin: 0 0 12px;
+      color: #2481cc;
+      font-size: 14px;
+      line-height: 22px;
+      font-weight: 600
+    }`,
+    `.root .profile-description {
+      margin: 0;
+      font-size: 15px;
+      line-height: 26px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere
+    }`,
+    `.root .profile-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 12px 0
+    }`,
+    `.root .profile-row + .profile-row {
+      border-top: 1px solid #f0f0f0
+    }`,
+    `.root .profile-row > svg {
+      margin-top: 5px;
+      color: #8a8f94
+    }`,
+    `.root .profile-row-content { min-width: 0; flex: 1 }`,
+    `.root .profile-label {
+      color: #707579;
+      font-size: 12px;
+      line-height: 20px;
+      margin-bottom: 2px
+    }`,
+    `.root .profile-value {
+      display: block;
+      font-size: 15px;
+      line-height: 24px;
+      text-align: right;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+      text-decoration: none;
+      color: #222222
+    }`,
+    `.root a.profile-value { color: #2481cc }`,
+    `.root .profile-toolbar .ib:hover { background: #f1f3f5 }`,
+    `.root .agent-profile button:focus-visible,.root .agent-profile a:focus-visible {
+      outline: 2px solid #3390ec;
+      outline-offset: 2px
+    }`,
+    `@media(prefers-reduced-motion:reduce) {
+      .root .agent-profile { transition: none }
     }`,
 
     // 15. پس‌زمینهٔ گفتگو و لایه‌های تصاویر
@@ -2892,6 +3119,7 @@
     this.busy = false;
     this.locked = false;
     this.mode = 'normal';
+    this.profileOpen = false;
   }
 
   UI.prototype.registerFonts = function () {
@@ -3011,7 +3239,8 @@
     }
     this.events.add(shadow, 'keydown', function (e) {
       if (e.key !== 'Escape') return;
-      if (self.menuFor) self.closeMenu();
+      if (self.profileOpen) self.closeProfile();
+      else if (self.menuFor) self.closeMenu();
       else if (self.emojiPanel.classList.contains('on'))
         self.toggleEmoji(false);
       else if (self.mode !== 'normal') self.A.onCancelCompose();
@@ -3080,6 +3309,7 @@
   };
   UI.prototype.close = function () {
     if (!this.isOpen()) return;
+    this.closeProfile(false);
     if (this.focusTimer) {
       this.events.clearTimeout(this.focusTimer);
       this.focusTimer = 0;
@@ -3201,6 +3431,7 @@
     rootStyle.setProperty('--panel-tilt', isLeft ? '-6deg' : '6deg');
   };
   UI.prototype.focusPrimary = function () {
+    if (this.profileOpen) return;
     var v = this.activeView;
     if (v === 'login') this.nameInp.focus({ preventScroll: true });
     else if (v === 'otp' && this.otpInputs[0])
@@ -3209,6 +3440,7 @@
       this.ta.focus({ preventScroll: true });
   };
   UI.prototype.showView = function (name) {
+    if (name !== 'chat') this.closeProfile(false);
     this.activeView = name;
     for (var k in this.views)
       this.views[k].classList.toggle('active', k === name);
@@ -3694,6 +3926,12 @@
     this.avEl = h('div', { class: 'av' }, h('img', { alt: '' }));
     this.nameEl = h('div', { class: 'hname', text: T.brand });
     this.statEl = h('div', { class: 'hstat' });
+    this.profileBtn = h('button', {
+      class: 'hdr-more', type: 'button',
+      'aria-label': T.profile, 'aria-haspopup': 'dialog',
+      'aria-expanded': 'false', 'aria-controls': 'coco-agent-profile',
+      on: { click: function () { self.openProfile(); } },
+    }, icon('more'));
     var hdr = h(
       'header',
       { class: 'hdr' },
@@ -3713,7 +3951,7 @@
       ),
       this.avEl,
       h('div', { class: 'hinfo' }, this.nameEl, this.statEl),
-      h('span', { class: 'hdr-more', 'aria-hidden': 'true' }, icon('more'))
+      this.profileBtn
     );
 
     this.msgs = h('div', { class: 'msgs', role: 'log', 'aria-live': 'polite' });
@@ -3857,7 +4095,127 @@
     );
     this.menu = h('div', { class: 'menu', role: 'menu', hidden: true });
     body.appendChild(this.menu);
-    return h('section', { class: 'view' }, hdr, body, dock);
+    this.chatContents = [hdr, body, dock];
+    this.profilePanel = this.buildProfile();
+    return h('section', { class: 'view' }, hdr, body, dock, this.profilePanel);
+  };
+  UI.prototype.buildProfile = function () {
+    var self = this;
+    this.profileBackBtn = h('button', {
+      class: 'ib', type: 'button', 'aria-label': T.profileBack,
+      on: { click: function () { self.closeProfile(); } },
+    }, icon('chatBack'));
+    this.profileImg = h('img', { alt: '', hidden: true,
+      on: { error: function () { self.profileImg.hidden = true; } } });
+    this.profileNameEl = h('h2', { class: 'profile-name', text: T.brand });
+    this.profileStatusEl = h('div', { class: 'profile-status' });
+    this.profileActions = h('div', { class: 'profile-actions' });
+    this.profileDescription = h('p', { class: 'profile-description' });
+    this.profileDetails = h('div', { class: 'profile-details' });
+    var panel = h('section', {
+      id: 'coco-agent-profile', class: 'agent-profile', role: 'dialog',
+      'aria-modal': 'true', 'aria-hidden': 'true',
+      'aria-labelledby': 'coco-profile-title',
+      on: { keydown: function (e) {
+        if (e.key === 'Escape') {
+          e.preventDefault(); e.stopPropagation(); self.closeProfile();
+        } else if (e.key === 'Tab') {
+          var controls = Array.prototype.filter.call(
+            panel.querySelectorAll('button:not(:disabled),a[href]'),
+            function (el) { return el.getClientRects().length > 0; });
+          var first = controls[0], last = controls[controls.length - 1];
+          var active = self.shadow.activeElement;
+          if (e.shiftKey && active === first) {
+            e.preventDefault(); last.focus();
+          } else if (!e.shiftKey && active === last) {
+            e.preventDefault(); first.focus();
+          }
+        }
+      } },
+    },
+    h('header', { class: 'profile-toolbar' }, this.profileBackBtn,
+      h('div', { id: 'coco-profile-title', text: T.profile })),
+    h('div', { class: 'profile-scroll' },
+      h('div', { class: 'profile-hero' },
+        h('div', { class: 'profile-avatar' }, icon('chat'), this.profileImg),
+        this.profileNameEl, this.profileStatusEl, this.profileActions),
+      h('section', { class: 'profile-group' },
+        h('h3', { text: T.profileAbout }), this.profileDescription),
+      h('section', { class: 'profile-group' },
+        h('h3', { text: T.profileContact }), this.profileDetails)));
+    panel.inert = true;
+    return panel;
+  };
+  UI.prototype.updateProfile = function () {
+    var self = this, p = this.agentProfile || readAgentProfile({});
+    var phone = latin(p.phone).replace(/[\s().-]/g, '');
+    var phoneHref = /^\+?\d{7,15}$/.test(phone) ? 'tel:' + phone : null;
+    var emailHref = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i.test(p.email)
+      ? 'mailto:' + encodeURIComponent(p.email) : null;
+    var websiteHref = p.website ? safeUrl(p.website, this.cfg.assetsBase) : null;
+    function action(label, glyph, href, handler) {
+      var props = { class: 'profile-action' };
+      if (handler) { props.type = 'button'; props.on = { click: handler }; }
+      else if (href) {
+        props.href = href;
+        if (/^https?:/i.test(href)) {
+          props.target = '_blank'; props.rel = 'noopener noreferrer';
+        }
+      } else { props.type = 'button'; props.disabled = true; }
+      return h(href ? 'a' : 'button', props, icon(glyph), h('span', { text: label }));
+    }
+    this.profileActions.textContent = '';
+    append(this.profileActions, [
+      action(T.profileMessage, 'chat', null, function () {
+        self.closeProfile(false); self.focusComposer();
+      }),
+      action(T.profileCall, 'phone', phoneHref),
+      action(T.profileWebsite, 'globe', websiteHref),
+    ]);
+    this.profileDescription.textContent = p.description || T.profileMissing;
+    this.profileDetails.textContent = '';
+    function row(label, value, glyph, href, ltr) {
+      var props = { class: 'profile-value', text: value || T.profileMissing };
+      if (ltr && value) props.dir = 'ltr';
+      if (href) {
+        props.href = href;
+        if (/^https?:/i.test(href)) {
+          props.target = '_blank'; props.rel = 'noopener noreferrer';
+        }
+      }
+      append(self.profileDetails, h('div', { class: 'profile-row' }, icon(glyph),
+        h('div', { class: 'profile-row-content' },
+          h('div', { class: 'profile-label', text: label }),
+          h(href ? 'a' : 'div', props))));
+    }
+    row(T.profilePhone, p.phone, 'phone', phoneHref, true);
+    row(T.profileEmail, p.email, 'mail', emailHref, true);
+    row(T.profileWebsite, p.website, 'globe', websiteHref, true);
+    row(T.profileHours, p.businessHours, 'clock');
+    row(T.profileAddress, p.address, 'location');
+  };
+  UI.prototype.openProfile = function () {
+    if (this.profileOpen || this.activeView !== 'chat' || !this.isOpen()) return;
+    this.closeMenu();
+    this.toggleEmoji(false);
+    this.profileOpen = true;
+    this.chatContents.forEach(function (el) { el.inert = true; });
+    this.profilePanel.inert = false;
+    this.profilePanel.setAttribute('aria-hidden', 'false');
+    this.profilePanel.classList.add('on');
+    this.profileBtn.setAttribute('aria-expanded', 'true');
+    this.profileBackBtn.focus({ preventScroll: true });
+  };
+  UI.prototype.closeProfile = function (restoreFocus) {
+    if (!this.profileOpen) return;
+    this.profileOpen = false;
+    this.profilePanel.inert = true;
+    this.profilePanel.setAttribute('aria-hidden', 'true');
+    this.profilePanel.classList.remove('on');
+    this.profileBtn.setAttribute('aria-expanded', 'false');
+    this.chatContents.forEach(function (el) { el.inert = false; });
+    if (restoreFocus !== false && this.isOpen())
+      this.profileBtn.focus({ preventScroll: true });
   };
   UI.prototype.renderSendIcon = function () {
     this.sendBtn.textContent = '';
@@ -3934,6 +4292,7 @@
     return this.nameEl.textContent || T.brand;
   };
   UI.prototype.setAgent = function (a) {
+    this.agentProfile = readAgentProfile(a);
     this.nameEl.textContent = a.name || T.brand;
     var img = this.avEl.firstChild,
       u = safeUrl(a.avatarUrl, this.cfg.assetsBase, true);
@@ -3943,6 +4302,17 @@
     } else {
       img.removeAttribute('src');
       img.hidden = true;
+    }
+    if (this.profileNameEl) {
+      this.profileNameEl.textContent = this.nameEl.textContent;
+      if (u) {
+        this.profileImg.src = u;
+        this.profileImg.hidden = false;
+      } else {
+        this.profileImg.removeAttribute('src');
+        this.profileImg.hidden = true;
+      }
+      this.updateProfile();
     }
   };
   /* kind: '' | 'act' | 'bad' */
@@ -3960,6 +4330,14 @@
         )
       );
     this.avEl.classList.toggle('off', !!away);
+    if (this.profileStatusEl) {
+      this.profileStatusEl.className = 'profile-status' +
+        (kind === 'bad' ? ' bad' : away ? ' away' : '');
+      this.profileStatusEl.textContent = text;
+      if (typing) this.profileStatusEl.appendChild(
+        h('span', { class: 'dots', 'aria-hidden': 'true' }, h('i'), h('i'), h('i'))
+      );
+    }
   };
   UI.prototype.toast = function (msg) {
     var self = this;
@@ -5060,6 +5438,7 @@
       name: String(a.name || T.brand),
       avatarUrl: a.avatarUrl || null,
       status: String(a.status || T.online),
+      profile: readAgentProfile(a),
     };
     d.settings = data.settings || {};
     var serverMaxLength = d.settings.maxLength;
