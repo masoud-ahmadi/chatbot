@@ -162,6 +162,8 @@
     retry:
       'M17.65 6.35A7.96 7.96 0 0012 4a8 8 0 108 8h-2a6 6 0 11-1.76-4.24L13 11h7V4l-2.35 2.35z',
     down: 'M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z',
+    more: 'M12 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm0 6a2 2 0 1 0 0 4 2 2 0 0 0 0-4z',
+    chatBack: 'M4 11h12.17l-5.59-5.59L12 4l8 8-8 8-1.41-1.41L16.17 13H4v-2z',
     back: 'M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z',
   };
   /* Icons are static, trusted constants (never user data). */
@@ -1364,15 +1366,17 @@
     // '.root .launcher:hover{background:#00b849;box-shadow:0 .4375rem 1.375rem rgba(0,201,81,.32)}',
 
     // هدر تلگرامی
-    '.root .hdr{flex-shrink:0;display:flex;align-items:center;gap:.6875rem;padding:.625rem .75rem;background:#ffffff;border-bottom:1px solid rgba(5,46,22,.08);z-index:6;min-height:4rem}',
-    '.root .av{position:relative;width:2.625rem;height:2.625rem;border-radius:50%;background:#e8f8ed;flex:none}',
+    '.root .hdr{flex-shrink:0;display:flex;align-items:center;gap:10px;padding:8px;background:#ffffff;border-bottom:1px solid #e7e9eb;box-shadow:0 1px 3px rgba(0,0,0,.04);z-index:6;min-height:64px}',
+    '.root .av{position:relative;width:42px;height:42px;border-radius:50%;background:#e8f0f7;flex:none;overflow:hidden}',
     '.root .av img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}',
-    '.root .av::after{content:"";position:absolute;bottom:0;left:0;width:.6875rem;height:.6875rem;border-radius:50%;background:#00c951;border:2px solid #ffffff}',
-    '.root .av.off::after{background:#94a3b8}',
-    '.root .hname{font-weight:700;font-size:.9375rem;line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#17212b}',
-    '.root .hstat{font-size:.75rem;color:#16834b;display:flex;align-items:center;gap:.3125rem;min-height:1.1875rem;line-height:1.5}',
-    '.root .hdr>.ib{width:2.25rem;height:2.25rem;color:#708090;border-radius:50%}',
-    '.root .hdr>.ib:hover{background:#f1f5f3;color:#334155}',
+    '.root .hname{font-weight:600;font-size:16px;line-height:24px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#222222}',
+    '.root .hstat{font-size:13px;color:#3390ec;display:flex;align-items:center;gap:5px;min-height:18px;line-height:18px;overflow:hidden}',
+    '.root .hdr>.ib{width:44px;height:44px;flex:none;color:#707579;border-radius:50%}',
+    '.root .hdr>.ib:hover{background:#f1f3f5;color:#3390ec}',
+    '.root .hstat.bad{color:var(--danger)}',
+    '.root .hdr-more{width:44px;height:44px;flex:none;color:#707579;display:grid;place-items:center}',
+    '.root .hdr>.ib svg,.root .hdr-more svg,.root .dock .ib svg,.root .send svg{width:24px;height:24px}',
+    '.root .hdr>.ib:focus-visible,.root .dock button:focus-visible{outline:2px solid #3390ec;outline-offset:2px}',
 
     // پس‌زمینه گفتگو با الگوی ظریف
     '.root .body{background-color:#cfe8c8;position:relative;z-index:1;flex:1;min-height:0}',
@@ -1428,28 +1432,28 @@
     '.root .menu svg{color:#657568;width:1.125rem;height:1.125rem}',
 
     // نوار پاسخ و ویرایش
-    '.root .banner{display:none;align-items:center;gap:.5625rem;padding:.5625rem .75rem 0}',
-    '.root .banner .bi{color:#16834b}',
-    '.root .banner .bt{flex:1;min-width:0;border-inline-start:3px solid #00c951;padding:.0625rem .5625rem;font-size:.75rem;cursor:pointer}',
-    '.root .banner .bt b{display:block;color:#16834b;font-weight:600;font-size:.75rem}',
+    '.root .banner{display:none;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid #edf0f2}',
+    '.root .banner .bi{color:#3390ec}',
+    '.root .banner .bt{flex:1;min-width:0;border-inline-start:2px solid #3390ec;padding:2px 10px;font-size:13px;cursor:pointer}',
+    '.root .banner .bt b{display:block;color:#3390ec;font-weight:600;font-size:13px}',
     '.root .banner .bt span{display:block;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;unicode-bidi:plaintext}',
     '.root .banner .bx{width:1.875rem;height:1.875rem;border-radius:50%;color:#64748b;display:grid;place-items:center}',
     '.root .banner .bx:hover{background:#f1f5f3}',
 
     // کادر ارسال پیام
-    '.root .dock{flex-shrink:0;position:relative;background:transparent;border-top:0;z-index:6;padding:.3125rem .5rem calc(.5rem + env(safe-area-inset-bottom,0px))}',
-    '.root .composer{display:flex;align-items:flex-end;gap:.5rem;padding:.125rem 0 .25rem}',
-    '.root .field{flex:1;min-width:0;display:flex;align-items:flex-end;background:#ffffff;border-radius:1.375rem;padding:.125rem .3125rem .125rem .4375rem;transition:box-shadow .15s;min-height:2.75rem;border:1px solid rgba(5,46,22,.07);box-shadow:0 .0625rem .125rem rgba(5,46,22,.13);gap:.125rem}',
-    '.root .field:focus-within{box-shadow:0 0 0 .125rem rgba(0,201,81,.2);border-color:rgba(0,201,81,.28)}',
-    '.root .ta{flex:1;min-width:0;resize:none;border:0;outline:0;background:transparent;max-height:7.5rem;height:2.375rem;padding:.5rem .625rem .5rem .25rem;line-height:1.5;font-size:16px;overflow-y:auto;unicode-bidi:plaintext;min-height:2.375rem;color:#17212b}',
-    '.root .ta::placeholder{color:#84918d;opacity:1}',
-    '.root .ib{width:2.25rem;height:2.375rem;border-radius:50%;color:#7a8983;display:grid;place-items:center;transition:color .15s,background .15s}',
-    '.root .ib:hover,.root .ib.on{color:#16834b;background:rgba(0,201,81,.07)}',
+    '.root .dock{flex-shrink:0;position:relative;background:#ffffff;border-top:1px solid #e7e9eb;z-index:6;padding:0 8px env(safe-area-inset-bottom,0px)}',
+    '.root .composer{display:flex;align-items:flex-end;gap:4px;padding:7px 0}',
+    '.root .field{flex:1;min-width:0;display:flex;align-items:flex-end;background:transparent;border-radius:0;padding:0;min-height:44px;border:0;box-shadow:none;gap:4px}',
+    '.root .field:focus-within{box-shadow:none}',
+    '.root .ta{flex:1;min-width:0;resize:none;border:0;outline:0;background:transparent;max-height:120px;height:38px;padding:7px 0;line-height:24px;font-size:16px;overflow-y:auto;unicode-bidi:plaintext;min-height:38px;color:#222222;margin-block:3px}',
+    '.root .ta::placeholder{color:#a2a6a9;opacity:1}',
+    '.root .ib{width:44px;height:44px;flex:none;border-radius:50%;color:#707579;display:grid;place-items:center;transition:color .15s,background .15s}',
+    '.root .ib:hover,.root .ib.on{color:#3390ec;background:#edf5fd}',
     '.root .ib svg{width:1.375rem;height:1.375rem}',
-    '.root .send{width:2.75rem;height:2.75rem;border-radius:50%;background:#00a844;color:#ffffff;display:grid;place-items:center;flex:none;transition:background .15s,transform .15s,opacity .15s;box-shadow:0 .0625rem .1875rem rgba(5,46,22,.22)}',
-    '.root .send:hover{background:#009a3e}',
+    '.root .send{width:44px;height:44px;border-radius:50%;background:transparent;color:#3390ec;display:grid;place-items:center;flex:none;transition:background .15s,transform .15s,color .15s;box-shadow:none}',
+    '.root .send:hover{background:#edf5fd}',
     '.root .send:active{transform:scale(.92)}',
-    '.root .send[disabled]{opacity:.48;cursor:default;background:#00a844}',
+    '.root .send[disabled]{opacity:1;cursor:default;background:transparent;color:#a2a6a9}',
 
     // پنل ایموجی
     '.root .emoji{position:absolute;bottom:100%;left:.5rem;right:.5rem;height:16.375rem;background:#ffffff;border-radius:1rem 1rem 0 0;box-shadow:0 -.3125rem 1.375rem rgba(5,46,22,.13);display:none;flex-direction:column;overflow:hidden;animation:rise .2s ease-out;z-index:7;border:1px solid rgba(5,46,22,.07);border-bottom:0}',
@@ -1498,7 +1502,7 @@
     '.root .cloud-btn{margin-top:.625rem;height:2.25rem;padding:0 1.125rem;border-radius:1.125rem;background:#00a844;color:#ffffff;font-weight:600;font-size:.8125rem}',
 
     // حالت موبایل
-    '@media(max-width:40rem){.root .panel{width:100%;border:0;box-shadow:none;background:#ffffff}.root .hdr{min-height:calc(3.75rem + env(safe-area-inset-top,0px));padding-top:calc(.5rem + env(safe-area-inset-top,0px));padding-bottom:.5rem}.root .msgs{padding:.625rem .5625rem .75rem}.root .bubble{max-width:86%;padding:.4375rem .5625rem .3125rem}.root .dock{padding-left:.4375rem;padding-right:.4375rem}.root .composer{gap:.4375rem}.root .send{width:2.6875rem;height:2.6875rem}}',
+    '@media(max-width:40rem){.root .panel{width:100%;border:0;box-shadow:none;background:#ffffff}.root .hdr{min-height:calc(3.75rem + env(safe-area-inset-top,0px));padding-top:calc(.5rem + env(safe-area-inset-top,0px));padding-bottom:.5rem}.root .msgs{padding:.625rem .5625rem .75rem}.root .bubble{max-width:86%;padding:.4375rem .5625rem .3125rem}.root .dock{padding-left:.4375rem;padding-right:.4375rem}.root .composer{gap:.4375rem}.root .send{width:44px;height:44px}}',
 
     // کاهش انیمیشن برای کاربرانی که ترجیح می‌دهند
     '@media(prefers-reduced-motion:reduce){.root .bubble,.root .menu,.root .emoji{animation:none!important;transition:none!important}}',
@@ -2380,8 +2384,6 @@
     var hdr = h(
       'header',
       { class: 'hdr' },
-      this.avEl,
-      h('div', { class: 'hinfo' }, this.nameEl, this.statEl),
       h(
         'button',
         {
@@ -2394,8 +2396,11 @@
             },
           },
         },
-        icon('close')
-      )
+        icon('chatBack')
+      ),
+      this.avEl,
+      h('div', { class: 'hinfo' }, this.nameEl, this.statEl),
+      h('span', { class: 'hdr-more', 'aria-hidden': 'true' }, icon('more'))
     );
 
     this.msgs = h('div', { class: 'msgs', role: 'log', 'aria-live': 'polite' });
@@ -2526,7 +2531,7 @@
     var composer = h(
       'div',
       { class: 'composer' },
-      h('div', { class: 'field' }, this.ta, this.emojiBtn),
+      h('div', { class: 'field' }, this.emojiBtn, this.ta),
       this.sendBtn
     );
     this.emojiPanel = this.buildEmoji();
